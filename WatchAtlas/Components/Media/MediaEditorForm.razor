@@ -7,80 +7,60 @@
             </div>
         }
 
-        <div class="grid gap-4 sm:grid-cols-2">
-            <AppSelect TValue="MediaType"
-                       Id="@($"{FieldPrefix}-media-type")"
-                       Label="Media Type"
-                       Value="@Media.Type"
-                       ValueChanged="HandleMediaTypeChanged">
-                    <option value="@MediaType.Movie">Movie</option>
-                    <option value="@MediaType.Series">Series</option>
-                </AppSelect>
-
-            <AppInput Id="@($"{FieldPrefix}-title")"
-                      Label="Title"
-                      Value="@Media.Title"
-                      ValueChanged="HandleTitleChanged" />
-        </div>
-
-        <div class="grid gap-4 sm:grid-cols-2">
-            <AppInput Id="@($"{FieldPrefix}-cover-url")"
-                      Label="Cover Image URL"
-                      Value="@Media.CoverImageUrl"
-                      ValueChanged="HandleCoverChanged" />
-
-            <div class="space-y-2">
-                <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-rating")">Rating</label>
-                <InputNumber id="@($"{FieldPrefix}-rating")" class="input-shell" @bind-Value="Media.PersonalRating" />
-            </div>
-        </div>
-
-        <AppInput Id="@($"{FieldPrefix}-genres")"
-                  Label="Genres"
-                  Value="@GenresText"
-                  ValueChanged="HandleGenresChanged"
-                  Placeholder="Drama, Sci-Fi, Comedy" />
-
-        <AppTextarea Id="@($"{FieldPrefix}-description")"
-                     Label="Description"
-                     Value="@Media.Description"
-                     ValueChanged="HandleDescriptionChanged"
-                     TextareaClassName="min-h-32" />
-
-        <AppTextarea Id="@($"{FieldPrefix}-notes")"
-                     Label="Notes"
-                     Value="@Media.Notes"
-                     ValueChanged="HandleNotesChanged"
-                     TextareaClassName="min-h-28" />
+        <AppSelect TValue="MediaType"
+                   Id="@($"{FieldPrefix}-media-type")"
+                   Label="Media Type"
+                   Value="@Media.Type"
+                   ValueChanged="HandleMediaTypeChanged"
+                   Class="max-w-sm">
+            <option value="@MediaType.Movie">Movie</option>
+            <option value="@MediaType.Series">Series</option>
+        </AppSelect>
 
         @if (Media.Type == MediaType.Movie)
         {
-            <div class="soft-block space-y-4 p-5">
-                <div class="flex items-center justify-between gap-3">
-                    <h2 class="text-xl">Movie Details</h2>
-                    <span class="section-chip-muted">Runtime & status</span>
-                </div>
-
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-movie-duration")">Duration (minutes)</label>
-                        <InputNumber id="@($"{FieldPrefix}-movie-duration")" class="input-shell" @bind-Value="MovieDetails.DurationMinutes" />
-                    </div>
-
-                    <AppCheckbox Label="Marked as watched"
-                                 Value="@MovieDetails.IsWatched"
-                                 ValueChanged="HandleMovieWatchedChanged" />
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-movie-watched-date")">Watched Date</label>
-                    <InputDate TValue="DateTime?" id="@($"{FieldPrefix}-movie-watched-date")" class="input-shell" @bind-Value="MovieDetails.WatchedDate" />
-                </div>
-            </div>
+            <MovieFormFields Model="MovieForm" FieldPrefix="@FieldPrefix" />
         }
         else
         {
             <div class="space-y-4">
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <AppInput Id="@($"{FieldPrefix}-title")"
+                              Label="Title"
+                              Value="@Media.Title"
+                              ValueChanged="HandleTitleChanged" />
+
+                    <AppInput Id="@($"{FieldPrefix}-cover-url")"
+                              Label="Cover Image URL"
+                              Value="@Media.CoverImageUrl"
+                              ValueChanged="HandleCoverChanged" />
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <AppInput Id="@($"{FieldPrefix}-genres")"
+                              Label="Genres"
+                              Value="@GenresText"
+                              ValueChanged="HandleGenresChanged"
+                              Placeholder="Drama, Sci-Fi, Comedy" />
+
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-rating")">Rating</label>
+                        <InputNumber TValue="int?" id="@($"{FieldPrefix}-rating")" class="input-shell" @bind-Value="Media.PersonalRating" />
+                    </div>
+                </div>
+
+                <AppTextarea Id="@($"{FieldPrefix}-description")"
+                             Label="Description"
+                             Value="@Media.Description"
+                             ValueChanged="HandleDescriptionChanged"
+                             TextareaClassName="min-h-32" />
+
+                <AppTextarea Id="@($"{FieldPrefix}-notes")"
+                             Label="Notes"
+                             Value="@Media.Notes"
+                             ValueChanged="HandleNotesChanged"
+                             TextareaClassName="min-h-28" />
+
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 class="text-xl">Series Builder</h2>
@@ -189,7 +169,9 @@
     private string GenresText { get; set; } = string.Empty;
     private string? ValidationMessage { get; set; }
     private Guid BoundMediaId { get; set; }
+    private MediaType BoundMediaType { get; set; }
     private bool IsInitialized { get; set; }
+    private MovieFormModel MovieForm { get; set; } = new();
 
     [Parameter, EditorRequired]
     public MediaItem Media { get; set; } = default!;
@@ -231,10 +213,12 @@
 
     protected override void OnParametersSet()
     {
-        if (!IsInitialized || BoundMediaId != Media.Id)
+        if (!IsInitialized || BoundMediaId != Media.Id || BoundMediaType != Media.Type)
         {
             GenresText = string.Join(", ", Media.Genres);
+            MovieForm = MovieFormModel.From(Media, MovieDetails);
             BoundMediaId = Media.Id;
+            BoundMediaType = Media.Type;
             IsInitialized = true;
         }
     }
@@ -310,6 +294,11 @@
 
     private string? Validate()
     {
+        if (Media.Type == MediaType.Movie)
+        {
+            return MovieForm.GetValidationMessages().FirstOrDefault();
+        }
+
         if (string.IsNullOrWhiteSpace(Media.Title))
         {
             return "Title is required.";
@@ -318,11 +307,6 @@
         if (Media.PersonalRating is < 1 or > 10)
         {
             return "Rating should be between 1 and 10.";
-        }
-
-        if (MovieDetails.DurationMinutes < 0)
-        {
-            return "Movie duration cannot be negative.";
         }
 
         foreach (var season in SeriesDetails.Seasons)
@@ -348,6 +332,13 @@
 
     private void ApplyViewState()
     {
+        if (Media.Type == MediaType.Movie)
+        {
+            MovieForm.ApplyTo(Media, MovieDetails);
+            SeriesDetails.MediaItemId = Media.Id;
+            return;
+        }
+
         Media.Title = Media.Title.Trim();
         Media.Genres = GenresText
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -356,11 +347,6 @@
 
         MovieDetails.MediaItemId = Media.Id;
         SeriesDetails.MediaItemId = Media.Id;
-
-        if (!MovieDetails.IsWatched)
-        {
-            MovieDetails.WatchedDate = null;
-        }
 
         SeriesDetails.Seasons = SeriesDetails.Seasons
             .OrderBy(season => season.SeasonNumber)
@@ -388,7 +374,18 @@
 
     private Task HandleMediaTypeChanged(MediaType value)
     {
+        if (Media.Type == MediaType.Movie)
+        {
+            MovieForm.ApplyTo(Media, MovieDetails);
+        }
+
         Media.Type = value;
+
+        if (value == MediaType.Movie)
+        {
+            MovieForm = MovieFormModel.From(Media, MovieDetails);
+        }
+
         return Task.CompletedTask;
     }
 
@@ -419,17 +416,6 @@
     private Task HandleNotesChanged(string? value)
     {
         Media.Notes = value;
-        return Task.CompletedTask;
-    }
-
-    private Task HandleMovieWatchedChanged(bool value)
-    {
-        MovieDetails.IsWatched = value;
-        if (!value)
-        {
-            MovieDetails.WatchedDate = null;
-        }
-
         return Task.CompletedTask;
     }
 

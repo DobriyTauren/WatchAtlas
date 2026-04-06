@@ -1,0 +1,152 @@
+@page "/movies/{Id:guid}/edit"
+@inject LibraryState LibraryState
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Movie</PageTitle>
+
+<section class="space-y-8">
+    @if (!IsReady)
+    {
+        <PageHeader Eyebrow="Movie Editor"
+                    Title="Loading movie editor."
+                    Subtitle="Pulling the stored movie from browser storage so the form can be populated." />
+    }
+    else if (Entry is null)
+    {
+        <PageHeader Eyebrow="Movie Editor"
+                    Title="This movie could not be found."
+                    Subtitle="The edit route is ready, but the selected movie is not currently in your local library." />
+
+        <EmptyStateCard Badge="Movie Editor"
+                        Title="Movie not found."
+                        Description="Create a movie first or return to the library to pick an existing item."
+                        PrimaryLabel="Create Movie"
+                        PrimaryHref="/movies/new"
+                        SecondaryLabel="Open Library"
+                        SecondaryHref="/library" />
+    }
+    else
+    {
+        <PageHeader Eyebrow="Edit Movie"
+                    Title="@Entry.Media.Title"
+                    Subtitle="Update metadata, runtime, notes, and watched progress without leaving the dedicated movie workflow." />
+
+        <section class="grid gap-4 xl:grid-cols-[1.15fr,0.85fr]">
+            <AppCard>
+                <MovieForm Model="Form"
+                           SubmitLabel="Save Changes"
+                           CancelHref="@($"/movies/{Id}")"
+                           FieldPrefix="movie-edit"
+                           ExternalErrorMessage="@ErrorMessage"
+                           SuccessMessage="@SuccessMessage"
+                           IsBusy="IsSaving"
+                           OnSubmitRequested="SaveAsync" />
+            </AppCard>
+
+            <AppCard>
+                <div class="space-y-5">
+                    <div class="flex flex-wrap gap-2">
+                        <AppBadge>Movie</AppBadge>
+                        @if (Entry.Media.PersonalRating is { } rating)
+                        {
+                            <span class="rating-pill">@rating/10</span>
+                        }
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="soft-block-strong p-5">
+                            <p class="text-sm font-semibold text-text">Created</p>
+                            <p class="mt-2 text-lg">@Entry.Media.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
+                        </div>
+
+                        <div class="soft-block-strong p-5">
+                            <p class="text-sm font-semibold text-text">Last Updated</p>
+                            <p class="mt-2 text-lg">@Entry.Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
+                        </div>
+                    </div>
+
+                    <div class="soft-block space-y-3 p-5 text-sm leading-7 text-muted">
+                        <p>Use this page for editing only. The read-only details view keeps the display layout cleaner and owns the delete confirmation flow.</p>
+                        <p>Changes save directly into browser storage through the existing repository and refresh the shared library state immediately.</p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                        <AppButton Href="@($"/movies/{Id}")" Variant="secondary">Back to Details</AppButton>
+                        <AppButton Href="/library" Variant="secondary">Open Library</AppButton>
+                    </div>
+                </div>
+            </AppCard>
+        </section>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private LibraryEntry? Entry { get; set; }
+    private MovieFormModel Form { get; set; } = new();
+    private bool IsReady { get; set; }
+    private bool IsSaving { get; set; }
+    private string? ErrorMessage { get; set; }
+    private string? SuccessMessage { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        IsReady = false;
+        ErrorMessage = null;
+        SuccessMessage = null;
+
+        await LibraryState.EnsureLoadedAsync();
+        var entry = LibraryState.GetById(Id);
+        Entry = entry?.Media.Type == MediaType.Movie ? entry : null;
+
+        if (Entry is not null)
+        {
+            Form = MovieFormModel.From(Entry.Media, Entry.Movie);
+        }
+
+        IsReady = true;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (Entry is null)
+        {
+            return;
+        }
+
+        var media = LibraryCloneHelper.Clone(Entry.Media);
+        var movie = LibraryCloneHelper.Clone(Entry.Movie) ?? new WatchAtlas.Models.MovieDetails
+        {
+            MediaItemId = Entry.Media.Id
+        };
+
+        Form.ApplyTo(media, movie);
+
+        try
+        {
+            IsSaving = true;
+            ErrorMessage = null;
+            SuccessMessage = null;
+
+            await LibraryState.UpdateAsync(media, movie, null);
+            var refreshedEntry = LibraryState.GetById(Id);
+            Entry = refreshedEntry?.Media.Type == MediaType.Movie ? refreshedEntry : null;
+
+            if (Entry is not null)
+            {
+                Form = MovieFormModel.From(Entry.Media, Entry.Movie);
+                SuccessMessage = "Movie changes were saved.";
+            }
+        }
+        catch (Exception exception)
+        {
+            ErrorMessage = exception.Message;
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+}

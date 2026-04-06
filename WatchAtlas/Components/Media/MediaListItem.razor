@@ -58,8 +58,8 @@
     </div>
 
     <div class="flex shrink-0 flex-wrap gap-3 sm:w-44 sm:flex-col">
-        <AppButton Href="@($"/media/{Entry.Media.Id}")">Open Details</AppButton>
-        <AppButton Href="/media/new" Variant="secondary">Add Another</AppButton>
+        <AppButton Href="@MediaRouteHelper.GetDetailsHref(Entry)">Open Details</AppButton>
+        <AppButton Href="@MediaRouteHelper.GetCreateHref(Entry.Media.Type)" Variant="secondary">Add Another</AppButton>
     </div>
 </article>
 

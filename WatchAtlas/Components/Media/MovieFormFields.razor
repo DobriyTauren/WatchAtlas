@@ -1,0 +1,80 @@
+<div class="space-y-6">
+    <div class="grid gap-4 sm:grid-cols-2">
+        <div class="app-field">
+            <label class="app-field-label" for="@($"{FieldPrefix}-title")">Title</label>
+            <InputText id="@($"{FieldPrefix}-title")" class="app-input" @bind-Value="Model.Title" />
+            <ValidationMessage For="@(() => Model.Title)" class="mt-2 block text-sm text-red-600" />
+        </div>
+
+        <div class="app-field">
+            <label class="app-field-label" for="@($"{FieldPrefix}-cover-url")">Cover Image URL</label>
+            <InputText id="@($"{FieldPrefix}-cover-url")" class="app-input" @bind-Value="Model.CoverImageUrl" />
+        </div>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+        <div class="app-field">
+            <label class="app-field-label" for="@($"{FieldPrefix}-rating")">Rating</label>
+            <InputNumber TValue="int?" id="@($"{FieldPrefix}-rating")" class="app-input" @bind-Value="Model.PersonalRating" />
+            <ValidationMessage For="@(() => Model.PersonalRating)" class="mt-2 block text-sm text-red-600" />
+        </div>
+
+        <div class="app-field">
+            <label class="app-field-label" for="@($"{FieldPrefix}-duration")">Duration (minutes)</label>
+            <InputNumber TValue="int?" id="@($"{FieldPrefix}-duration")" class="app-input" @bind-Value="Model.DurationMinutes" />
+            <ValidationMessage For="@(() => Model.DurationMinutes)" class="mt-2 block text-sm text-red-600" />
+        </div>
+    </div>
+
+    <AppInput Id="@($"{FieldPrefix}-genres")"
+              Label="Genres"
+              @bind-Value="Model.GenresText"
+              Placeholder="Drama, Sci-Fi, Comedy" />
+
+    <AppTextarea Id="@($"{FieldPrefix}-description")"
+                 Label="Description"
+                 @bind-Value="Model.Description"
+                 TextareaClassName="min-h-32" />
+
+    <AppTextarea Id="@($"{FieldPrefix}-notes")"
+                 Label="Notes"
+                 @bind-Value="Model.Notes"
+                 TextareaClassName="min-h-28" />
+
+    <div class="soft-block space-y-4 p-5">
+        <div class="flex items-center justify-between gap-3">
+            <h2 class="text-xl">Watch Status</h2>
+            <span class="section-chip-muted">Runtime & progress</span>
+        </div>
+
+        <AppCheckbox Label="Marked as watched"
+                     Description="Store optional watch date information for this movie."
+                     Value="@Model.IsWatched"
+                     ValueChanged="HandleWatchedChanged" />
+
+        <div class="app-field">
+            <label class="app-field-label" for="@($"{FieldPrefix}-watched-date")">Watched Date</label>
+            <InputDate TValue="DateTime?" id="@($"{FieldPrefix}-watched-date")" class="app-input" @bind-Value="Model.WatchedDate" />
+            <ValidationMessage For="@(() => Model.WatchedDate)" class="mt-2 block text-sm text-red-600" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public MovieFormModel Model { get; set; } = default!;
+
+    [Parameter]
+    public string FieldPrefix { get; set; } = "movie-form";
+
+    private Task HandleWatchedChanged(bool value)
+    {
+        Model.IsWatched = value;
+        if (!value)
+        {
+            Model.WatchedDate = null;
+        }
+
+        return Task.CompletedTask;
+    }
+}

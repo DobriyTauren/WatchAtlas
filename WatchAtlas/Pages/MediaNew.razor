@@ -41,7 +41,7 @@
         Type = MediaType.Movie
     };
 
-    private MovieDetails Movie { get; set; } = new();
+    private WatchAtlas.Models.MovieDetails Movie { get; set; } = new();
     private SeriesDetails Series { get; set; } = new();
     private bool IsSaving { get; set; }
     private string? ErrorMessage { get; set; }
@@ -54,7 +54,7 @@
             ErrorMessage = null;
 
             await LibraryState.AddAsync(Media, Movie, Series);
-            NavigationManager.NavigateTo($"/media/{Media.Id}");
+            NavigationManager.NavigateTo(MediaRouteHelper.GetDetailsHref(Media));
         }
         catch (Exception exception)
         {

@@ -95,7 +95,7 @@
     public string Id { get; set; } = string.Empty;
 
     private MediaItem? Media { get; set; }
-    private MovieDetails Movie { get; set; } = new();
+    private WatchAtlas.Models.MovieDetails Movie { get; set; } = new();
     private SeriesDetails Series { get; set; } = new();
     private bool IsSaving { get; set; }
     private string? ErrorMessage { get; set; }
@@ -107,7 +107,14 @@
 
         if (Guid.TryParse(Id, out var parsedId))
         {
-            LoadEditorState(LibraryState.GetById(parsedId));
+            var entry = LibraryState.GetById(parsedId);
+            if (entry?.Media.Type == MediaType.Movie)
+            {
+                NavigationManager.NavigateTo(MediaRouteHelper.GetDetailsHref(entry), replace: true);
+                return;
+            }
+
+            LoadEditorState(entry);
             return;
         }
 
@@ -184,13 +191,13 @@
         if (entry is null)
         {
             Media = null;
-            Movie = new MovieDetails();
+            Movie = new WatchAtlas.Models.MovieDetails();
             Series = new SeriesDetails();
             return;
         }
 
         Media = LibraryCloneHelper.Clone(entry.Media);
-        Movie = LibraryCloneHelper.Clone(entry.Movie) ?? new MovieDetails
+        Movie = LibraryCloneHelper.Clone(entry.Movie) ?? new WatchAtlas.Models.MovieDetails
         {
             MediaItemId = entry.Media.Id
         };

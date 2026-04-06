@@ -77,8 +77,8 @@
     }
 
     <div class="mt-auto flex flex-wrap gap-3 pt-1">
-        <AppButton Href="@($"/media/{Entry.Media.Id}")" Variant="secondary">Open Details</AppButton>
-        <AppButton Href="/media/new">Add Another</AppButton>
+        <AppButton Href="@MediaRouteHelper.GetDetailsHref(Entry)" Variant="secondary">Open Details</AppButton>
+        <AppButton Href="@MediaRouteHelper.GetCreateHref(Entry.Media.Type)">Add Another</AppButton>
     </div>
 </article>
 

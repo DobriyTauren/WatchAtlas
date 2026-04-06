@@ -1,0 +1,65 @@
+@page "/movies/new"
+@inject LibraryState LibraryState
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Movie</PageTitle>
+
+<section class="space-y-8">
+    <PageHeader Eyebrow="New Movie"
+                Title="Add a movie to your library."
+                Subtitle="This flow is dedicated to movie metadata, watch status, and validation so film entries feel focused instead of generic." />
+
+    <section class="grid gap-4 xl:grid-cols-[1.25fr,0.9fr]">
+        <AppCard>
+            <MovieForm Model="Form"
+                       SubmitLabel="Create Movie"
+                       CancelHref="/library"
+                       FieldPrefix="movie-new"
+                       ExternalErrorMessage="@ErrorMessage"
+                       IsBusy="IsSaving"
+                       OnSubmitRequested="SaveAsync" />
+        </AppCard>
+
+        <AppCard>
+            <div class="space-y-4">
+                <h2 class="text-2xl">Movie Notes</h2>
+                <div class="space-y-4 text-sm leading-7 text-muted">
+                    <p>Movie creation now uses a dedicated form model, so title, runtime, rating, and watched-date rules are validated before anything reaches browser storage.</p>
+                    <p>Genres are stored as a normalized list, and watched date is persisted only when the movie is marked as watched.</p>
+                    <p>After saving, the app redirects to the movie details page so edit and delete actions stay in one focused place.</p>
+                </div>
+            </div>
+        </AppCard>
+    </section>
+</section>
+
+@code {
+    private MovieFormModel Form { get; set; } = new();
+    private bool IsSaving { get; set; }
+    private string? ErrorMessage { get; set; }
+
+    private async Task SaveAsync()
+    {
+        var media = new MediaItem();
+        var movie = new WatchAtlas.Models.MovieDetails();
+
+        Form.ApplyTo(media, movie);
+
+        try
+        {
+            IsSaving = true;
+            ErrorMessage = null;
+
+            await LibraryState.AddAsync(media, movie, null);
+            NavigationManager.NavigateTo($"/movies/{media.Id}");
+        }
+        catch (Exception exception)
+        {
+            ErrorMessage = exception.Message;
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+}

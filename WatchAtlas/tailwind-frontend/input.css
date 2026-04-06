@@ -454,6 +454,27 @@
         border-radius: var(--radius-shell);
         box-shadow: var(--shadow-panel);
     }
+
+    .movie-cover-fallback {
+        @apply flex h-80 flex-col justify-end gap-4 p-8 text-left;
+        border-radius: var(--radius-card);
+        background-image:
+            radial-gradient(circle at top right, rgb(var(--orb-secondary) / 0.32), transparent 16rem),
+            linear-gradient(160deg, rgb(var(--accent-soft) / 0.92), rgb(var(--surface-soft-strong) / 0.96));
+    }
+
+    .movie-cover-fallback__badge {
+        @apply inline-flex w-fit rounded-full border border-border/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-muted;
+        background-color: rgb(var(--surface-strong) / 0.75);
+    }
+
+    .movie-cover-fallback__title {
+        @apply text-3xl text-text;
+    }
+
+    .movie-cover-fallback__copy {
+        @apply max-w-md text-sm leading-7 text-muted;
+    }
 }
 
 @layer utilities {

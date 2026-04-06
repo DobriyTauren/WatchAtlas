@@ -1,0 +1,76 @@
+<EditForm EditContext="EditContext" OnValidSubmit="HandleValidSubmitAsync">
+    <DataAnnotationsValidator />
+
+    <div class="space-y-6">
+        @if (!string.IsNullOrWhiteSpace(ExternalErrorMessage))
+        {
+            <div class="soft-block-strong border border-red-200/70 p-4 text-sm text-red-700">
+                @ExternalErrorMessage
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(SuccessMessage))
+        {
+            <div class="soft-block-strong border border-emerald-200/70 p-4 text-sm text-emerald-700">
+                @SuccessMessage
+            </div>
+        }
+
+        @if (EditContext.GetValidationMessages().Any())
+        {
+            <ValidationSummary class="space-y-1 rounded-3xl border border-red-200/70 bg-red-50/80 px-4 py-3 text-sm text-red-700" />
+        }
+
+        <MovieFormFields Model="Model" FieldPrefix="@FieldPrefix" />
+
+        <div class="flex flex-wrap gap-3">
+            <AppButton Type="submit" Disabled="@IsBusy">@SubmitLabel</AppButton>
+
+            @if (!string.IsNullOrWhiteSpace(CancelHref))
+            {
+                <AppButton Href="@CancelHref" Variant="secondary">Cancel</AppButton>
+            }
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private EditContext EditContext { get; set; } = default!;
+    private MovieFormModel? BoundModel { get; set; }
+
+    [Parameter, EditorRequired]
+    public MovieFormModel Model { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback OnSubmitRequested { get; set; }
+
+    [Parameter]
+    public string SubmitLabel { get; set; } = "Save Movie";
+
+    [Parameter]
+    public string CancelHref { get; set; } = "/library";
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public string? ExternalErrorMessage { get; set; }
+
+    [Parameter]
+    public string? SuccessMessage { get; set; }
+
+    [Parameter]
+    public string FieldPrefix { get; set; } = "movie-form";
+
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(BoundModel, Model))
+        {
+            EditContext = new EditContext(Model);
+            BoundModel = Model;
+        }
+    }
+
+    private Task HandleValidSubmitAsync()
+        => OnSubmitRequested.InvokeAsync();
+}
