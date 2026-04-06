@@ -108,7 +108,7 @@
         if (Guid.TryParse(Id, out var parsedId))
         {
             var entry = LibraryState.GetById(parsedId);
-            if (entry?.Media.Type == MediaType.Movie)
+            if (entry is not null)
             {
                 NavigationManager.NavigateTo(MediaRouteHelper.GetDetailsHref(entry), replace: true);
                 return;

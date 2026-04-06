@@ -1,0 +1,238 @@
+<div class="space-y-6">
+    <div class="grid gap-4 sm:grid-cols-2">
+        <div class="app-field">
+            <label class="app-field-label" for="@($"{FieldPrefix}-title")">Title</label>
+            <InputText id="@($"{FieldPrefix}-title")" class="app-input" @bind-Value="Model.Title" />
+            <ValidationMessage For="@(() => Model.Title)" class="mt-2 block text-sm text-red-600" />
+        </div>
+
+        <div class="app-field">
+            <label class="app-field-label" for="@($"{FieldPrefix}-cover-url")">Cover Image URL</label>
+            <InputText id="@($"{FieldPrefix}-cover-url")" class="app-input" @bind-Value="Model.CoverImageUrl" />
+        </div>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+        <AppInput Id="@($"{FieldPrefix}-genres")"
+                  Label="Genres"
+                  @bind-Value="Model.GenresText"
+                  Placeholder="Drama, Sci-Fi, Comedy" />
+
+        <div class="app-field">
+            <label class="app-field-label" for="@($"{FieldPrefix}-rating")">Rating</label>
+            <InputNumber TValue="int?" id="@($"{FieldPrefix}-rating")" class="app-input" @bind-Value="Model.PersonalRating" />
+            <ValidationMessage For="@(() => Model.PersonalRating)" class="mt-2 block text-sm text-red-600" />
+        </div>
+    </div>
+
+    <AppTextarea Id="@($"{FieldPrefix}-description")"
+                 Label="Description"
+                 @bind-Value="Model.Description"
+                 TextareaClassName="min-h-32" />
+
+    <AppTextarea Id="@($"{FieldPrefix}-notes")"
+                 Label="Notes"
+                 @bind-Value="Model.Notes"
+                 TextareaClassName="min-h-28" />
+
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h2 class="text-xl">Season Editor</h2>
+            <p class="mt-1 text-sm text-muted">Build seasons and episodes with quick generation, watch-state bulk actions, and reusable runtime tools.</p>
+        </div>
+
+        <AppButton Variant="secondary" OnClick="AddSeasonAsync">Add Season</AppButton>
+    </div>
+
+    @if (Model.Seasons.Count == 0)
+    {
+        <div class="soft-block p-5 text-sm text-muted">
+            No seasons yet. Add one to start structuring the series.
+        </div>
+    }
+    else
+    {
+        @foreach (var season in Model.Seasons.OrderBy(season => season.SeasonNumber))
+        {
+            var completionPercent = season.Episodes.Count == 0
+                ? 0
+                : season.Episodes.Count(episode => episode.IsWatched) * 100d / season.Episodes.Count;
+
+            <section @key="season.Id" class="shell-card space-y-5 p-5">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div class="grid flex-1 gap-4 sm:grid-cols-[140px,1fr]">
+                        <div class="app-field">
+                            <label class="app-field-label">Season Number</label>
+                            <InputNumber TValue="int" class="app-input" @bind-Value="season.SeasonNumber" />
+                        </div>
+
+                        <div class="app-field">
+                            <label class="app-field-label">Season Title</label>
+                            <InputText class="app-input" @bind-Value="season.Title" />
+                        </div>
+                    </div>
+
+                    <AppButton Variant="ghost" Size="sm" OnClick="@((MouseEventArgs args) => RemoveSeasonAsync(season, args))">Remove</AppButton>
+                </div>
+
+                <div class="grid gap-4 xl:grid-cols-[1.15fr,1fr]">
+                    <div class="soft-block space-y-4 p-4">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <h3 class="text-lg">Season Progress</h3>
+                            <span class="section-chip-muted">@season.Episodes.Count episode(s)</span>
+                        </div>
+
+                        <ProgressBar Label="Completion"
+                                     Value="@completionPercent"
+                                     Max="100" />
+
+                        <div class="flex flex-wrap gap-3">
+                            <AppButton Variant="secondary" Size="sm" OnClick="@((MouseEventArgs args) => MarkSeasonWatchedAsync(season, args))">Mark Watched</AppButton>
+                            <AppButton Variant="secondary" Size="sm" OnClick="@((MouseEventArgs args) => MarkSeasonUnwatchedAsync(season, args))">Mark Unwatched</AppButton>
+                        </div>
+                    </div>
+
+                    <div class="soft-block space-y-4 p-4">
+                        <h3 class="text-lg">Bulk Actions</h3>
+
+                        <div class="grid gap-4 sm:grid-cols-[140px,auto] sm:items-end">
+                            <div class="app-field">
+                                <label class="app-field-label">Generate Count</label>
+                                <InputNumber TValue="int" class="app-input" @bind-Value="season.GenerateEpisodeCount" />
+                            </div>
+
+                            <AppButton Variant="secondary" Size="sm" OnClick="@((MouseEventArgs args) => GenerateEpisodesAsync(season, args))">Generate Episodes</AppButton>
+                        </div>
+
+                        <div class="grid gap-4 sm:grid-cols-[160px,auto] sm:items-end">
+                            <div class="app-field">
+                                <label class="app-field-label">Shared Duration</label>
+                                <InputNumber TValue="int?" class="app-input" @bind-Value="season.SharedDurationMinutes" />
+                            </div>
+
+                            <AppButton Variant="secondary" Size="sm" OnClick="@((MouseEventArgs args) => ApplySharedDurationAsync(season, args))">Apply To All Episodes</AppButton>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    @if (season.Episodes.Count == 0)
+                    {
+                        <div class="soft-block p-4 text-sm text-muted">No episodes in this season yet.</div>
+                    }
+                    else
+                    {
+                        @foreach (var episode in season.Episodes.OrderBy(episode => episode.EpisodeNumber))
+                        {
+                            <article @key="episode.Id" class="soft-block space-y-4 p-4">
+                                <div class="grid gap-4 lg:grid-cols-[120px,1fr,160px]">
+                                    <div class="app-field">
+                                        <label class="app-field-label">Episode #</label>
+                                        <InputNumber TValue="int" class="app-input" @bind-Value="episode.EpisodeNumber" />
+                                    </div>
+
+                                    <div class="app-field">
+                                        <label class="app-field-label">Title</label>
+                                        <InputText class="app-input" @bind-Value="episode.Title" />
+                                    </div>
+
+                                    <div class="app-field">
+                                        <label class="app-field-label">Duration</label>
+                                        <InputNumber TValue="int?" class="app-input" @bind-Value="episode.DurationMinutes" />
+                                    </div>
+                                </div>
+
+                                <div class="grid gap-4 sm:grid-cols-[auto,1fr,auto] sm:items-center">
+                                    <AppCheckbox Label="Watched"
+                                                 Value="@episode.IsWatched"
+                                                 ValueChanged="value => HandleEpisodeWatchedChanged(episode, value)"
+                                                 Class="px-4 py-3" />
+
+                                    <div class="app-field">
+                                        <label class="app-field-label">Watched Date</label>
+                                        <InputDate TValue="DateTime?" class="app-input" @bind-Value="episode.WatchedDate" />
+                                    </div>
+
+                                    <AppButton Variant="ghost" Size="sm" OnClick="@((MouseEventArgs args) => RemoveEpisodeAsync(season, episode, args))">Remove</AppButton>
+                                </div>
+                            </article>
+                        }
+                    }
+                </div>
+
+                <AppButton Variant="secondary" OnClick="@((MouseEventArgs args) => AddEpisodeAsync(season, args))">Add Episode</AppButton>
+            </section>
+        }
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public SeriesFormModel Model { get; set; } = default!;
+
+    [Parameter]
+    public string FieldPrefix { get; set; } = "series-form";
+
+    private Task AddSeasonAsync(MouseEventArgs _)
+    {
+        Model.AddSeason();
+        return Task.CompletedTask;
+    }
+
+    private Task RemoveSeasonAsync(SeasonFormModel season, MouseEventArgs _)
+    {
+        Model.RemoveSeason(season);
+        return Task.CompletedTask;
+    }
+
+    private Task AddEpisodeAsync(SeasonFormModel season, MouseEventArgs _)
+    {
+        Model.AddEpisode(season);
+        return Task.CompletedTask;
+    }
+
+    private Task RemoveEpisodeAsync(SeasonFormModel season, EpisodeFormModel episode, MouseEventArgs _)
+    {
+        Model.RemoveEpisode(season, episode);
+        return Task.CompletedTask;
+    }
+
+    private Task GenerateEpisodesAsync(SeasonFormModel season, MouseEventArgs _)
+    {
+        Model.GenerateEpisodes(season);
+        return Task.CompletedTask;
+    }
+
+    private Task ApplySharedDurationAsync(SeasonFormModel season, MouseEventArgs _)
+    {
+        Model.ApplySharedDuration(season);
+        return Task.CompletedTask;
+    }
+
+    private Task MarkSeasonWatchedAsync(SeasonFormModel season, MouseEventArgs _)
+    {
+        Model.MarkSeasonWatched(season);
+        return Task.CompletedTask;
+    }
+
+    private Task MarkSeasonUnwatchedAsync(SeasonFormModel season, MouseEventArgs _)
+    {
+        Model.MarkSeasonUnwatched(season);
+        return Task.CompletedTask;
+    }
+
+    private Task HandleEpisodeWatchedChanged(EpisodeFormModel episode, bool value)
+    {
+        episode.IsWatched = value;
+        if (!value)
+        {
+            episode.WatchedDate = null;
+        }
+        else
+        {
+            episode.WatchedDate ??= DateTime.Today;
+        }
+
+        return Task.CompletedTask;
+    }
+}

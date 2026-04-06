@@ -1,0 +1,152 @@
+@page "/series/{Id:guid}/edit"
+@inject LibraryState LibraryState
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Series</PageTitle>
+
+<section class="space-y-8">
+    @if (!IsReady)
+    {
+        <PageHeader Eyebrow="Series Editor"
+                    Title="Loading series editor."
+                    Subtitle="Fetching the series from browser storage so its seasons and episodes can be edited." />
+    }
+    else if (Entry is null)
+    {
+        <PageHeader Eyebrow="Series Editor"
+                    Title="This series could not be found."
+                    Subtitle="The edit route is ready, but the selected series is not in your local library." />
+
+        <EmptyStateCard Badge="Series Editor"
+                        Title="Series not found."
+                        Description="Create a series first or return to the library to pick an existing entry."
+                        PrimaryLabel="Create Series"
+                        PrimaryHref="/series/new"
+                        SecondaryLabel="Open Library"
+                        SecondaryHref="/library" />
+    }
+    else
+    {
+        <PageHeader Eyebrow="Edit Series"
+                    Title="@Entry.Media.Title"
+                    Subtitle="Adjust metadata, season structure, episode details, and bulk watch-state updates in the dedicated series workflow." />
+
+        <section class="grid gap-4 xl:grid-cols-[1.15fr,0.85fr]">
+            <AppCard>
+                <SeriesForm Model="Form"
+                            SubmitLabel="Save Changes"
+                            CancelHref="@($"/series/{Id}")"
+                            FieldPrefix="series-edit"
+                            ExternalErrorMessage="@ErrorMessage"
+                            SuccessMessage="@SuccessMessage"
+                            IsBusy="IsSaving"
+                            OnSubmitRequested="SaveAsync" />
+            </AppCard>
+
+            <AppCard>
+                <div class="space-y-5">
+                    <div class="flex flex-wrap gap-2">
+                        <AppBadge>Series</AppBadge>
+                        @if (Entry.Media.PersonalRating is { } rating)
+                        {
+                            <span class="rating-pill">@rating/10</span>
+                        }
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="soft-block-strong p-5">
+                            <p class="text-sm font-semibold text-text">Created</p>
+                            <p class="mt-2 text-lg">@Entry.Media.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
+                        </div>
+
+                        <div class="soft-block-strong p-5">
+                            <p class="text-sm font-semibold text-text">Updated</p>
+                            <p class="mt-2 text-lg">@Entry.Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
+                        </div>
+                    </div>
+
+                    <div class="soft-block space-y-3 p-5 text-sm leading-7 text-muted">
+                        <p>This editor reuses the same series model as the generic media flow, so metadata and episode changes stay in one shared implementation.</p>
+                        <p>Bulk season actions here update completion status automatically because the existing watch-status and statistics helpers already read from episode state.</p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                        <AppButton Href="@($"/series/{Id}")" Variant="secondary">Back to Details</AppButton>
+                        <AppButton Href="/library" Variant="secondary">Open Library</AppButton>
+                    </div>
+                </div>
+            </AppCard>
+        </section>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private LibraryEntry? Entry { get; set; }
+    private SeriesFormModel Form { get; set; } = new();
+    private bool IsReady { get; set; }
+    private bool IsSaving { get; set; }
+    private string? ErrorMessage { get; set; }
+    private string? SuccessMessage { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        IsReady = false;
+        ErrorMessage = null;
+        SuccessMessage = null;
+
+        await LibraryState.EnsureLoadedAsync();
+        var entry = LibraryState.GetById(Id);
+        Entry = entry?.Media.Type == MediaType.Series ? entry : null;
+
+        if (Entry is not null)
+        {
+            Form = SeriesFormModel.From(Entry.Media, Entry.Series);
+        }
+
+        IsReady = true;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (Entry is null)
+        {
+            return;
+        }
+
+        var media = LibraryCloneHelper.Clone(Entry.Media);
+        var series = LibraryCloneHelper.Clone(Entry.Series) ?? new SeriesDetails
+        {
+            MediaItemId = Entry.Media.Id
+        };
+
+        Form.ApplyTo(media, series);
+
+        try
+        {
+            IsSaving = true;
+            ErrorMessage = null;
+            SuccessMessage = null;
+
+            await LibraryState.UpdateAsync(media, null, series);
+            var refreshedEntry = LibraryState.GetById(Id);
+            Entry = refreshedEntry?.Media.Type == MediaType.Series ? refreshedEntry : null;
+
+            if (Entry is not null)
+            {
+                Form = SeriesFormModel.From(Entry.Media, Entry.Series);
+                SuccessMessage = "Series changes were saved.";
+            }
+        }
+        catch (Exception exception)
+        {
+            ErrorMessage = exception.Message;
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+}

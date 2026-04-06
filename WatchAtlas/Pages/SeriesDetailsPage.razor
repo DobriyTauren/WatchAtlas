@@ -1,0 +1,308 @@
+@page "/series/{Id:guid}"
+@inject LibraryState LibraryState
+@inject IStatisticsService StatisticsService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Series Details</PageTitle>
+
+<section class="space-y-8">
+    @if (!IsReady)
+    {
+        <PageHeader Eyebrow="Series Details"
+                    Title="Loading series details."
+                    Subtitle="Reading the selected series from browser storage." />
+    }
+    else if (Entry is null)
+    {
+        <PageHeader Eyebrow="Series Details"
+                    Title="This series is not in the library yet."
+                    Subtitle="The details route is ready, but the requested series was not found in browser storage." />
+
+        <EmptyStateCard Badge="Series Details"
+                        Title="No series found."
+                        Description="Create a series first, then return here to review seasons, episodes, and progress."
+                        PrimaryLabel="Create Series"
+                        PrimaryHref="/series/new"
+                        SecondaryLabel="Return to Library"
+                        SecondaryHref="/library" />
+    }
+    else
+    {
+        <PageHeader Eyebrow="Series Details"
+                    Title="@Entry.Media.Title"
+                    Subtitle="@GetSubtitle()"
+                    Actions="@ActionButtons" />
+
+        @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+        {
+            <div class="soft-block-strong border border-red-200/70 p-4 text-sm text-red-700">
+                @ErrorMessage
+            </div>
+        }
+
+        <section class="grid gap-4 xl:grid-cols-[0.95fr,1.15fr]">
+            <AppCard Class="overflow-hidden">
+                @if (!string.IsNullOrWhiteSpace(Entry.Media.CoverImageUrl))
+                {
+                    <img src="@Entry.Media.CoverImageUrl"
+                         alt="@($"{Entry.Media.Title} cover")"
+                         class="h-80 w-full rounded-3xl object-cover" />
+                }
+                else
+                {
+                    <div class="movie-cover-fallback">
+                        <span class="movie-cover-fallback__badge">Series</span>
+                        <h2 class="movie-cover-fallback__title">@Entry.Media.Title</h2>
+                        <p class="movie-cover-fallback__copy">Add a cover image from the edit page to give the series page a stronger visual identity.</p>
+                    </div>
+                }
+            </AppCard>
+
+            <div class="space-y-4">
+                <AppCard>
+                    <div class="space-y-5">
+                        <div class="flex flex-wrap gap-2">
+                            <MediaTypeBadge Type="@MediaType.Series" />
+                            <MediaStatusBadge Status="@WatchStatusHelper.GetStatus(Entry)" />
+                            @if (Entry.Media.PersonalRating is { } rating)
+                            {
+                                <span class="rating-pill">@rating/10</span>
+                            }
+                        </div>
+
+                        <ProgressBar Label="Series Completion"
+                                     Value="@SeriesStats.CompletionPercent"
+                                     Max="100" />
+
+                        @if (Entry.Media.Genres.Count > 0)
+                        {
+                            <div class="flex flex-wrap gap-2">
+                                @foreach (var genre in Entry.Media.Genres)
+                                {
+                                    <AppBadge Variant="outline">@genre</AppBadge>
+                                }
+                            </div>
+                        }
+
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="soft-block p-5">
+                                <p class="text-sm font-semibold text-text">Episodes</p>
+                                <p class="mt-2 text-lg">@SeriesStats.WatchedEpisodes / @SeriesStats.TotalEpisodes watched</p>
+                            </div>
+
+                            <div class="soft-block p-5">
+                                <p class="text-sm font-semibold text-text">Watch Time</p>
+                                <p class="mt-2 text-lg">@SeriesStats.WatchedMinutes.ToReadableDuration()</p>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(Entry.Media.Description))
+                        {
+                            <div class="space-y-2">
+                                <h2 class="text-xl">Summary</h2>
+                                <p class="text-sm leading-7 text-muted">@Entry.Media.Description</p>
+                            </div>
+                        }
+                    </div>
+                </AppCard>
+
+                <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    <StatTile Title="Seasons" Value="@SeriesStats.SeasonCount.ToString()" Caption="Tracked seasons in this series." ChipLabel="Series" />
+                    <StatTile Title="Episodes" Value="@SeriesStats.TotalEpisodes.ToString()" Caption="Total tracked episodes." ChipLabel="Episodes" />
+                    <StatTile Title="Watched" Value="@SeriesStats.WatchedEpisodes.ToString()" Caption="Episodes marked as watched." ChipLabel="Progress" />
+                    <StatTile Title="Runtime" Value="@SeriesStats.WatchedMinutes.ToReadableDuration()" Caption="Watched episode runtime." ChipLabel="Runtime" />
+                </section>
+            </div>
+        </section>
+
+        <AppCard>
+            <div class="space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-2xl">Season Breakdown</h2>
+                        <p class="mt-2 text-sm leading-7 text-muted">Open each season to inspect episode progress, runtime, and watched dates.</p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                        <AppButton Href="@($"/series/{Id}/edit")" Variant="secondary">Quick Edit</AppButton>
+                        <AppButton Href="/library" Variant="secondary">Open Library</AppButton>
+                    </div>
+                </div>
+
+                @if (SeriesStats.Seasons.Count == 0)
+                {
+                    <div class="soft-block p-5 text-sm text-muted">
+                        No seasons have been added yet. Open the editor to create the first season and generate episodes.
+                    </div>
+                }
+                else
+                {
+                    @foreach (var seasonStats in SeriesStats.Seasons)
+                    {
+                        var season = Entry.Series?.Seasons.FirstOrDefault(item => item.Id == seasonStats.SeasonId);
+
+                        <details class="series-accordion" open>
+                            <summary class="series-accordion__summary">
+                                <div class="space-y-2">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <h3 class="text-xl">Season @seasonStats.SeasonNumber</h3>
+                                        <SeriesStatusBadge Statistics="seasonStats" />
+                                    </div>
+                                    @if (!string.IsNullOrWhiteSpace(seasonStats.Title))
+                                    {
+                                        <p class="text-sm text-muted">@seasonStats.Title</p>
+                                    }
+                                </div>
+
+                                <div class="series-accordion__meta">
+                                    <span>@seasonStats.WatchedEpisodes / @seasonStats.TotalEpisodes watched</span>
+                                    <span>@seasonStats.WatchedMinutes.ToReadableDuration()</span>
+                                </div>
+                            </summary>
+
+                            <div class="space-y-4 pt-4">
+                                <ProgressBar Label="Season Completion"
+                                             Value="@seasonStats.CompletionPercent"
+                                             Max="100" />
+
+                                @if (season?.Episodes.Count > 0)
+                                {
+                                    <div class="space-y-3">
+                                        @foreach (var episode in season.Episodes.OrderBy(item => item.EpisodeNumber))
+                                        {
+                                            <article class="soft-block flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between">
+                                                <div class="space-y-1">
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        <p class="font-semibold text-text">Episode @episode.EpisodeNumber</p>
+                                                        <AppBadge Variant="@GetEpisodeBadgeVariant(episode)">@GetEpisodeBadgeLabel(episode)</AppBadge>
+                                                    </div>
+
+                                                    @if (!string.IsNullOrWhiteSpace(episode.Title))
+                                                    {
+                                                        <p class="text-sm text-muted">@episode.Title</p>
+                                                    }
+                                                </div>
+
+                                                <div class="flex flex-wrap gap-4 text-sm text-muted">
+                                                    <span>@((episode.DurationMinutes ?? 0).ToReadableDuration())</span>
+                                                    <span>@(episode.WatchedDate?.ToLocalTime().ToString("dd MMM yyyy") ?? "No watch date")</span>
+                                                </div>
+                                            </article>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="soft-block p-4 text-sm text-muted">This season does not contain any episodes yet.</div>
+                                }
+                            </div>
+                        </details>
+                    }
+                }
+            </div>
+        </AppCard>
+
+        <AppModal IsOpen="@IsDeleteModalOpen"
+                  Title="Delete this series?"
+                  Description="This permanently removes the series and all stored seasons and episodes from browser storage."
+                  OnClose="CloseDeleteModalAsync">
+            <ChildContent>
+                <p class="text-sm leading-7 text-muted">
+                    <strong>@Entry.Media.Title</strong> and all tracked episode progress will be removed from the library immediately.
+                </p>
+            </ChildContent>
+            <Footer>
+                <AppButton Variant="secondary" Disabled="@IsDeleting" OnClick="CloseDeleteModalButtonAsync">Cancel</AppButton>
+                <AppButton Disabled="@IsDeleting" OnClick="ConfirmDeleteAsync">Delete Series</AppButton>
+            </Footer>
+        </AppModal>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private LibraryEntry? Entry { get; set; }
+    private SeriesStatistics SeriesStats { get; set; } = new();
+    private bool IsReady { get; set; }
+    private bool IsDeleteModalOpen { get; set; }
+    private bool IsDeleting { get; set; }
+    private string? ErrorMessage { get; set; }
+
+    private RenderFragment ActionButtons => @<div class="flex flex-wrap gap-3">
+        <AppButton Href="@($"/series/{Id}/edit")" Variant="secondary">Edit Series</AppButton>
+        <AppButton OnClick="OpenDeleteModalAsync">Delete Series</AppButton>
+    </div>;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        IsReady = false;
+        ErrorMessage = null;
+        IsDeleteModalOpen = false;
+
+        await LibraryState.EnsureLoadedAsync();
+        var entry = LibraryState.GetById(Id);
+        Entry = entry?.Media.Type == MediaType.Series ? entry : null;
+        SeriesStats = Entry is null ? new SeriesStatistics() : StatisticsService.CalculateSeriesStatistics(Entry);
+        IsReady = true;
+    }
+
+    private string GetSubtitle()
+    {
+        if (Entry is null)
+        {
+            return string.Empty;
+        }
+
+        return SeriesStats.TotalEpisodes == 0
+            ? "This series is saved and ready for seasons, episodes, and watch tracking."
+            : "Progress, watched runtime, and per-season completion are calculated automatically from episode state.";
+    }
+
+    private static string GetEpisodeBadgeVariant(Episode episode)
+        => episode.IsWatched ? "success" : "muted";
+
+    private static string GetEpisodeBadgeLabel(Episode episode)
+        => episode.IsWatched ? "Watched" : "Pending";
+
+    private Task OpenDeleteModalAsync(MouseEventArgs _)
+    {
+        IsDeleteModalOpen = true;
+        return Task.CompletedTask;
+    }
+
+    private Task CloseDeleteModalButtonAsync(MouseEventArgs _)
+        => CloseDeleteModalAsync();
+
+    private Task CloseDeleteModalAsync()
+    {
+        IsDeleteModalOpen = false;
+        return Task.CompletedTask;
+    }
+
+    private async Task ConfirmDeleteAsync(MouseEventArgs _)
+    {
+        if (Entry is null)
+        {
+            return;
+        }
+
+        try
+        {
+            IsDeleting = true;
+            ErrorMessage = null;
+            await LibraryState.DeleteAsync(Entry.Media.Id);
+            NavigationManager.NavigateTo("/library");
+        }
+        catch (Exception exception)
+        {
+            ErrorMessage = exception.Message;
+        }
+        finally
+        {
+            IsDeleting = false;
+            IsDeleteModalOpen = false;
+        }
+    }
+}

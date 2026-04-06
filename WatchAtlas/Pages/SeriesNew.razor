@@ -1,0 +1,65 @@
+@page "/series/new"
+@inject LibraryState LibraryState
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Series</PageTitle>
+
+<section class="space-y-8">
+    <PageHeader Eyebrow="New Series"
+                Title="Add a series to your library."
+                Subtitle="Create the base metadata, sketch out seasons, generate episodes quickly, and save progress-ready structure in one flow." />
+
+    <section class="grid gap-4 xl:grid-cols-[1.2fr,0.9fr]">
+        <AppCard>
+            <SeriesForm Model="Form"
+                        SubmitLabel="Create Series"
+                        CancelHref="/library"
+                        FieldPrefix="series-new"
+                        ExternalErrorMessage="@ErrorMessage"
+                        IsBusy="IsSaving"
+                        OnSubmitRequested="SaveAsync" />
+        </AppCard>
+
+        <AppCard>
+            <div class="space-y-4">
+                <h2 class="text-2xl">Series Notes</h2>
+                <div class="space-y-4 text-sm leading-7 text-muted">
+                    <p>This dedicated series flow now supports seasons, episodes, quick generation, bulk watched-state updates, and shared runtimes without leaving the form.</p>
+                    <p>Everything still saves through the same repository and library state, so the library page and statistics update immediately after save.</p>
+                    <p>After creating the series, the app redirects to a read-focused detail page with progress cards and season breakdowns.</p>
+                </div>
+            </div>
+        </AppCard>
+    </section>
+</section>
+
+@code {
+    private SeriesFormModel Form { get; set; } = new();
+    private bool IsSaving { get; set; }
+    private string? ErrorMessage { get; set; }
+
+    private async Task SaveAsync()
+    {
+        var media = new MediaItem();
+        var series = new SeriesDetails();
+
+        Form.ApplyTo(media, series);
+
+        try
+        {
+            IsSaving = true;
+            ErrorMessage = null;
+
+            await LibraryState.AddAsync(media, null, series);
+            NavigationManager.NavigateTo($"/series/{media.Id}");
+        }
+        catch (Exception exception)
+        {
+            ErrorMessage = exception.Message;
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+}

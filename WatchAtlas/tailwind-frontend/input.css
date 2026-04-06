@@ -475,6 +475,26 @@
     .movie-cover-fallback__copy {
         @apply max-w-md text-sm leading-7 text-muted;
     }
+
+    .series-accordion {
+        @apply rounded-[1.75rem] border border-border/70 bg-surface-strong/80 p-5;
+    }
+
+    .series-accordion[open] {
+        box-shadow: var(--shadow-soft);
+    }
+
+    .series-accordion__summary {
+        @apply flex cursor-pointer list-none flex-col gap-3 md:flex-row md:items-center md:justify-between;
+    }
+
+    .series-accordion__summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .series-accordion__meta {
+        @apply flex flex-wrap gap-3 text-sm text-muted;
+    }
 }
 
 @layer utilities {
