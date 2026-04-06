@@ -1,0 +1,51 @@
+<div class="@WrapperClass">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="app-field-label" for="@Id">@Label</label>
+    }
+
+    <div class="search-box-shell">
+        @if (!string.IsNullOrWhiteSpace(Prefix))
+        {
+            <span class="search-box-prefix">@Prefix</span>
+        }
+
+        <input id="@Id"
+               class="search-box-input"
+               value="@Value"
+               placeholder="@Placeholder"
+               @oninput="HandleInput"
+               @attributes="AdditionalAttributes" />
+    </div>
+    </div>
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? Prefix { get; set; } = "Search";
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string WrapperClass => string.Join(" ", new[] { "space-y-2", Class }.Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    private Task HandleInput(ChangeEventArgs args)
+        => ValueChanged.InvokeAsync(args.Value?.ToString());
+}

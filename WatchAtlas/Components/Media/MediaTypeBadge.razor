@@ -1,0 +1,8 @@
+<AppBadge>@Label</AppBadge>
+
+@code {
+    [Parameter, EditorRequired]
+    public MediaType Type { get; set; }
+
+    private string Label => Type == MediaType.Movie ? "Movie" : "Series";
+}

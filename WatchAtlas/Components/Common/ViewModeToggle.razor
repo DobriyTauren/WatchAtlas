@@ -1,0 +1,20 @@
+<div class="view-mode-toggle">
+    <button class="@GetButtonClass(LibraryViewMode.Grid)" type="button" @onclick="() => ChangeAsync(LibraryViewMode.Grid)">Grid</button>
+    <button class="@GetButtonClass(LibraryViewMode.List)" type="button" @onclick="() => ChangeAsync(LibraryViewMode.List)">List</button>
+</div>
+
+@code {
+    [Parameter]
+    public LibraryViewMode Value { get; set; }
+
+    [Parameter]
+    public EventCallback<LibraryViewMode> ValueChanged { get; set; }
+
+    private Task ChangeAsync(LibraryViewMode mode)
+        => ValueChanged.InvokeAsync(mode);
+
+    private string GetButtonClass(LibraryViewMode mode)
+        => mode == Value
+            ? "view-mode-toggle__button view-mode-toggle__button-active"
+            : "view-mode-toggle__button";
+}

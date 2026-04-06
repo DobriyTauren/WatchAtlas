@@ -409,6 +409,40 @@
         background-image: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-strong)));
     }
 
+    .search-box-shell {
+        @apply flex items-center gap-3 border border-border;
+        border-radius: 9999px;
+        background-color: rgb(var(--surface-soft) / 0.9);
+        padding: 0.85rem 1rem;
+    }
+
+    .search-box-prefix {
+        @apply text-sm font-medium text-muted;
+    }
+
+    .search-box-input {
+        @apply w-full border-0 bg-transparent p-0 text-sm text-text outline-none placeholder:text-muted;
+    }
+
+    .filter-bar {
+        @apply space-y-4 rounded-[1.75rem] border border-border/60;
+        background-color: rgb(var(--surface-soft) / 0.45);
+        padding: 1rem;
+    }
+
+    .view-mode-toggle {
+        @apply inline-flex items-center gap-1 rounded-full border border-border/70 p-1;
+        background-color: rgb(var(--surface-soft) / 0.85);
+    }
+
+    .view-mode-toggle__button {
+        @apply rounded-full px-4 py-2 text-sm font-semibold text-muted transition;
+    }
+
+    .view-mode-toggle__button-active {
+        @apply bg-accent-soft text-text shadow-float;
+    }
+
     .app-modal-backdrop {
         @apply fixed inset-0 z-50 grid place-items-center p-4;
         background-color: rgb(var(--panel-shadow) / 0.35);

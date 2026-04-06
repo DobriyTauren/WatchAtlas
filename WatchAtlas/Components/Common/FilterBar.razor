@@ -1,0 +1,13 @@
+<section class="@CssClass">
+    @ChildContent
+</section>
+
+@code {
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = default!;
+
+    private string CssClass => string.Join(" ", new[] { "filter-bar", Class }.Where(value => !string.IsNullOrWhiteSpace(value)));
+}

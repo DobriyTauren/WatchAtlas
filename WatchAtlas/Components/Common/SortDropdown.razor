@@ -1,0 +1,36 @@
+<AppSelect TValue="string"
+           Id="@Id"
+           Label="@Label"
+           Value="@Value"
+           ValueChanged="HandleChanged">
+    @foreach (var option in Options)
+    {
+        <option value="@option.Key">@option.Label</option>
+    }
+</AppSelect>
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    [Parameter]
+    public string Label { get; set; } = "Sort";
+
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<SortDropdownOption> Options { get; set; } = Array.Empty<SortDropdownOption>();
+
+    private Task HandleChanged(string value)
+        => ValueChanged.InvokeAsync(value);
+
+    public class SortDropdownOption
+    {
+        public required string Key { get; init; }
+        public required string Label { get; init; }
+    }
+}

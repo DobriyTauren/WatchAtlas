@@ -29,4 +29,34 @@ public static class WatchStatusHelper
             _ => WatchStatus.InProgress
         };
     }
+
+    public static double GetCompletionPercent(LibraryEntry entry)
+    {
+        if (entry.Media.Type == MediaType.Movie)
+        {
+            return entry.Movie?.IsWatched == true ? 100 : 0;
+        }
+
+        var episodes = entry.Series?.Seasons.SelectMany(season => season.Episodes).ToList() ?? new List<Episode>();
+        if (episodes.Count == 0)
+        {
+            return 0;
+        }
+
+        var watchedCount = episodes.Count(episode => episode.IsWatched);
+        return watchedCount * 100d / episodes.Count;
+    }
+
+    public static int GetTrackedMinutes(LibraryEntry entry)
+    {
+        if (entry.Media.Type == MediaType.Movie)
+        {
+            return entry.Movie?.DurationMinutes ?? 0;
+        }
+
+        return (entry.Series?.Seasons ?? Enumerable.Empty<Season>())
+            .SelectMany(season => season.Episodes)
+            .Where(episode => episode.IsWatched)
+            .Sum(episode => episode.DurationMinutes ?? 0);
+    }
 }

@@ -2,104 +2,251 @@
 @implements IDisposable
 @inject FilterState FilterState
 @inject LibraryState LibraryState
+@inject SettingsState SettingsState
 
 <PageTitle>Library</PageTitle>
 
 <section class="space-y-8">
     <PageHeader Eyebrow="Library"
                 Title="Browse your full watch collection."
-                Subtitle="Search, filter, and sort across movies and series. The library view now reads from browser-backed state, so new items persist across refreshes.">
+                Subtitle="Search, filter, sort, and switch layouts across your full movie and series collection. The browsing view updates instantly from shared browser-backed state.">
         <Actions>
-            <a class="primary-button" href="/media/new">Add New Item</a>
+            <AppButton Href="/media/new">Add New Item</AppButton>
         </Actions>
     </PageHeader>
 
-    <section class="shell-card space-y-5 p-5 sm:p-6">
-        <div class="grid gap-4 xl:grid-cols-[1.6fr,1fr,1fr]">
-            <div class="space-y-2">
-                <label class="text-sm font-semibold text-text" for="library-search">Title Search</label>
-                <input id="library-search"
-                       class="input-shell"
-                       placeholder="Search by movie or series title"
-                       value="@FilterState.Options.SearchTerm"
-                       @oninput="HandleSearchChanged" />
-            </div>
+    <AppCard Class="space-y-5">
+        <div class="grid gap-4 xl:grid-cols-[1.8fr,1fr,1fr]">
+            <SearchBox Id="library-search"
+                       Label="Search"
+                       Prefix="Search"
+                       Value="@FilterState.Options.SearchTerm"
+                       ValueChanged="HandleSearchChanged"
+                       Placeholder="Search by title, description, or genre" />
 
-            <div class="space-y-2">
-                <label class="text-sm font-semibold text-text" for="library-sort">Sort</label>
-                <select id="library-sort" class="input-shell" value="@FilterState.Options.SortBy" @onchange="HandleSortChanged">
-                    <option value="@LibrarySortBy.RecentlyUpdated">Recently updated</option>
-                    <option value="@LibrarySortBy.Title">Title</option>
-                    <option value="@LibrarySortBy.Rating">Rating</option>
-                    <option value="@LibrarySortBy.CreatedAt">Created date</option>
-                </select>
-            </div>
+            <SortDropdown Id="library-sort"
+                          Label="Sort"
+                          Value="@SelectedSortKey"
+                          ValueChanged="HandleSortChanged"
+                          Options="@SortOptions" />
 
             <div class="soft-block-strong p-4">
                 <p class="text-sm font-semibold text-text">Visible Items</p>
                 <p class="mt-2 text-3xl">@QueryResult.FilteredCount</p>
-                <p class="mt-2 text-sm text-muted">The library view is already prepared for richer filters and saved preferences.</p>
+                <p class="mt-2 text-sm text-muted">@SummaryCopy</p>
             </div>
         </div>
 
-        <div class="flex flex-wrap gap-2">
-            <button class="@GetFilterButtonClass(FilterState.Options.MediaType is null)" type="button" @onclick="() => FilterState.SetMediaType(null)">All Items</button>
-            <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Movie)" type="button" @onclick="() => FilterState.SetMediaType(MediaType.Movie)">Movies</button>
-            <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Series)" type="button" @onclick="() => FilterState.SetMediaType(MediaType.Series)">Series</button>
-            <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.Completed)" type="button" @onclick="() => FilterState.SetStatus(WatchStatus.Completed)">Completed</button>
-            <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.InProgress)" type="button" @onclick="() => FilterState.SetStatus(WatchStatus.InProgress)">In Progress</button>
-            <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.NotStarted)" type="button" @onclick="() => FilterState.SetStatus(WatchStatus.NotStarted)">Not Started</button>
-            <button class="secondary-button" type="button" @onclick="ClearFilters">Reset Filters</button>
-        </div>
-    </section>
+        <FilterBar>
+            <div class="grid gap-4 xl:grid-cols-[1.4fr,1fr,1fr]">
+                <div class="space-y-3">
+                    <p class="text-sm font-semibold text-text">Quick Filters</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="@GetFilterButtonClass(FilterState.Options.MediaType is null && FilterState.Options.Status is null)" type="button" @onclick="() => SelectQuickFilter(null, null)">All Items</button>
+                        <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Movie)" type="button" @onclick="() => SelectQuickFilter(MediaType.Movie, null)">Movies</button>
+                        <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Series)" type="button" @onclick="() => SelectQuickFilter(MediaType.Series, null)">Series</button>
+                        <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.Completed)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.Completed)">Completed</button>
+                        <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.InProgress)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.InProgress)">In Progress</button>
+                        <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.NotStarted)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.NotStarted)">Not Started</button>
+                    </div>
+                </div>
 
-    @if (FilteredEntries.Count == 0)
+                <AppSelect TValue="string"
+                           Id="library-genre"
+                           Label="Genre"
+                           Value="@SelectedGenreValue"
+                           ValueChanged="HandleGenreChanged">
+                    <option value="">All genres</option>
+                    @foreach (var genre in AvailableGenres)
+                    {
+                        <option value="@genre">@genre</option>
+                    }
+                </AppSelect>
+
+                <AppSelect TValue="string"
+                           Id="library-series"
+                           Label="Selected Series"
+                           Value="@SelectedSeriesValue"
+                           ValueChanged="HandleSeriesChanged">
+                    <option value="">All series</option>
+                    @foreach (var series in AvailableSeries)
+                    {
+                        <option value="@series.Media.Id">@series.Media.Title</option>
+                    }
+                </AppSelect>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-4">
+                <div class="flex flex-wrap items-center gap-3">
+                    <ViewModeToggle Value="@CurrentViewMode" ValueChanged="HandleViewModeChanged" />
+                    <button class="@GetDirectionButtonClass()" type="button" @onclick="ToggleSortDirection">
+                        @(FilterState.Options.Descending ? "Descending" : "Ascending")
+                    </button>
+                </div>
+
+                <AppButton Variant="secondary" OnClick="ClearFiltersAsync">Reset Filters</AppButton>
+            </div>
+        </FilterBar>
+    </AppCard>
+
+    @if (QueryResult.TotalCount == 0)
     {
         <EmptyStateCard Badge="Library"
                         Title="Your library is still empty."
-                        Description="Your browser-backed library is ready. Add the first movie or series and it will stay here after a refresh."
+                        Description="Start by adding your first movie or series. Once it is saved, this page becomes your main browsing hub for search, filters, and progress tracking."
                         PrimaryLabel="Add First Entry"
                         PrimaryHref="/media/new"
                         SecondaryLabel="Open Settings"
                         SecondaryHref="/settings" />
     }
+    else if (FilteredEntries.Count == 0)
+    {
+        <AppCard Class="text-center">
+            <div class="mx-auto flex max-w-2xl flex-col items-center gap-4">
+                <AppBadge>No Results</AppBadge>
+                <h2 class="text-2xl">Nothing matches these filters.</h2>
+                <p class="text-sm leading-7 text-muted sm:text-base">Try clearing one or two filters, broadening the search text, or switching the media type and status filters back to a wider view.</p>
+
+                <div class="flex flex-wrap justify-center gap-3 pt-2">
+                    <AppButton Variant="secondary" OnClick="ClearFiltersAsync">Reset Filters</AppButton>
+                    <AppButton Href="/media/new">Add New Item</AppButton>
+                </div>
+            </div>
+        </AppCard>
+    }
     else
     {
-        <section class="grid gap-4 lg:grid-cols-2">
-            @foreach (var entry in FilteredEntries)
-            {
-                <MediaPreviewCard Entry="entry" />
-            }
-        </section>
+        @if (CurrentViewMode == LibraryViewMode.Grid)
+        {
+            <MediaGrid Entries="FilteredEntries" Dense="@SettingsState.Current.UseDenseLibraryGrid" />
+        }
+        else
+        {
+            <section class="space-y-4">
+                @foreach (var entry in FilteredEntries)
+                {
+                    <MediaListItem Entry="entry" />
+                }
+            </section>
+        }
     }
 </section>
 
 @code {
+    private static readonly IReadOnlyList<SortDropdown.SortDropdownOption> SortOptions =
+    [
+        new() { Key = "updated-desc", Label = "Recently updated" },
+        new() { Key = "updated-asc", Label = "Least recently updated" },
+        new() { Key = "created-desc", Label = "Recently added" },
+        new() { Key = "created-asc", Label = "Oldest first" },
+        new() { Key = "title-asc", Label = "Title A-Z" },
+        new() { Key = "title-desc", Label = "Title Z-A" },
+        new() { Key = "rating-desc", Label = "Highest rating" },
+        new() { Key = "rating-asc", Label = "Lowest rating" },
+        new() { Key = "progress-desc", Label = "Most progress" },
+        new() { Key = "progress-asc", Label = "Least progress" }
+    ];
+
     private LibraryQueryResult QueryResult => FilterState.Apply(LibraryState.Entries);
     private IReadOnlyList<LibraryEntry> FilteredEntries => QueryResult.Items;
+    private IReadOnlyList<string> AvailableGenres => LibraryState.Entries
+        .SelectMany(entry => entry.Media.Genres)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(genre => genre)
+        .ToList();
+    private IReadOnlyList<LibraryEntry> AvailableSeries => LibraryState.Entries
+        .Where(entry => entry.Media.Type == MediaType.Series)
+        .OrderBy(entry => entry.Media.Title)
+        .ToList();
+    private LibraryViewMode CurrentViewMode => SettingsState.Current.LibraryViewMode;
+    private string SelectedGenreValue => FilterState.Options.Genre ?? string.Empty;
+    private string SelectedSeriesValue => FilterState.Options.SeriesId?.ToString() ?? string.Empty;
+    private string SelectedSortKey => $"{GetSortKey(FilterState.Options.SortBy)}-{(FilterState.Options.Descending ? "desc" : "asc")}";
+    private string SummaryCopy => QueryResult.TotalCount == QueryResult.FilteredCount
+        ? "Everything currently in your watch library is visible."
+        : $"{QueryResult.FilteredCount} of {QueryResult.TotalCount} items match the current filters.";
 
     protected override async Task OnInitializedAsync()
     {
         FilterState.Changed += HandleStateChanged;
         LibraryState.Changed += HandleStateChanged;
+        SettingsState.Changed += HandleStateChanged;
         await LibraryState.EnsureLoadedAsync();
+        await SettingsState.EnsureLoadedAsync();
     }
 
-    private void HandleSearchChanged(ChangeEventArgs args)
-        => FilterState.SetSearchTerm(args.Value?.ToString() ?? string.Empty);
-
-    private void HandleSortChanged(ChangeEventArgs args)
+    private Task HandleSearchChanged(string? value)
     {
-        if (Enum.TryParse<LibrarySortBy>(args.Value?.ToString(), out var sortBy))
-        {
-            FilterState.SetSortBy(sortBy);
-        }
+        FilterState.SetSearchTerm(value ?? string.Empty);
+        return Task.CompletedTask;
     }
 
-    private void ClearFilters() => FilterState.Reset();
+    private Task HandleSortChanged(string value)
+    {
+        var parts = value.Split('-', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parts.Length != 2)
+        {
+            return Task.CompletedTask;
+        }
+
+        var sortBy = parts[0] switch
+        {
+            "title" => LibrarySortBy.Title,
+            "rating" => LibrarySortBy.Rating,
+            "created" => LibrarySortBy.CreatedAt,
+            "progress" => LibrarySortBy.Progress,
+            _ => LibrarySortBy.UpdatedAt
+        };
+
+        FilterState.SetSortBy(sortBy);
+        FilterState.SetDescending(parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase));
+        return Task.CompletedTask;
+    }
+
+    private Task HandleGenreChanged(string value)
+    {
+        FilterState.SetGenre(value);
+        return Task.CompletedTask;
+    }
+
+    private Task HandleSeriesChanged(string value)
+    {
+        FilterState.SetSeriesId(Guid.TryParse(value, out var parsed) ? parsed : null);
+        return Task.CompletedTask;
+    }
+
+    private void SelectQuickFilter(MediaType? mediaType, WatchStatus? status)
+    {
+        FilterState.SetMediaType(mediaType);
+        FilterState.SetStatus(status);
+    }
+
+    private Task HandleViewModeChanged(LibraryViewMode mode)
+        => SettingsState.UpdateLibraryViewModeAsync(mode);
+
+    private Task ClearFiltersAsync(MouseEventArgs _)
+    {
+        FilterState.Reset();
+        return Task.CompletedTask;
+    }
+
+    private void ToggleSortDirection()
+        => FilterState.SetDescending(!FilterState.Options.Descending);
 
     private string GetFilterButtonClass(bool isActive)
         => isActive ? "nav-chip nav-chip-active" : "nav-chip";
+
+    private string GetDirectionButtonClass()
+        => FilterState.Options.Descending ? "nav-chip nav-chip-active" : "nav-chip";
+
+    private static string GetSortKey(LibrarySortBy sortBy) => sortBy switch
+    {
+        LibrarySortBy.Title => "title",
+        LibrarySortBy.Rating => "rating",
+        LibrarySortBy.CreatedAt => "created",
+        LibrarySortBy.Progress => "progress",
+        _ => "updated"
+    };
 
     private void HandleStateChanged() => InvokeAsync(StateHasChanged);
 
@@ -107,5 +254,6 @@
     {
         FilterState.Changed -= HandleStateChanged;
         LibraryState.Changed -= HandleStateChanged;
+        SettingsState.Changed -= HandleStateChanged;
     }
 }

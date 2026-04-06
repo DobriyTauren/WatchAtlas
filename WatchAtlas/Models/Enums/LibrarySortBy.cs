@@ -2,8 +2,10 @@ namespace WatchAtlas.Models.Enums;
 
 public enum LibrarySortBy
 {
-    RecentlyUpdated,
+    UpdatedAt,
+    RecentlyUpdated = UpdatedAt,
     Title,
     Rating,
-    CreatedAt
+    CreatedAt,
+    Progress
 }

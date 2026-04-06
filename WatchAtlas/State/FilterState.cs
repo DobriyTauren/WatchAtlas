@@ -30,6 +30,18 @@ public class FilterState : StateStoreBase
         NotifyStateChanged();
     }
 
+    public void SetGenre(string? value)
+    {
+        var normalized = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+        if (Options.Genre == normalized)
+        {
+            return;
+        }
+
+        Options.Genre = normalized;
+        NotifyStateChanged();
+    }
+
     public void SetStatus(WatchStatus? value)
     {
         if (Options.Status == value)
@@ -63,13 +75,25 @@ public class FilterState : StateStoreBase
         NotifyStateChanged();
     }
 
+    public void SetDescending(bool value)
+    {
+        if (Options.Descending == value)
+        {
+            return;
+        }
+
+        Options.Descending = value;
+        NotifyStateChanged();
+    }
+
     public void Reset()
     {
         Options.SearchTerm = string.Empty;
+        Options.Genre = null;
         Options.MediaType = null;
         Options.Status = null;
         Options.SeriesId = null;
-        Options.SortBy = LibrarySortBy.RecentlyUpdated;
+        Options.SortBy = LibrarySortBy.UpdatedAt;
         Options.Descending = true;
         NotifyStateChanged();
     }
@@ -81,12 +105,20 @@ public class FilterState : StateStoreBase
 
         if (!string.IsNullOrWhiteSpace(Options.SearchTerm))
         {
-            query = query.Where(entry => entry.Media.Title.Contains(Options.SearchTerm, StringComparison.OrdinalIgnoreCase));
+            query = query.Where(entry =>
+                entry.Media.Title.Contains(Options.SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                (entry.Media.Description?.Contains(Options.SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                entry.Media.Genres.Any(genre => genre.Contains(Options.SearchTerm, StringComparison.OrdinalIgnoreCase)));
         }
 
         if (Options.MediaType is not null)
         {
             query = query.Where(entry => entry.Media.Type == Options.MediaType);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Options.Genre))
+        {
+            query = query.Where(entry => entry.Media.Genres.Any(genre => genre.Equals(Options.Genre, StringComparison.OrdinalIgnoreCase)));
         }
 
         if (Options.Status is not null)
@@ -110,6 +142,11 @@ public class FilterState : StateStoreBase
             LibrarySortBy.CreatedAt => Options.Descending
                 ? query.OrderByDescending(entry => entry.Media.CreatedAt)
                 : query.OrderBy(entry => entry.Media.CreatedAt),
+            LibrarySortBy.Progress => Options.Descending
+                ? query.OrderByDescending(WatchStatusHelper.GetCompletionPercent)
+                    .ThenByDescending(entry => entry.Media.UpdatedAt)
+                : query.OrderBy(WatchStatusHelper.GetCompletionPercent)
+                    .ThenBy(entry => entry.Media.UpdatedAt),
             _ => Options.Descending
                 ? query.OrderByDescending(entry => entry.Media.UpdatedAt)
                 : query.OrderBy(entry => entry.Media.UpdatedAt)
@@ -123,6 +160,7 @@ public class FilterState : StateStoreBase
             Filters = new LibraryFilterOptions
             {
                 SearchTerm = Options.SearchTerm,
+                Genre = Options.Genre,
                 MediaType = Options.MediaType,
                 Status = Options.Status,
                 SeriesId = Options.SeriesId,

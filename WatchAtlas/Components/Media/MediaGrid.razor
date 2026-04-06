@@ -1,0 +1,18 @@
+<section class="@GridClass">
+    @foreach (var entry in Entries)
+    {
+        <MediaCard Entry="entry" />
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<LibraryEntry> Entries { get; set; } = Array.Empty<LibraryEntry>();
+
+    [Parameter]
+    public bool Dense { get; set; }
+
+    private string GridClass => Dense
+        ? "grid gap-4 md:grid-cols-2 2xl:grid-cols-3"
+        : "grid gap-4 lg:grid-cols-2";
+}

@@ -48,6 +48,7 @@ public class LocalStorageSettingsRepository(IJSRuntime jsRuntime) : ISettingsRep
     private static AppSettings Clone(AppSettings settings) => new()
     {
         ThemeMode = settings.ThemeMode,
+        LibraryViewMode = settings.LibraryViewMode,
         UseDenseLibraryGrid = settings.UseDenseLibraryGrid,
         ShowCompletedItemsFirst = settings.ShowCompletedItemsFirst
     };

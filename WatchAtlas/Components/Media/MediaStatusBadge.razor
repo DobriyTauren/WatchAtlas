@@ -1,0 +1,20 @@
+<AppBadge Variant="@Variant">@Label</AppBadge>
+
+@code {
+    [Parameter, EditorRequired]
+    public WatchStatus Status { get; set; }
+
+    private string Label => Status switch
+    {
+        WatchStatus.Completed => "Completed",
+        WatchStatus.InProgress => "In Progress",
+        _ => "Not Started"
+    };
+
+    private string Variant => Status switch
+    {
+        WatchStatus.Completed => "success",
+        WatchStatus.InProgress => "outline",
+        _ => "muted"
+    };
+}

@@ -28,4 +28,17 @@ public class SettingsState(ISettingsRepository repository) : StateStoreBase
         await repository.SaveAsync(Current, cancellationToken);
         NotifyStateChanged();
     }
+
+    public async Task UpdateLibraryViewModeAsync(LibraryViewMode viewMode, CancellationToken cancellationToken = default)
+    {
+        await EnsureLoadedAsync(cancellationToken);
+        if (Current.LibraryViewMode == viewMode)
+        {
+            return;
+        }
+
+        Current.LibraryViewMode = viewMode;
+        await repository.SaveAsync(Current, cancellationToken);
+        NotifyStateChanged();
+    }
 }

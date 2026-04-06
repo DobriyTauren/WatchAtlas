@@ -1,0 +1,69 @@
+@using WatchAtlas.Extensions
+
+@{
+    var status = WatchStatusHelper.GetStatus(Entry);
+    var completion = WatchStatusHelper.GetCompletionPercent(Entry);
+    var runtimeMinutes = WatchStatusHelper.GetTrackedMinutes(Entry);
+}
+
+<article class="shell-card flex flex-col gap-5 p-5 sm:flex-row sm:items-start sm:justify-between sm:p-6">
+    <div class="min-w-0 flex-1 space-y-4">
+        <div class="flex flex-wrap items-center gap-2">
+            <MediaTypeBadge Type="@Entry.Media.Type" />
+            <MediaStatusBadge Status="@status" />
+
+            @if (Entry.Media.PersonalRating is { } rating)
+            {
+                <span class="rating-pill">@rating/10</span>
+            }
+        </div>
+
+        <div class="space-y-2">
+            <h3 class="text-2xl">@Entry.Media.Title</h3>
+            <p class="text-sm leading-7 text-muted">
+                @(string.IsNullOrWhiteSpace(Entry.Media.Description)
+                    ? "No description yet. Open details to enrich this entry."
+                    : Entry.Media.Description)
+            </p>
+        </div>
+
+        @if (Entry.Media.Genres.Count > 0)
+        {
+            <div class="flex flex-wrap gap-2">
+                @foreach (var genre in Entry.Media.Genres)
+                {
+                    <AppBadge Variant="outline">@genre</AppBadge>
+                }
+            </div>
+        }
+
+        <div class="grid gap-3 text-sm text-muted sm:grid-cols-3">
+            <div class="soft-block p-4">
+                <p class="font-semibold text-text">Created</p>
+                <p class="mt-1">@Entry.Media.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
+            </div>
+
+            <div class="soft-block p-4">
+                <p class="font-semibold text-text">Updated</p>
+                <p class="mt-1">@Entry.Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
+            </div>
+
+            <div class="soft-block p-4">
+                <p class="font-semibold text-text">Tracked Time</p>
+                <p class="mt-1">@(runtimeMinutes > 0 ? runtimeMinutes.ToReadableDuration() : "Not tracked yet")</p>
+            </div>
+        </div>
+
+        <ProgressBar Label="Completion" Value="@completion" Max="100" />
+    </div>
+
+    <div class="flex shrink-0 flex-wrap gap-3 sm:w-44 sm:flex-col">
+        <AppButton Href="@($"/media/{Entry.Media.Id}")">Open Details</AppButton>
+        <AppButton Href="/media/new" Variant="secondary">Add Another</AppButton>
+    </div>
+</article>
+
+@code {
+    [Parameter, EditorRequired]
+    public LibraryEntry Entry { get; set; } = default!;
+}
