@@ -4,7 +4,18 @@
 }
 else
 {
-    <button type="@Type" class="@CssClass" disabled="@Disabled" @onclick="OnClick" @attributes="AdditionalAttributes">@ChildContent</button>
+    <button type="@Type"
+            class="@CssClass"
+            disabled="@IsActuallyDisabled"
+            aria-busy="@IsLoading"
+            @onclick="OnClick"
+            @attributes="AdditionalAttributes">
+        @if (IsLoading)
+        {
+            <span class="app-button__spinner" aria-hidden="true"></span>
+        }
+        @ChildContent
+    </button>
 }
 
 @code {
@@ -24,6 +35,9 @@ else
     public bool Disabled { get; set; }
 
     [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
     public string? Class { get; set; }
 
     [Parameter]
@@ -34,6 +48,8 @@ else
 
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool IsActuallyDisabled => Disabled || IsLoading;
 
     private string CssClass => string.Join(" ", new[]
     {
@@ -50,7 +66,7 @@ else
             "lg" => "app-button-lg",
             _ => "app-button-md"
         },
-        Disabled ? "app-button-disabled" : null,
+        IsActuallyDisabled ? "app-button-disabled" : null,
         Class
     }.Where(value => !string.IsNullOrWhiteSpace(value)));
 }

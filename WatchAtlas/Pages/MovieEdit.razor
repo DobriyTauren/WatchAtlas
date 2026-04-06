@@ -1,6 +1,7 @@
 @page "/movies/{Id:guid}/edit"
 @inject LibraryState LibraryState
 @inject NavigationManager NavigationManager
+@inject ToastState ToastState
 
 <PageTitle>Edit Movie</PageTitle>
 
@@ -138,11 +139,13 @@
             {
                 Form = MovieFormModel.From(Entry.Media, Entry.Movie);
                 SuccessMessage = "Movie changes were saved.";
+                ToastState.ShowSuccess("Movie saved.", "Your movie details were updated successfully.");
             }
         }
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
+            ToastState.ShowError("Movie changes could not be saved.", exception.Message);
         }
         finally
         {

@@ -1,18 +1,25 @@
 @if (IsOpen)
 {
     <div class="app-modal-backdrop" @onclick="HandleBackdropClick">
-        <div class="app-modal-panel" @onclick:stopPropagation="true">
+        <div class="app-modal-panel"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="@TitleId"
+             aria-describedby="@AriaDescriptionId"
+             tabindex="-1"
+             @onkeydown="HandleKeyDownAsync"
+             @onclick:stopPropagation="true">
             @if (!string.IsNullOrWhiteSpace(Title) || !string.IsNullOrWhiteSpace(Description))
             {
                 <div class="space-y-2">
                     @if (!string.IsNullOrWhiteSpace(Title))
                     {
-                        <h2 class="text-2xl">@Title</h2>
+                        <h2 id="@TitleId" class="text-2xl">@Title</h2>
                     }
 
                     @if (!string.IsNullOrWhiteSpace(Description))
                     {
-                        <p class="text-sm leading-7 text-muted">@Description</p>
+                        <p id="@DescriptionId" class="text-sm leading-7 text-muted">@Description</p>
                     }
                 </div>
             }
@@ -53,6 +60,13 @@
     [Parameter]
     public RenderFragment? Footer { get; set; }
 
+    private string TitleId { get; } = $"modal-title-{Guid.NewGuid():N}";
+    private string DescriptionId { get; } = $"modal-description-{Guid.NewGuid():N}";
+    private string? AriaDescriptionId => !string.IsNullOrWhiteSpace(Description) ? DescriptionId : null;
+
     private Task HandleBackdropClick()
         => CloseOnBackdropClick ? OnClose.InvokeAsync() : Task.CompletedTask;
+
+    private Task HandleKeyDownAsync(KeyboardEventArgs args)
+        => args.Key == "Escape" ? OnClose.InvokeAsync() : Task.CompletedTask;
 }

@@ -1,4 +1,6 @@
-<EditForm EditContext="EditContext" OnValidSubmit="HandleValidSubmitAsync">
+@inject ToastState ToastState
+
+<EditForm EditContext="EditContext" OnValidSubmit="HandleValidSubmitAsync" OnInvalidSubmit="HandleInvalidSubmit">
     <DataAnnotationsValidator />
 
     <div class="space-y-6">
@@ -24,7 +26,7 @@
         <MovieFormFields Model="Model" FieldPrefix="@FieldPrefix" />
 
         <div class="flex flex-wrap gap-3">
-            <AppButton Type="submit" Disabled="@IsBusy">@SubmitLabel</AppButton>
+            <AppButton Type="submit" IsLoading="@IsBusy">@SubmitLabel</AppButton>
 
             @if (!string.IsNullOrWhiteSpace(CancelHref))
             {
@@ -73,4 +75,10 @@
 
     private Task HandleValidSubmitAsync()
         => OnSubmitRequested.InvokeAsync();
+
+    private void HandleInvalidSubmit(EditContext editContext)
+    {
+        var firstMessage = editContext.GetValidationMessages().FirstOrDefault();
+        ToastState.ShowWarning("Please review the form fields.", firstMessage ?? "Some movie details still need attention before save.");
+    }
 }

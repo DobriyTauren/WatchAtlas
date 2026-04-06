@@ -1,8 +1,10 @@
 window.watchAtlasTheme = {
     settingsKey: 'watchatlas.settings',
     defaultThemeKey: 'light-soft',
+    transitionBlockerId: 'watchatlas-theme-transition-blocker',
     apply: function (themeKey, accentHex) {
         var resolvedTheme = themeKey || this.defaultThemeKey;
+        var releaseTransitions = this.freezeTransitions();
 
         document.documentElement.setAttribute('data-theme', resolvedTheme);
         if (document.body) {
@@ -15,6 +17,33 @@ window.watchAtlasTheme = {
                 themeColorMeta.setAttribute('content', accentHex);
             }
         }
+
+        releaseTransitions();
+    },
+    freezeTransitions: function () {
+        var existing = document.getElementById(this.transitionBlockerId);
+        if (existing) {
+            existing.remove();
+        }
+
+        var style = document.createElement('style');
+        style.id = this.transitionBlockerId;
+        style.textContent = '*,*::before,*::after{transition:none!important;animation:none!important;}';
+        document.head.appendChild(style);
+
+        if (document.body) {
+            void document.body.offsetHeight;
+        } else {
+            void document.documentElement.offsetHeight;
+        }
+
+        return function () {
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    style.remove();
+                });
+            });
+        };
     },
     bootstrap: function () {
         try {

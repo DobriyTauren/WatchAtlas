@@ -15,6 +15,28 @@
         </Actions>
     </PageHeader>
 
+    @if (LibraryState.IsLoading && !LibraryState.IsLoaded)
+    {
+        <section class="space-y-4">
+            <AppCard Class="space-y-5">
+                <div class="grid gap-4 xl:grid-cols-[1.8fr,1fr,1fr]">
+                    <SkeletonBlock HeightClass="h-14" RadiusClass="rounded-full" />
+                    <SkeletonBlock HeightClass="h-14" RadiusClass="rounded-[1.4rem]" />
+                    <SkeletonCard ShowChip="false" Class="min-h-[5.5rem]" />
+                </div>
+                <SkeletonBlock HeightClass="h-40" RadiusClass="rounded-[1.75rem]" />
+            </AppCard>
+
+            <section class="grid gap-4 lg:grid-cols-2">
+                <SkeletonCard Class="min-h-[16rem]" />
+                <SkeletonCard Class="min-h-[16rem]" />
+                <SkeletonCard Class="min-h-[16rem]" />
+                <SkeletonCard Class="min-h-[16rem]" />
+            </section>
+        </section>
+    }
+    else
+    {
     <AppCard Class="space-y-5">
         <div class="grid gap-4 xl:grid-cols-[1.8fr,1fr,1fr]">
             <SearchBox Id="library-search"
@@ -129,6 +151,7 @@
                 }
             </section>
         }
+    }
     }
 </section>
 

@@ -1,5 +1,6 @@
 ﻿@page "/"
 
+@implements IDisposable
 @inject LibraryState LibraryState
 @inject ThemeState ThemeState
 @inject IStatisticsService StatisticsService
@@ -8,6 +9,36 @@
 <PageTitle>WatchAtlas</PageTitle>
 
 <section class="space-y-8">
+    @if (LibraryState.IsLoading && !LibraryState.IsLoaded)
+    {
+        <PageHeader Eyebrow="Overview"
+                    Title="Loading your watch library."
+                    Subtitle="Preparing the dashboard, saved totals, and library overview from browser storage." />
+
+        <section class="grid gap-4 xl:grid-cols-[1.4fr,1fr]">
+            <AppCard Class="space-y-6">
+                <SkeletonBlock HeightClass="h-7" Class="w-36" />
+                <SkeletonBlock HeightClass="h-12" Class="w-full max-w-2xl" />
+                <SkeletonBlock HeightClass="h-4" Class="w-full" />
+                <SkeletonBlock HeightClass="h-4" Class="w-5/6" />
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <SkeletonCard ShowChip="false" />
+                    <SkeletonCard ShowChip="false" />
+                </div>
+            </AppCard>
+
+            <SkeletonCard Class="h-full" />
+        </section>
+
+        <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+        </section>
+    }
+    else
+    {
     <PageHeader Eyebrow="Phase 3"
                 Title="Your personal watch library starts here."
                 Subtitle="The foundation now combines browser-backed persistence, reusable Blazor structure, and a shared theme-aware design system across the app shell.">
@@ -62,6 +93,7 @@
         <StatTile Title="Watched Episodes" Value="@Stats.WatchedEpisodes.ToString()" Caption="Episode totals update from saved series data and watched states." ChipLabel="Episodes" />
         <StatTile Title="Watch Time" Value="@Stats.TotalWatchTimeMinutes.ToReadableDuration()" Caption="Calculated through the statistics service." ChipLabel="Runtime" />
     </section>
+    }
 </section>
 
 @code {
@@ -69,6 +101,14 @@
 
     protected override async Task OnInitializedAsync()
     {
+        LibraryState.Changed += HandleLibraryChanged;
         await LibraryState.EnsureLoadedAsync();
+    }
+
+    private void HandleLibraryChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        LibraryState.Changed -= HandleLibraryChanged;
     }
 }

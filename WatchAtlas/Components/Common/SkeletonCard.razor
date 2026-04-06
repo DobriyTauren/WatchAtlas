@@ -1,0 +1,38 @@
+<AppCard Class="@WrapperClass">
+    <div class="space-y-4" aria-hidden="true">
+        <div class="flex items-start justify-between gap-4">
+            <SkeletonBlock HeightClass="h-4" Class="w-28" />
+            @if (ShowChip)
+            {
+                <SkeletonBlock HeightClass="h-8" RadiusClass="rounded-full" Class="w-20" />
+            }
+        </div>
+
+        <SkeletonBlock HeightClass="h-10" Class="w-24" />
+
+        @for (var index = 0; index < LineCount; index++)
+        {
+            <SkeletonBlock HeightClass="h-3.5" Class="@GetLineWidth(index)" />
+        }
+    </div>
+</AppCard>
+
+@code {
+    [Parameter]
+    public int LineCount { get; set; } = 2;
+
+    [Parameter]
+    public bool ShowChip { get; set; } = true;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private string WrapperClass => string.Join(" ", new[] { "overflow-hidden", Class }.Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    private static string GetLineWidth(int index) => index switch
+    {
+        0 => "w-full",
+        1 => "w-4/5",
+        _ => "w-2/3"
+    };
+}

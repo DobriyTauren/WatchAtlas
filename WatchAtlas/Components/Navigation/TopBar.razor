@@ -1,6 +1,6 @@
 @inject FilterState FilterState
 
-<header class="shell-card sticky top-4 z-20 flex flex-col gap-4 p-4 sm:p-5">
+<header class="shell-card sticky top-4 z-20 flex flex-col gap-4 p-4 sm:p-5" role="search" aria-label="Library search and quick actions">
     <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <AppInput Class="flex-1"
                   InputClassName="rounded-full border-0 bg-surface-strong"
@@ -9,9 +9,9 @@
                   Placeholder="Search titles from your library"
                   aria-label="Search titles" />
 
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3 max-sm:w-full">
             <ThemeSwitcher Compact="true" />
-            <AppButton Href="/media/new">Add Movie or Series</AppButton>
+            <AppButton Href="/media/new" Class="max-sm:flex-1">Add Movie or Series</AppButton>
         </div>
     </div>
 </header>

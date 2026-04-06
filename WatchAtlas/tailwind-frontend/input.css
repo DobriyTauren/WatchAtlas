@@ -132,17 +132,17 @@
 
 @layer components {
     .shell-card {
-        @apply rounded-3xl border border-border/80 bg-surface/90 backdrop-blur;
+        @apply rounded-3xl border border-border/80 bg-surface/90 backdrop-blur transition-shadow duration-200;
         box-shadow: var(--shadow-soft);
     }
 
     .shell-panel {
-        @apply rounded-[2rem] border border-border/70 bg-surface-strong/90 backdrop-blur;
+        @apply rounded-[2rem] border border-border/70 bg-surface-strong/90 backdrop-blur transition-shadow duration-200;
         box-shadow: var(--shadow-panel);
     }
 
     .nav-chip {
-        @apply inline-flex items-center gap-2 rounded-full border border-transparent px-4 py-2 text-sm font-medium text-muted transition-all duration-200 hover:border-border hover:bg-surface-strong hover:text-text;
+        @apply inline-flex items-center gap-2 rounded-full border border-transparent px-4 py-2 text-sm font-medium text-muted transition-all duration-200 hover:border-border hover:bg-surface-strong hover:text-text focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent-soft/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent;
     }
 
     .nav-chip-active {
@@ -249,7 +249,7 @@
     }
 
     .app-card {
-        @apply border border-border/70 backdrop-blur;
+        @apply border border-border/70 backdrop-blur transition-all duration-200;
         border-radius: var(--radius-card);
     }
 
@@ -284,24 +284,29 @@
     }
 
     .app-button {
-        @apply inline-flex items-center justify-center font-semibold transition-all duration-200 disabled:pointer-events-none disabled:opacity-60;
+        @apply inline-flex items-center justify-center gap-2 font-semibold transition-all duration-200 disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent-soft/80 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent;
         border-radius: 9999px;
     }
 
     .app-button-primary {
-        @apply shadow-float hover:-translate-y-0.5;
+        @apply shadow-float hover:-translate-y-0.5 active:translate-y-0;
         background-image: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-strong)));
         color: rgb(var(--accent-contrast));
     }
 
     .app-button-secondary {
-        @apply border border-border text-text hover:border-accent/30 hover:text-accent;
+        @apply border border-border text-text hover:border-accent/30 hover:text-accent active:translate-y-0;
         background-color: rgb(var(--surface-soft) / 0.90);
     }
 
     .app-button-ghost {
         @apply text-muted hover:text-text;
         background-color: transparent;
+    }
+
+    .app-button__spinner {
+        @apply h-4 w-4 rounded-full border-2 border-current border-r-transparent;
+        animation: watchatlas-spin 0.75s linear infinite;
     }
 
     .app-button-sm {
@@ -331,7 +336,7 @@
     .app-input,
     .app-select,
     .app-textarea {
-        @apply w-full border border-border text-sm text-text outline-none transition focus:border-accent/40 focus:ring-4 focus:ring-accent-soft/70;
+        @apply w-full border border-border text-sm text-text outline-none transition focus:border-accent/40 focus:ring-4 focus:ring-accent-soft/70 focus-visible:outline-none;
         border-radius: calc(var(--radius-soft) + 0.125rem);
         background-color: rgb(var(--surface-soft) / 0.90);
         padding: 0.85rem 1rem;
@@ -343,7 +348,7 @@
     }
 
     .app-checkbox {
-        @apply flex items-start gap-3 border border-border/70;
+        @apply flex items-start gap-3 border border-border/70 transition focus-within:ring-4 focus-within:ring-accent-soft/70;
         border-radius: calc(var(--radius-soft) + 0.25rem);
         background-color: rgb(var(--surface-soft) / 0.70);
         padding: 0.9rem 1rem;
@@ -389,7 +394,7 @@
     }
 
     .theme-card {
-        @apply flex flex-col gap-3 border border-border/70 p-5 text-left transition hover:border-accent/30 hover:text-text;
+        @apply flex flex-col gap-3 border border-border/70 p-5 text-left transition hover:border-accent/30 hover:text-text focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent-soft/80 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent;
         border-radius: var(--radius-card);
         background-color: rgb(var(--surface-soft-strong) / 0.92);
     }
@@ -436,7 +441,7 @@
     }
 
     .view-mode-toggle__button {
-        @apply rounded-full px-4 py-2 text-sm font-semibold text-muted transition;
+        @apply rounded-full px-4 py-2 text-sm font-semibold text-muted transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent-soft/80;
     }
 
     .view-mode-toggle__button-active {
@@ -477,7 +482,7 @@
     }
 
     .series-accordion {
-        @apply rounded-[1.75rem] border border-border/70 bg-surface-strong/80 p-5;
+        @apply rounded-[1.75rem] border border-border/70 bg-surface-strong/80 p-5 transition-all duration-200;
     }
 
     .series-accordion[open] {
@@ -488,12 +493,79 @@
         @apply flex cursor-pointer list-none flex-col gap-3 md:flex-row md:items-center md:justify-between;
     }
 
+    .series-accordion__summary:focus-visible {
+        @apply rounded-2xl outline-none ring-4 ring-accent-soft/80;
+    }
+
     .series-accordion__summary::-webkit-details-marker {
         display: none;
     }
 
     .series-accordion__meta {
         @apply flex flex-wrap gap-3 text-sm text-muted;
+    }
+
+    .toast-host {
+        @apply fixed right-4 top-4 z-[70] flex w-[min(92vw,26rem)] flex-col gap-3;
+    }
+
+    .toast {
+        @apply flex items-start justify-between gap-4 rounded-[1.5rem] border p-4 shadow-lg backdrop-blur animate-rise;
+        background-color: rgb(var(--surface-strong) / 0.95);
+    }
+
+    .toast-info {
+        @apply border-border/80;
+    }
+
+    .toast-success {
+        border-color: rgb(var(--success) / 0.35);
+        background-color: rgb(var(--status-success-bg) / 0.96);
+    }
+
+    .toast-warning {
+        border-color: rgb(234 179 8 / 0.35);
+        background-color: rgb(254 249 195 / 0.96);
+    }
+
+    body[data-theme='dark-soft'] .toast-warning,
+    [data-theme='dark-soft'] .toast-warning {
+        border-color: rgb(250 204 21 / 0.24);
+        background-color: rgb(92 72 23 / 0.96);
+    }
+
+    .toast-error {
+        border-color: rgb(239 68 68 / 0.35);
+        background-color: rgb(254 242 242 / 0.97);
+    }
+
+    body[data-theme='dark-soft'] .toast-error,
+    [data-theme='dark-soft'] .toast-error {
+        border-color: rgb(248 113 113 / 0.28);
+        background-color: rgb(96 35 44 / 0.96);
+    }
+
+    .toast__title {
+        @apply text-sm font-semibold text-text;
+    }
+
+    .toast__description {
+        @apply text-sm leading-6 text-muted;
+    }
+
+    .toast__dismiss {
+        @apply rounded-full border border-border/60 px-2.5 py-1 text-xs font-semibold text-muted transition hover:border-accent/30 hover:text-text focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent-soft/70;
+        background-color: rgb(var(--surface-soft) / 0.7);
+    }
+
+    .skeleton-block {
+        @apply relative overflow-hidden rounded-2xl;
+        background: linear-gradient(90deg,
+            rgb(var(--surface-soft) / 0.8) 0%,
+            rgb(var(--surface-soft-strong) / 0.95) 50%,
+            rgb(var(--surface-soft) / 0.8) 100%);
+        background-size: 220% 100%;
+        animation: skeleton-shimmer 1.4s ease-in-out infinite;
     }
 
     .cover-uploader__mode {
@@ -617,5 +689,15 @@
 @keyframes watchatlas-spin {
     to {
         transform: rotate(360deg);
+    }
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
     }
 }

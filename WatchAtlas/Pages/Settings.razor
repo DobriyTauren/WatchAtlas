@@ -7,6 +7,7 @@
 @inject SettingsState SettingsState
 @inject ThemeState ThemeState
 @inject FilterState FilterState
+@inject ToastState ToastState
 
 <PageTitle>Settings</PageTitle>
 
@@ -93,7 +94,7 @@
                     <p class="text-sm font-semibold text-text">Export backup</p>
                     <p class="mt-2 text-sm leading-7 text-muted">Exports the full library snapshot, including movies, series, seasons, episodes, and current app settings.</p>
                     <div class="mt-4 flex flex-wrap gap-3">
-                        <AppButton Disabled="@IsExporting" OnClick="ExportBackupAsync">
+                        <AppButton IsLoading="@IsExporting" OnClick="ExportBackupAsync">
                             @(IsExporting ? "Preparing Export..." : "Export JSON Backup")
                         </AppButton>
                     </div>
@@ -153,8 +154,8 @@
             </div>
         </ChildContent>
         <Footer>
-            <AppButton Variant="secondary" Disabled="@IsImporting" OnClick="CloseImportModalButtonAsync">Cancel</AppButton>
-            <AppButton Disabled="@IsImporting" OnClick="ConfirmImportAsync">Replace Local Data</AppButton>
+                <AppButton Variant="secondary" Disabled="@IsImporting" OnClick="CloseImportModalButtonAsync">Cancel</AppButton>
+                <AppButton IsLoading="@IsImporting" OnClick="ConfirmImportAsync">Replace Local Data</AppButton>
         </Footer>
     </AppModal>
 
@@ -169,7 +170,7 @@
         </ChildContent>
         <Footer>
             <AppButton Variant="secondary" Disabled="@IsResetting" OnClick="CloseResetModalButtonAsync">Cancel</AppButton>
-            <AppButton Disabled="@IsResetting" OnClick="ConfirmResetAsync">Reset Everything</AppButton>
+            <AppButton IsLoading="@IsResetting" OnClick="ConfirmResetAsync">Reset Everything</AppButton>
         </Footer>
     </AppModal>
 </section>
@@ -238,10 +239,12 @@
             var json = ImportExportService.Export(backup);
             await JsRuntime.InvokeVoidAsync("watchAtlasStorage.downloadTextFile", fileName, json, "application/json;charset=utf-8");
             FeedbackMessage = "Backup exported successfully.";
+            ToastState.ShowSuccess("Backup exported.", "A full JSON snapshot of your library and settings has been downloaded.");
         }
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
+            ToastState.ShowError("Backup export failed.", exception.Message);
         }
         finally
         {
@@ -274,6 +277,7 @@
             if (!result.IsSuccessful)
             {
                 ErrorMessage = result.ErrorMessage ?? "The selected backup could not be imported.";
+                ToastState.ShowError("Import failed.", ErrorMessage);
                 return;
             }
 
@@ -283,6 +287,7 @@
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
+            ToastState.ShowError("Import failed.", exception.Message);
         }
     }
 
@@ -329,6 +334,7 @@
             FilterState.Reset(SettingsState.Current.DefaultLibrarySortBy, SettingsState.Current.DefaultLibrarySortDescending);
 
             FeedbackMessage = "Backup restored successfully.";
+            ToastState.ShowSuccess("Backup restored.", "The selected backup replaced the current local data.");
             IsImportModalOpen = false;
             SelectedImportFileName = null;
             PendingImportBackup = null;
@@ -336,6 +342,7 @@
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
+            ToastState.ShowError("Backup restore failed.", exception.Message);
         }
         finally
         {
@@ -356,6 +363,7 @@
             FilterState.Reset(SettingsState.Current.DefaultLibrarySortBy, SettingsState.Current.DefaultLibrarySortDescending);
 
             FeedbackMessage = "All local WatchAtlas data has been cleared.";
+            ToastState.ShowSuccess("Local data reset.", "The library and saved preferences were cleared from browser storage.");
             IsResetModalOpen = false;
             SelectedImportFileName = null;
             PendingImportBackup = null;
@@ -363,6 +371,7 @@
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
+            ToastState.ShowError("Reset failed.", exception.Message);
         }
         finally
         {

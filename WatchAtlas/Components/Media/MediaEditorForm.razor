@@ -1,3 +1,5 @@
+@inject ToastState ToastState
+
 <EditForm Model="Media" OnSubmit="HandleSubmitAsync">
     <div class="space-y-6">
         @if (!string.IsNullOrWhiteSpace(DisplayedErrorMessage))
@@ -27,7 +29,7 @@
         }
 
         <div class="flex flex-wrap gap-3">
-            <AppButton Type="submit" Disabled="@IsBusy">@SubmitLabel</AppButton>
+            <AppButton Type="submit" IsLoading="@IsBusy">@SubmitLabel</AppButton>
 
             @if (AllowDelete)
             {
@@ -105,6 +107,7 @@
         ValidationMessage = Validate();
         if (!string.IsNullOrWhiteSpace(ValidationMessage))
         {
+            ToastState.ShowWarning("Please review the form.", ValidationMessage);
             return;
         }
 

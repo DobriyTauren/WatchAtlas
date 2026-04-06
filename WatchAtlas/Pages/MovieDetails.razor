@@ -1,6 +1,7 @@
 @page "/movies/{Id:guid}"
 @inject LibraryState LibraryState
 @inject NavigationManager NavigationManager
+@inject ToastState ToastState
 
 <PageTitle>Movie Details</PageTitle>
 
@@ -137,7 +138,7 @@
             </ChildContent>
             <Footer>
                 <AppButton Variant="secondary" Disabled="@IsDeleting" OnClick="CloseDeleteModalButtonAsync">Cancel</AppButton>
-                <AppButton Disabled="@IsDeleting" OnClick="ConfirmDeleteAsync">Delete Movie</AppButton>
+                <AppButton IsLoading="@IsDeleting" OnClick="ConfirmDeleteAsync">Delete Movie</AppButton>
             </Footer>
         </AppModal>
     }
@@ -215,16 +216,20 @@
             return;
         }
 
+        var deletedTitle = Entry.Media.Title;
+
         try
         {
             IsDeleting = true;
             ErrorMessage = null;
             await LibraryState.DeleteAsync(Entry.Media.Id);
+            ToastState.ShowSuccess("Movie deleted.", $"\"{deletedTitle}\" was removed from your library.");
             NavigationManager.NavigateTo("/library");
         }
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
+            ToastState.ShowError("Movie could not be deleted.", exception.Message);
         }
         finally
         {

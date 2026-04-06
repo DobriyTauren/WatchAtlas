@@ -10,6 +10,7 @@
             class="@SelectClass"
             value="@BindConverter.FormatValue(Value)"
             disabled="@Disabled"
+            aria-describedby="@HelpTextId"
             @onchange="HandleChanged"
             @attributes="AdditionalAttributes">
         @ChildContent
@@ -17,7 +18,7 @@
 
     @if (!string.IsNullOrWhiteSpace(HelpText))
     {
-        <p class="app-field-help">@HelpText</p>
+        <p id="@HelpTextId" class="app-field-help">@HelpText</p>
     }
 </div>
 
@@ -54,6 +55,7 @@
 
     private string WrapperClass => string.Join(" ", new[] { "app-field", Class }.Where(value => !string.IsNullOrWhiteSpace(value)));
     private string SelectClass => string.Join(" ", new[] { "app-select", SelectClassName }.Where(value => !string.IsNullOrWhiteSpace(value)));
+    private string? HelpTextId => !string.IsNullOrWhiteSpace(HelpText) && !string.IsNullOrWhiteSpace(Id) ? $"{Id}-help" : null;
 
     private Task HandleChanged(ChangeEventArgs args)
     {

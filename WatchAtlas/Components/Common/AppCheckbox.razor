@@ -3,13 +3,14 @@
            class="app-checkbox-input"
            checked="@Value"
            disabled="@Disabled"
+           aria-describedby="@AriaDescriptionId"
            @onchange="HandleChanged"
            @attributes="AdditionalAttributes" />
     <span class="app-checkbox-copy">
         <span class="app-checkbox-label">@Label</span>
         @if (!string.IsNullOrWhiteSpace(Description))
         {
-            <span class="app-checkbox-description">@Description</span>
+            <span id="@DescriptionId" class="app-checkbox-description">@Description</span>
         }
     </span>
 </label>
@@ -37,6 +38,8 @@
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string WrapperClass => string.Join(" ", new[] { "app-checkbox", Class }.Where(value => !string.IsNullOrWhiteSpace(value)));
+    private string DescriptionId { get; } = $"checkbox-desc-{Guid.NewGuid():N}";
+    private string? AriaDescriptionId => !string.IsNullOrWhiteSpace(Description) ? DescriptionId : null;
 
     private Task HandleChanged(ChangeEventArgs args)
         => ValueChanged.InvokeAsync(args.Value is bool value && value);

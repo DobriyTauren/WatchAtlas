@@ -1,6 +1,7 @@
 @page "/movies/new"
 @inject LibraryState LibraryState
 @inject NavigationManager NavigationManager
+@inject ToastState ToastState
 
 <PageTitle>Create Movie</PageTitle>
 
@@ -51,11 +52,13 @@
             ErrorMessage = null;
 
             await LibraryState.AddAsync(media, movie, null);
+            ToastState.ShowSuccess("Movie created.", "The new movie has been saved in your library.");
             NavigationManager.NavigateTo($"/movies/{media.Id}");
         }
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
+            ToastState.ShowError("Movie could not be created.", exception.Message);
         }
         finally
         {

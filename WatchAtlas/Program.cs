@@ -20,5 +20,6 @@ builder.Services.AddScoped<LibraryState>();
 builder.Services.AddScoped<ThemeState>();
 builder.Services.AddScoped<FilterState>();
 builder.Services.AddScoped<SettingsState>();
+builder.Services.AddScoped<ToastState>();
 
 await builder.Build().RunAsync();
