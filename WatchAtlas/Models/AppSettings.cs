@@ -1,0 +1,12 @@
+using WatchAtlas.Models.Enums;
+
+namespace WatchAtlas.Models;
+
+public class AppSettings
+{
+    public ThemeMode ThemeMode { get; set; } = ThemeMode.LightSoft;
+    public bool UseDenseLibraryGrid { get; set; }
+    public bool ShowCompletedItemsFirst { get; set; }
+
+    public static AppSettings Default => new();
+}

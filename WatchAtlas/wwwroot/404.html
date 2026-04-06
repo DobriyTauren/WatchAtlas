@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WatchAtlas</title>
+    <meta name="theme-color" content="#d17187" />
+    <meta name="description" content="A soft personal library for tracking watched movies and TV series." />
+    <base href="/WatchAtlas/" />
+    <link rel="preload" id="webassembly" />
+    <link rel="stylesheet" href="css/app.css" />
+    <script src="theme.js"></script>
+    <script type="importmap"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="watchatlas-loading">
+            <div class="watchatlas-loading__panel">
+                <div class="watchatlas-loading__ring"></div>
+                <p class="watchatlas-loading__title">Loading WatchAtlas</p>
+                <p class="watchatlas-loading__copy">Rehydrating the app shell from the GitHub Pages fallback page.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="." class="reload">Reload</a>
+        <span class="dismiss">x</span>
+    </div>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+</body>
+
+</html>

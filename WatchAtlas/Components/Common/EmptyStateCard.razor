@@ -1,0 +1,42 @@
+<section class="shell-card p-8 text-center sm:p-10">
+    <div class="mx-auto flex max-w-2xl flex-col items-center gap-4">
+        <span class="inline-flex rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-text">@Badge</span>
+        <h2 class="text-2xl">@Title</h2>
+        <p class="text-sm leading-7 text-muted sm:text-base">@Description</p>
+
+        <div class="flex flex-wrap justify-center gap-3 pt-2">
+            @if (!string.IsNullOrWhiteSpace(PrimaryHref) && !string.IsNullOrWhiteSpace(PrimaryLabel))
+            {
+                <a class="primary-button" href="@PrimaryHref">@PrimaryLabel</a>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(SecondaryHref) && !string.IsNullOrWhiteSpace(SecondaryLabel))
+            {
+                <a class="secondary-button" href="@SecondaryHref">@SecondaryLabel</a>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public string Badge { get; set; } = "Empty State";
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Description { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? PrimaryLabel { get; set; }
+
+    [Parameter]
+    public string? PrimaryHref { get; set; }
+
+    [Parameter]
+    public string? SecondaryLabel { get; set; }
+
+    [Parameter]
+    public string? SecondaryHref { get; set; }
+}

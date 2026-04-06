@@ -1,0 +1,56 @@
+@page "/settings"
+@inject SettingsState SettingsState
+@inject ThemeState ThemeState
+
+<PageTitle>Settings</PageTitle>
+
+<section class="space-y-8">
+    <PageHeader Eyebrow="Settings"
+                Title="Tune the app shell before the data layer arrives."
+                Subtitle="This page already manages theme preferences and records the architecture decisions for browser storage and GitHub Pages hosting." />
+
+    <section class="grid gap-4 xl:grid-cols-[1.2fr,1fr]">
+        <article class="shell-card p-6 sm:p-8">
+            <div class="flex flex-col gap-6">
+                <div>
+                    <h2 class="text-2xl">Themes</h2>
+                    <p class="mt-2 text-sm leading-7 text-muted">Switching themes already flows through shared state, so we can persist the same setting once local storage is connected.</p>
+                </div>
+
+                <div class="grid gap-4 lg:grid-cols-3">
+                    @foreach (var theme in ThemeState.AvailableThemes)
+                    {
+                        <button class="@GetThemeCardClass(theme)" type="button" @onclick="() => ThemeState.ApplyThemeAsync(theme.Mode)">
+                            <span class="text-left text-sm font-semibold text-text">@theme.DisplayName</span>
+                            <span class="text-left text-sm leading-6 text-muted">@theme.Description</span>
+                            <span class="text-left text-xs font-semibold uppercase tracking-[0.24em] text-muted">@theme.AccentLabel</span>
+                        </button>
+                    }
+                </div>
+            </div>
+        </article>
+
+        <article class="shell-card p-6 sm:p-8">
+            <div class="space-y-5">
+                <h2 class="text-2xl">Architecture Notes</h2>
+                <div class="space-y-4 text-sm leading-7 text-muted">
+                    <p><span class="font-semibold text-text">Storage:</span> repositories are abstracted so `localStorage` can be added first and swapped later for IndexedDB or an API.</p>
+                    <p><span class="font-semibold text-text">Hosting:</span> the app uses a project-site base path and an SPA fallback page for GitHub Pages compatibility.</p>
+                    <p><span class="font-semibold text-text">State:</span> theme, library, filters, and settings live in scoped services instead of a heavier external state library.</p>
+                </div>
+            </div>
+        </article>
+    </section>
+</section>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await SettingsState.EnsureLoadedAsync();
+    }
+
+    private string GetThemeCardClass(ThemeSettings theme)
+        => theme.Mode == ThemeState.CurrentTheme.Mode
+            ? "rounded-[1.75rem] border border-accent/30 bg-accent-soft p-5 text-left shadow-float transition"
+            : "rounded-[1.75rem] border border-border bg-white/45 p-5 text-left transition hover:border-accent/30 hover:bg-white/60";
+}

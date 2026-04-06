@@ -1,0 +1,74 @@
+﻿@page "/"
+
+@inject LibraryState LibraryState
+@inject ThemeState ThemeState
+@inject IStatisticsService StatisticsService
+@using WatchAtlas.Extensions
+
+<PageTitle>WatchAtlas</PageTitle>
+
+<section class="space-y-8">
+    <PageHeader Eyebrow="Phase 1"
+                Title="Your personal watch library starts here."
+                Subtitle="The foundation is ready for a browser-only tracker with soft theming, reusable Blazor structure, and room for future local storage, CRUD flows, and statistics.">
+        <Actions>
+            <a class="primary-button" href="/media/new">Add First Entry</a>
+            <a class="secondary-button" href="/library">Open Library</a>
+        </Actions>
+    </PageHeader>
+
+    <section class="grid gap-4 xl:grid-cols-[1.4fr,1fr]">
+        <article class="shell-card overflow-hidden p-6 sm:p-8">
+            <div class="space-y-4">
+                <span class="inline-flex rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-text">Project Vision</span>
+                <h2 class="max-w-2xl text-3xl">Soft, modern, and fully client-side watch tracking.</h2>
+                <p class="max-w-3xl text-sm leading-7 text-muted sm:text-base">
+                    WatchAtlas is now structured around reusable services, theme state, library state, and GitHub Pages-friendly routing so the next phases can focus on real data flows instead of rebuilding the shell.
+                </p>
+            </div>
+
+            <div class="mt-8 grid gap-4 sm:grid-cols-2">
+                <div class="rounded-[1.75rem] bg-white/45 p-5">
+                    <p class="text-sm font-semibold text-text">Current Theme</p>
+                    <p class="mt-2 text-2xl">@ThemeState.CurrentTheme.DisplayName</p>
+                    <p class="mt-2 text-sm text-muted">@ThemeState.CurrentTheme.Description</p>
+                </div>
+
+                <div class="rounded-[1.75rem] bg-white/45 p-5">
+                    <p class="text-sm font-semibold text-text">Deployment Ready</p>
+                    <p class="mt-2 text-2xl">GitHub Pages</p>
+                    <p class="mt-2 text-sm text-muted">Static asset base path and SPA fallback are prepared for project-site hosting.</p>
+                </div>
+            </div>
+        </article>
+
+        <article class="shell-card p-6 sm:p-8">
+            <div class="space-y-4">
+                <span class="inline-flex rounded-full bg-white/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-muted">Foundation Checklist</span>
+                <div class="space-y-3 text-sm leading-7 text-muted">
+                    <p>Blazor WebAssembly solution organized for modular growth</p>
+                    <p>Tailwind rebuilt to scan Razor and C# files in this project</p>
+                    <p>Reusable navigation for desktop and mobile breakpoints</p>
+                    <p>State and repository abstractions ready for browser persistence</p>
+                    <p>Starter pages mapped for library, statistics, settings, and media routes</p>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <StatTile Title="Watched Movies" Value="@Stats.WatchedMovies.ToString()" Caption="Movie tracking will plug into the repository next." ChipLabel="Movies" />
+        <StatTile Title="Series Added" Value="@Stats.TotalSeries.ToString()" Caption="Series progress cards are already scaffolded." ChipLabel="Series" />
+        <StatTile Title="Watched Episodes" Value="@Stats.WatchedEpisodes.ToString()" Caption="Episode totals will grow once CRUD arrives." ChipLabel="Episodes" />
+        <StatTile Title="Watch Time" Value="@Stats.TotalWatchTimeMinutes.ToReadableDuration()" Caption="Calculated through the statistics service." ChipLabel="Runtime" />
+    </section>
+</section>
+
+@code {
+    private GlobalStatistics Stats => StatisticsService.CalculateGlobalStatistics(LibraryState.Entries);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LibraryState.EnsureLoadedAsync();
+    }
+}

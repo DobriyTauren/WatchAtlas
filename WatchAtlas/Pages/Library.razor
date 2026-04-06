@@ -1,0 +1,116 @@
+@page "/library"
+@implements IDisposable
+@inject FilterState FilterState
+@inject LibraryState LibraryState
+
+<PageTitle>Library</PageTitle>
+
+<section class="space-y-8">
+    <PageHeader Eyebrow="Library"
+                Title="Browse your full watch collection."
+                Subtitle="Search, filter, and sort across movies and series. CRUD arrives in the next phase, but the browsing shell is already wired to shared state.">
+        <Actions>
+            <a class="primary-button" href="/media/new">Add New Item</a>
+        </Actions>
+    </PageHeader>
+
+    <section class="shell-card space-y-5 p-5 sm:p-6">
+        <div class="grid gap-4 xl:grid-cols-[1.6fr,1fr,1fr]">
+            <div class="space-y-2">
+                <label class="text-sm font-semibold text-text" for="library-search">Title Search</label>
+                <input id="library-search"
+                       class="input-shell"
+                       placeholder="Search by movie or series title"
+                       value="@FilterState.Options.SearchTerm"
+                       @oninput="HandleSearchChanged" />
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-semibold text-text" for="library-sort">Sort</label>
+                <select id="library-sort" class="input-shell" value="@FilterState.Options.SortBy" @onchange="HandleSortChanged">
+                    <option value="@LibrarySortBy.RecentlyUpdated">Recently updated</option>
+                    <option value="@LibrarySortBy.Title">Title</option>
+                    <option value="@LibrarySortBy.Rating">Rating</option>
+                    <option value="@LibrarySortBy.CreatedAt">Created date</option>
+                </select>
+            </div>
+
+            <div class="rounded-[1.75rem] bg-white/45 p-4">
+                <p class="text-sm font-semibold text-text">Visible Items</p>
+                <p class="mt-2 text-3xl">@FilteredEntries.Count</p>
+                <p class="mt-2 text-sm text-muted">The library view is already prepared for richer filters and saved preferences.</p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+            <button class="@GetFilterButtonClass(FilterState.Options.MediaType is null)" type="button" @onclick="() => FilterState.SetMediaType(null)">All Items</button>
+            <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Movie)" type="button" @onclick="() => FilterState.SetMediaType(MediaType.Movie)">Movies</button>
+            <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Series)" type="button" @onclick="() => FilterState.SetMediaType(MediaType.Series)">Series</button>
+            <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.Completed)" type="button" @onclick="() => FilterState.SetStatus(WatchStatus.Completed)">Completed</button>
+            <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.InProgress)" type="button" @onclick="() => FilterState.SetStatus(WatchStatus.InProgress)">In Progress</button>
+            <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.NotStarted)" type="button" @onclick="() => FilterState.SetStatus(WatchStatus.NotStarted)">Not Started</button>
+            <button class="secondary-button" type="button" @onclick="ClearFilters">Reset Filters</button>
+        </div>
+    </section>
+
+    @if (FilteredEntries.Count == 0)
+    {
+        <EmptyStateCard Badge="Library"
+                        Title="Your library is still empty."
+                        Description="The repository and library state are in place, so the next phase can connect creation forms straight into browser persistence."
+                        PrimaryLabel="Add First Entry"
+                        PrimaryHref="/media/new"
+                        SecondaryLabel="Open Settings"
+                        SecondaryHref="/settings" />
+    }
+    else
+    {
+        <section class="grid gap-4 lg:grid-cols-2">
+            @foreach (var entry in FilteredEntries)
+            {
+                <MediaPreviewCard Entry="entry" />
+            }
+        </section>
+    }
+</section>
+
+@code {
+    private List<LibraryEntry> FilteredEntries => FilterState.Apply(LibraryState.Entries).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        FilterState.Changed += HandleStateChanged;
+        LibraryState.Changed += HandleStateChanged;
+        await LibraryState.EnsureLoadedAsync();
+    }
+
+    private void HandleSearchChanged(ChangeEventArgs args)
+        => FilterState.SetSearchTerm(args.Value?.ToString() ?? string.Empty);
+
+    private void HandleSortChanged(ChangeEventArgs args)
+    {
+        if (Enum.TryParse<LibrarySortBy>(args.Value?.ToString(), out var sortBy))
+        {
+            FilterState.SetSortBy(sortBy);
+        }
+    }
+
+    private void ClearFilters()
+    {
+        FilterState.SetSearchTerm(string.Empty);
+        FilterState.SetMediaType(null);
+        FilterState.SetStatus(null);
+        FilterState.SetSortBy(LibrarySortBy.RecentlyUpdated);
+    }
+
+    private string GetFilterButtonClass(bool isActive)
+        => isActive ? "nav-chip nav-chip-active" : "nav-chip";
+
+    private void HandleStateChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        FilterState.Changed -= HandleStateChanged;
+        LibraryState.Changed -= HandleStateChanged;
+    }
+}

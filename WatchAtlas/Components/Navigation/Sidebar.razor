@@ -1,0 +1,32 @@
+<aside class="hidden w-80 shrink-0 lg:block">
+    <div class="shell-panel sticky top-4 flex min-h-[calc(100vh-2rem)] flex-col gap-8 p-6">
+        <div class="space-y-3">
+            <div class="inline-flex items-center gap-3 rounded-full bg-white/70 px-4 py-2 text-sm font-semibold text-text">
+                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-white">WA</span>
+                <span>WatchAtlas</span>
+            </div>
+
+            <div class="space-y-2">
+                <h2 class="text-2xl">Soft tracking for movies and series.</h2>
+                <p class="text-sm leading-7 text-muted">Phase 1 now covers routing, reusable layout, theme groundwork, and browser-only architecture.</p>
+            </div>
+        </div>
+
+        <nav class="flex flex-col gap-2">
+            <NavLink href="/" Match="NavLinkMatch.All" class="nav-chip justify-start" ActiveClass="nav-chip-active">Overview</NavLink>
+            <NavLink href="/library" class="nav-chip justify-start" ActiveClass="nav-chip-active">Library</NavLink>
+            <NavLink href="/statistics" class="nav-chip justify-start" ActiveClass="nav-chip-active">Statistics</NavLink>
+            <NavLink href="/settings" class="nav-chip justify-start" ActiveClass="nav-chip-active">Settings</NavLink>
+            <NavLink href="/media/new" class="nav-chip justify-start" ActiveClass="nav-chip-active">Add New Item</NavLink>
+        </nav>
+
+        <div class="mt-auto space-y-4 rounded-[1.75rem] bg-white/60 p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-muted">Current Scope</p>
+            <ul class="space-y-3 text-sm leading-6 text-muted">
+                <li>Reusable Blazor layout and core pages</li>
+                <li>Tailwind rebuilt specifically for Razor files</li>
+                <li>Service and state scaffolding ready for local storage</li>
+            </ul>
+        </div>
+    </div>
+</aside>
