@@ -1,18 +1,7 @@
-<AppCard Class="h-full">
-    <div class="flex items-start justify-between gap-4">
-        <div class="space-y-2">
-            <p class="text-sm font-medium text-muted">@Title</p>
-            <p class="text-3xl font-semibold text-text">@Value</p>
-
-            @if (!string.IsNullOrWhiteSpace(Caption))
-            {
-                <p class="text-sm text-muted">@Caption</p>
-            }
-        </div>
-
-        <AppBadge>@ChipLabel</AppBadge>
-    </div>
-</AppCard>
+<StatCard Title="@Title"
+          Value="@Value"
+          Caption="@Caption"
+          ChipLabel="@ChipLabel" />
 
 @code {
     [Parameter, EditorRequired]

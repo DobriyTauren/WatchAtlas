@@ -1,0 +1,50 @@
+<AppCard>
+    <div class="space-y-6">
+        <div>
+            <h2 class="text-2xl">Completion Overview</h2>
+            <p class="mt-2 text-sm leading-7 text-muted">A quick breakdown of watched versus remaining items across movies, series, and episodes.</p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div class="soft-block-strong p-5">
+                <p class="text-sm font-semibold text-text">Movie Watch Rate</p>
+                <p class="mt-2 text-3xl">@Stats.MovieWatchRatePercent.ToPercentageLabel()</p>
+                <p class="mt-2 text-sm text-muted">@Stats.WatchedMovies.ToCountLabel("movie") watched, @Stats.UnwatchedMovies.ToCountLabel("movie") remaining.</p>
+            </div>
+
+            <div class="soft-block-strong p-5">
+                <p class="text-sm font-semibold text-text">Episode Watch Rate</p>
+                <p class="mt-2 text-3xl">@Stats.EpisodeWatchRatePercent.ToPercentageLabel()</p>
+                <p class="mt-2 text-sm text-muted">@Stats.WatchedEpisodes.ToCountLabel("episode") watched, @Stats.UnwatchedEpisodes.ToCountLabel("episode") remaining.</p>
+            </div>
+
+            <div class="soft-block-strong p-5">
+                <p class="text-sm font-semibold text-text">Series Completion</p>
+                <p class="mt-2 text-3xl">@Stats.AverageSeriesCompletionPercent.ToPercentageLabel()</p>
+                <p class="mt-2 text-sm text-muted">@Stats.CompletedSeries.ToCountLabel("series", "series") completed, @Stats.InProgressSeries.ToCountLabel("series", "series") in progress.</p>
+            </div>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-3">
+            <div class="soft-block p-4">
+                <p class="text-sm font-semibold text-text">Completed Series</p>
+                <p class="mt-2 text-lg">@Stats.CompletedSeries</p>
+            </div>
+
+            <div class="soft-block p-4">
+                <p class="text-sm font-semibold text-text">In Progress</p>
+                <p class="mt-2 text-lg">@Stats.InProgressSeries</p>
+            </div>
+
+            <div class="soft-block p-4">
+                <p class="text-sm font-semibold text-text">Not Started</p>
+                <p class="mt-2 text-lg">@Stats.NotStartedSeries</p>
+            </div>
+        </div>
+    </div>
+</AppCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public GlobalStatistics Stats { get; set; } = default!;
+}

@@ -1,0 +1,39 @@
+<AppCard>
+    <div class="space-y-6">
+        <div>
+            <h2 class="text-2xl">Watch Time Summary</h2>
+            <p class="mt-2 text-sm leading-7 text-muted">Compare watched movie runtime, watched episode runtime, and how much tracked time is still left unseen.</p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+            <StatCard Title="Movies"
+                      Value="@Summary.WatchedMovieMinutes.ToReadableDuration()"
+                      Caption="Watched movie runtime."
+                      ChipLabel="Movies"
+                      ChipVariant="outline" />
+
+            <StatCard Title="Episodes"
+                      Value="@Summary.WatchedEpisodeMinutes.ToReadableDuration()"
+                      Caption="Watched episode runtime."
+                      ChipLabel="Episodes"
+                      ChipVariant="outline" />
+
+            <StatCard Title="Total Watched"
+                      Value="@Summary.TotalWatchedMinutes.ToReadableDuration()"
+                      Caption="Combined watched runtime."
+                      ChipLabel="Runtime"
+                      ChipVariant="success" />
+
+            <StatCard Title="Remaining"
+                      Value="@Summary.RemainingMinutes.ToReadableDuration()"
+                      Caption="Tracked runtime not watched yet."
+                      ChipLabel="Pending"
+                      ChipVariant="muted" />
+        </div>
+    </div>
+</AppCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public WatchTimeSummary Summary { get; set; } = default!;
+}

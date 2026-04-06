@@ -1,0 +1,40 @@
+<AppCard Class="@ContainerClass">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div class="space-y-2">
+            <p class="text-sm font-medium text-muted">@Title</p>
+            <p class="text-2xl font-semibold text-text sm:text-3xl">@Value</p>
+
+            @if (!string.IsNullOrWhiteSpace(Caption))
+            {
+                <p class="text-sm leading-7 text-muted">@Caption</p>
+            }
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(ChipLabel))
+        {
+            <AppBadge Variant="@ChipVariant" Class="w-fit shrink-0">@ChipLabel</AppBadge>
+        }
+    </div>
+</AppCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Value { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Caption { get; set; }
+
+    [Parameter]
+    public string ChipLabel { get; set; } = "Overview";
+
+    [Parameter]
+    public string ChipVariant { get; set; } = "accent";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private string ContainerClass => string.Join(" ", new[] { "h-full", Class }.Where(value => !string.IsNullOrWhiteSpace(value)));
+}

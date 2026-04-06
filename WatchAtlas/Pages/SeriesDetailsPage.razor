@@ -106,11 +106,11 @@
                     </div>
                 </AppCard>
 
-                <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <StatTile Title="Seasons" Value="@SeriesStats.SeasonCount.ToString()" Caption="Tracked seasons in this series." ChipLabel="Series" />
-                    <StatTile Title="Episodes" Value="@SeriesStats.TotalEpisodes.ToString()" Caption="Total tracked episodes." ChipLabel="Episodes" />
-                    <StatTile Title="Watched" Value="@SeriesStats.WatchedEpisodes.ToString()" Caption="Episodes marked as watched." ChipLabel="Progress" />
-                    <StatTile Title="Runtime" Value="@SeriesStats.WatchedMinutes.ToReadableDuration()" Caption="Watched episode runtime." ChipLabel="Runtime" />
+                <section class="grid gap-4 sm:grid-cols-2">
+                    <StatTile Title="Seasons" Value="@SeriesStats.SeasonCount.ToString()" Caption="Tracked in this series." ChipLabel="Series" />
+                    <StatTile Title="Episodes" Value="@SeriesStats.TotalEpisodes.ToString()" Caption="Total episodes tracked." ChipLabel="Episodes" />
+                    <StatTile Title="Watched" Value="@SeriesStats.WatchedEpisodes.ToString()" Caption="Marked as watched." ChipLabel="Progress" />
+                    <StatTile Title="Runtime" Value="@SeriesStats.WatchedMinutes.ToReadableDuration()" Caption="Watched episode time." ChipLabel="Runtime" />
                 </section>
             </div>
         </section>

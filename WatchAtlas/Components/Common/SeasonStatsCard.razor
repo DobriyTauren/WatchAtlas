@@ -1,0 +1,36 @@
+<AppCard Class="h-full">
+    <div class="space-y-5">
+        <div class="flex items-start justify-between gap-4">
+            <div class="space-y-2">
+                <div class="flex flex-wrap items-center gap-2">
+                    <MediaStatusBadge Status="@Statistics.Status" />
+                    <AppBadge Variant="outline">@Statistics.SeriesTitle</AppBadge>
+                </div>
+                <h3 class="text-xl">Season @Statistics.SeasonNumber</h3>
+                @if (!string.IsNullOrWhiteSpace(Statistics.Title))
+                {
+                    <p class="text-sm text-muted">@Statistics.Title</p>
+                }
+            </div>
+
+            <span class="rating-pill">@Statistics.CompletionPercent.ToPercentageLabel()</span>
+        </div>
+
+        <div class="grid gap-3 text-sm text-muted sm:grid-cols-2">
+            <div class="soft-block p-4">
+                <p class="font-semibold text-text">Episodes</p>
+                <p class="mt-1">@Statistics.WatchedEpisodes / @Statistics.TotalEpisodes watched</p>
+            </div>
+
+            <div class="soft-block p-4">
+                <p class="font-semibold text-text">Watch Time</p>
+                <p class="mt-1">@Statistics.WatchedMinutes.ToReadableDuration()</p>
+            </div>
+        </div>
+    </div>
+</AppCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public SeasonStatistics Statistics { get; set; } = default!;
+}

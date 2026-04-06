@@ -1,4 +1,5 @@
 @page "/statistics"
+@implements IDisposable
 @inject LibraryState LibraryState
 @inject IStatisticsService StatisticsService
 @using WatchAtlas.Extensions
@@ -8,48 +9,118 @@
 <section class="space-y-8">
     <PageHeader Eyebrow="Statistics"
                 Title="A clear overview of your watch progress."
-                Subtitle="The statistics service already centralizes watch totals, progress percentages, and total runtime so future features can reuse the same calculations." />
+                Subtitle="The statistics service now centralizes totals, watch-time summaries, completion breakdowns, and ranked series or season views so analytics stay consistent everywhere." />
 
     <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatTile Title="Movies Added" Value="@Stats.TotalMovies.ToString()" Caption="All movie entries in your library." ChipLabel="Catalog" />
-        <StatTile Title="Completed Series" Value="@Stats.CompletedSeries.ToString()" Caption="Series with every tracked episode watched." ChipLabel="Series" />
-        <StatTile Title="Episodes Watched" Value="@Stats.WatchedEpisodes.ToString()" Caption="@($"{Stats.WatchedEpisodes}/{Stats.TotalEpisodes} tracked episodes completed.")" ChipLabel="Episodes" />
-        <StatTile Title="Total Watch Time" Value="@Stats.TotalWatchTimeMinutes.ToReadableDuration()" Caption="Sum of watched movie and episode runtimes." ChipLabel="Runtime" />
+        <StatCard Title="Movies Watched"
+                  Value="@Stats.WatchedMovies.ToString()"
+                  Caption="@($"{Stats.WatchedMovies} of {Stats.TotalMovies} movies are marked watched.")"
+                  ChipLabel="Movies" />
+        <StatCard Title="Series Added"
+                  Value="@Stats.TotalSeries.ToString()"
+                  Caption="@($"{Stats.CompletedSeries} completed, {Stats.InProgressSeries} in progress.")"
+                  ChipLabel="Series" />
+        <StatCard Title="Episodes Watched"
+                  Value="@Stats.WatchedEpisodes.ToString()"
+                  Caption="@($"{Stats.WatchedEpisodes}/{Stats.TotalEpisodes} tracked episodes watched.")"
+                  ChipLabel="Episodes" />
+        <StatCard Title="Total Watch Time"
+                  Value="@Stats.TotalWatchTimeMinutes.ToReadableDuration()"
+                  Caption="Sum of watched movie and episode runtime."
+                  ChipLabel="Runtime"
+                  ChipVariant="success" />
     </section>
 
-    <section class="grid gap-4 xl:grid-cols-[1.2fr,1fr]">
-        <article class="shell-card p-6 sm:p-8">
-            <h2 class="text-2xl">Global Overview</h2>
-            <div class="mt-6 grid gap-4 sm:grid-cols-2">
-                <div class="soft-block-strong p-5">
-                    <p class="text-sm font-semibold text-text">Series Completion</p>
-                    <p class="mt-2 text-3xl">@Stats.AverageSeriesCompletionPercent.ToString("0")%</p>
-                    <p class="mt-2 text-sm text-muted">Average progress across all series entries.</p>
-                </div>
+    <section class="grid gap-4 xl:grid-cols-[1.15fr,1fr]">
+        <GlobalStatsPanel Stats="Stats" />
+        <WatchTimeSummaryPanel Summary="WatchTime" />
+    </section>
 
-                <div class="soft-block-strong p-5">
-                    <p class="text-sm font-semibold text-text">Watched Movies</p>
-                    <p class="mt-2 text-3xl">@Stats.WatchedMovies</p>
-                    <p class="mt-2 text-sm text-muted">Movie progress now comes directly from the local storage repository.</p>
-                </div>
-            </div>
-        </article>
+    <section class="space-y-4">
+        <SectionHeader Eyebrow="Rankings"
+                       Title="Top series by watched duration."
+                       Description="Series ordered by the amount of watched runtime already logged in the library." />
 
-        <article class="shell-card p-6 sm:p-8">
-            <h2 class="text-2xl">Why It Matters</h2>
-            <div class="mt-5 space-y-4 text-sm leading-7 text-muted">
-                <p>The stats page pulls from a single service, which keeps the dashboard, library cards, and detail pages consistent.</p>
-                <p>Because persistence now lives behind the repository abstraction, future storage upgrades can evolve without forcing page rewrites.</p>
-            </div>
-        </article>
+        @if (TopSeriesByDuration.Count == 0)
+        {
+            <AppCard>
+                <p class="text-sm leading-7 text-muted">No tracked series runtime yet. Add a series with seasons and watched episodes to see rankings here.</p>
+            </AppCard>
+        }
+        else
+        {
+            <section class="grid gap-4 xl:grid-cols-3">
+                @foreach (var series in TopSeriesByDuration)
+                {
+                    <SeriesStatsCard Statistics="series" />
+                }
+            </section>
+        }
+    </section>
+
+    <section class="space-y-4">
+        <SectionHeader Eyebrow="Completion"
+                       Title="Most completed series."
+                       Description="Entries ranked by completion percentage, then by watched episode count." />
+
+        @if (MostCompletedSeries.Count == 0)
+        {
+            <AppCard>
+                <p class="text-sm leading-7 text-muted">No series progress to compare yet. Once episodes are tracked, completion standings will appear here.</p>
+            </AppCard>
+        }
+        else
+        {
+            <section class="grid gap-4 xl:grid-cols-3">
+                @foreach (var series in MostCompletedSeries)
+                {
+                    <SeriesStatsCard Statistics="series" />
+                }
+            </section>
+        }
+    </section>
+
+    <section class="space-y-4">
+        <SectionHeader Eyebrow="Seasons"
+                       Title="Top seasons by watched runtime."
+                       Description="Season totals are calculated from episode data and ranked across the whole library." />
+
+        @if (TopSeasonsByDuration.Count == 0)
+        {
+            <AppCard>
+                <p class="text-sm leading-7 text-muted">No season runtime has been logged yet. Mark episodes as watched to populate these cards.</p>
+            </AppCard>
+        }
+        else
+        {
+            <section class="grid gap-4 xl:grid-cols-3">
+                @foreach (var season in TopSeasonsByDuration)
+                {
+                    <SeasonStatsCard Statistics="season" />
+                }
+            </section>
+        }
     </section>
 </section>
 
 @code {
     private GlobalStatistics Stats => StatisticsService.CalculateGlobalStatistics(LibraryState.Entries);
+    private WatchTimeSummary WatchTime => StatisticsService.CalculateWatchTimeSummary(LibraryState.Entries);
+    private IReadOnlyList<SeriesStatistics> TopSeriesByDuration => StatisticsService.GetTopSeriesByWatchTime(LibraryState.Entries, 3);
+    private IReadOnlyList<SeriesStatistics> MostCompletedSeries => StatisticsService.GetMostCompletedSeries(LibraryState.Entries, 3);
+    private IReadOnlyList<SeasonStatistics> TopSeasonsByDuration => StatisticsService.GetTopSeasonsByWatchTime(LibraryState.Entries, 3);
 
     protected override async Task OnInitializedAsync()
     {
+        LibraryState.Changed += HandleLibraryChanged;
         await LibraryState.EnsureLoadedAsync();
+    }
+
+    private void HandleLibraryChanged()
+        => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        LibraryState.Changed -= HandleLibraryChanged;
     }
 }
