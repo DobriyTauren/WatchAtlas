@@ -28,7 +28,7 @@
                     Subtitle="Edit the stored item, adjust progress, and keep the browser-backed library in sync." />
 
         <section class="grid gap-4 xl:grid-cols-[1.2fr,0.9fr]">
-            <article class="shell-card p-6 sm:p-8">
+            <AppCard>
                 <MediaEditorForm Media="Media"
                                  MovieDetails="Movie"
                                  SeriesDetails="Series"
@@ -37,18 +37,18 @@
                                  CancelHref="/library"
                                  FieldPrefix="media-details"
                                  AllowDelete="true"
-                                 ExternalErrorMessage="ErrorMessage"
+                                 ExternalErrorMessage="@ErrorMessage"
                                  IsBusy="IsSaving"
                                  OnSubmitRequested="SaveAsync"
                                  OnDeleteRequested="DeleteAsync" />
-            </article>
+            </AppCard>
 
-            <article class="shell-card p-6 sm:p-8">
+            <AppCard>
                 @if (PreviewEntry is not null)
                 {
                     <div class="space-y-5">
                         <div class="flex flex-wrap gap-2">
-                            <span class="tag-pill">@(PreviewEntry.Media.Type == MediaType.Movie ? "Movie" : "Series")</span>
+                            <AppBadge>@(PreviewEntry.Media.Type == MediaType.Movie ? "Movie" : "Series")</AppBadge>
                             <span class="rating-pill">
                                 Rating: @(PreviewEntry.Media.PersonalRating?.ToString() ?? "Not set")
                             </span>
@@ -71,6 +71,9 @@
                             {
                                 var seriesStats = StatisticsService.CalculateSeriesStatistics(PreviewEntry);
 
+                                <ProgressBar Label="Completion"
+                                             Value="@seriesStats.WatchedEpisodes"
+                                             Max="@Math.Max(seriesStats.TotalEpisodes, 1)" />
                                 <p>@seriesStats.SeasonCount season(s), @seriesStats.TotalEpisodes tracked episode(s), @seriesStats.WatchedEpisodes watched.</p>
                                 <p>@seriesStats.CompletionPercent.ToString("0")% complete with @seriesStats.WatchedMinutes.ToReadableDuration() of watched runtime.</p>
                             }
@@ -82,7 +85,7 @@
                         </div>
                     </div>
                 }
-            </article>
+            </AppCard>
         </section>
     }
 </section>

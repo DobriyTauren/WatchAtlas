@@ -28,9 +28,21 @@
                 display: ['"Aptos Display"', '"Trebuchet MS"', 'sans-serif'],
                 body: ['"Aptos"', '"Segoe UI Variable"', '"Segoe UI"', 'sans-serif']
             },
+            spacing: {
+                gutter: 'var(--space-gutter)',
+                'card-sm': 'var(--space-card-sm)',
+                'card-md': 'var(--space-card-md)',
+                'card-lg': 'var(--space-card-lg)'
+            },
+            borderRadius: {
+                soft: 'var(--radius-soft)',
+                card: 'var(--radius-card)',
+                shell: 'var(--radius-shell)'
+            },
             boxShadow: {
-                soft: '0 20px 60px rgba(15, 23, 42, 0.12)',
-                float: '0 16px 40px rgba(59, 130, 246, 0.14)'
+                soft: 'var(--shadow-soft)',
+                float: 'var(--shadow-float)',
+                panel: 'var(--shadow-panel)'
             },
             backgroundImage: {
                 'hero-mist': 'radial-gradient(circle at top left, rgba(255,255,255,0.65), transparent 42%), radial-gradient(circle at right, rgba(125,211,252,0.26), transparent 28%), linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0))'

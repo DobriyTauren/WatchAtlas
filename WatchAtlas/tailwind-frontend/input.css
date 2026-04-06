@@ -12,6 +12,13 @@
 @layer base {
     :root {
         color-scheme: light;
+        --space-gutter: clamp(1rem, 1.2vw + 0.8rem, 1.75rem);
+        --space-card-sm: 1rem;
+        --space-card-md: 1.5rem;
+        --space-card-lg: 2rem;
+        --radius-soft: 1.25rem;
+        --radius-card: 1.75rem;
+        --radius-shell: 2rem;
         --app-bg: 247 242 239;
         --surface: 255 250 247;
         --surface-strong: 255 255 255;
@@ -36,6 +43,9 @@
         --success: 92 155 122;
         --shell-start: 255 245 239;
         --shell-end: 238 244 255;
+        --shadow-soft: 0 20px 60px rgb(var(--panel-shadow) / 0.10);
+        --shadow-panel: 0 28px 80px rgb(var(--panel-shadow) / 0.12);
+        --shadow-float: 0 16px 40px rgb(var(--accent) / 0.18);
     }
 
     body[data-theme='dark-soft'],
@@ -123,12 +133,12 @@
 @layer components {
     .shell-card {
         @apply rounded-3xl border border-border/80 bg-surface/90 backdrop-blur;
-        box-shadow: 0 20px 60px rgb(var(--panel-shadow) / 0.10);
+        box-shadow: var(--shadow-soft);
     }
 
     .shell-panel {
         @apply rounded-[2rem] border border-border/70 bg-surface-strong/90 backdrop-blur;
-        box-shadow: 0 28px 80px rgb(var(--panel-shadow) / 0.12);
+        box-shadow: var(--shadow-panel);
     }
 
     .nav-chip {
@@ -230,6 +240,185 @@
 
     .theme-orb-secondary {
         background-color: rgb(var(--orb-secondary) / 0.35);
+    }
+
+    .app-container {
+        @apply mx-auto w-full max-w-[1600px] px-4 sm:px-6;
+        padding-left: var(--space-gutter);
+        padding-right: var(--space-gutter);
+    }
+
+    .app-card {
+        @apply border border-border/70 backdrop-blur;
+        border-radius: var(--radius-card);
+    }
+
+    .app-card-default {
+        @apply bg-surface/90;
+        box-shadow: var(--shadow-soft);
+    }
+
+    .app-card-panel {
+        @apply bg-surface-strong/90;
+        box-shadow: var(--shadow-panel);
+    }
+
+    .app-card-soft {
+        background-color: rgb(var(--surface-soft) / 0.85);
+    }
+
+    .app-card-strong {
+        background-color: rgb(var(--surface-soft-strong) / 0.92);
+    }
+
+    .app-card-padding-sm {
+        padding: var(--space-card-sm);
+    }
+
+    .app-card-padding-md {
+        padding: var(--space-card-md);
+    }
+
+    .app-card-padding-lg {
+        padding: var(--space-card-lg);
+    }
+
+    .app-button {
+        @apply inline-flex items-center justify-center font-semibold transition-all duration-200 disabled:pointer-events-none disabled:opacity-60;
+        border-radius: 9999px;
+    }
+
+    .app-button-primary {
+        @apply shadow-float hover:-translate-y-0.5;
+        background-image: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-strong)));
+        color: rgb(var(--accent-contrast));
+    }
+
+    .app-button-secondary {
+        @apply border border-border text-text hover:border-accent/30 hover:text-accent;
+        background-color: rgb(var(--surface-soft) / 0.90);
+    }
+
+    .app-button-ghost {
+        @apply text-muted hover:text-text;
+        background-color: transparent;
+    }
+
+    .app-button-sm {
+        @apply px-3.5 py-2 text-sm;
+    }
+
+    .app-button-md {
+        @apply px-4 py-2.5 text-sm;
+    }
+
+    .app-button-lg {
+        @apply px-5 py-3 text-sm;
+    }
+
+    .app-field {
+        @apply space-y-2;
+    }
+
+    .app-field-label {
+        @apply text-sm font-semibold text-text;
+    }
+
+    .app-field-help {
+        @apply text-xs leading-6 text-muted;
+    }
+
+    .app-input,
+    .app-select,
+    .app-textarea {
+        @apply w-full border border-border text-sm text-text outline-none transition focus:border-accent/40 focus:ring-4 focus:ring-accent-soft/70;
+        border-radius: calc(var(--radius-soft) + 0.125rem);
+        background-color: rgb(var(--surface-soft) / 0.90);
+        padding: 0.85rem 1rem;
+    }
+
+    .app-textarea {
+        min-height: 8rem;
+        resize: vertical;
+    }
+
+    .app-checkbox {
+        @apply flex items-start gap-3 border border-border/70;
+        border-radius: calc(var(--radius-soft) + 0.25rem);
+        background-color: rgb(var(--surface-soft) / 0.70);
+        padding: 0.9rem 1rem;
+    }
+
+    .app-checkbox-input {
+        @apply mt-1 h-4 w-4 rounded border-border text-accent focus:ring-accent/40;
+    }
+
+    .app-checkbox-copy {
+        @apply flex min-w-0 flex-col;
+    }
+
+    .app-checkbox-label {
+        @apply text-sm font-semibold text-text;
+    }
+
+    .app-checkbox-description {
+        @apply text-xs leading-6 text-muted;
+    }
+
+    .app-badge {
+        @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+    }
+
+    .app-badge-accent {
+        @apply bg-accent-soft text-text;
+    }
+
+    .app-badge-muted {
+        background-color: rgb(var(--surface-soft));
+        color: rgb(var(--muted-text));
+    }
+
+    .app-badge-outline {
+        @apply border border-border text-text;
+        background-color: rgb(var(--surface-strong) / 0.75);
+    }
+
+    .app-badge-success {
+        background-color: rgb(var(--status-success-bg));
+        color: rgb(var(--status-success-text));
+    }
+
+    .theme-card {
+        @apply flex flex-col gap-3 border border-border/70 p-5 text-left transition hover:border-accent/30 hover:text-text;
+        border-radius: var(--radius-card);
+        background-color: rgb(var(--surface-soft-strong) / 0.92);
+    }
+
+    .theme-card-active {
+        @apply border-accent/30 text-text shadow-float;
+        background-color: rgb(var(--accent-soft) / 0.9);
+    }
+
+    .progress-shell {
+        @apply h-3 overflow-hidden rounded-full border border-border/60;
+        background-color: rgb(var(--surface-soft));
+    }
+
+    .progress-fill {
+        @apply h-full rounded-full;
+        background-image: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-strong)));
+    }
+
+    .app-modal-backdrop {
+        @apply fixed inset-0 z-50 grid place-items-center p-4;
+        background-color: rgb(var(--panel-shadow) / 0.35);
+        backdrop-filter: blur(10px);
+    }
+
+    .app-modal-panel {
+        @apply w-full max-w-2xl space-y-6 border border-border/70 bg-surface-strong/95 p-6;
+        border-radius: var(--radius-shell);
+        box-shadow: var(--shadow-panel);
     }
 }
 

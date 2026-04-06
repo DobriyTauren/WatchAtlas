@@ -1,0 +1,28 @@
+<span class="@CssClass" @attributes="AdditionalAttributes">@ChildContent</span>
+
+@code {
+    [Parameter]
+    public string Variant { get; set; } = "accent";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = default!;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => string.Join(" ", new[]
+    {
+        "app-badge",
+        Variant switch
+        {
+            "muted" => "app-badge-muted",
+            "outline" => "app-badge-outline",
+            "success" => "app-badge-success",
+            _ => "app-badge-accent"
+        },
+        Class
+    }.Where(value => !string.IsNullOrWhiteSpace(value)));
+}

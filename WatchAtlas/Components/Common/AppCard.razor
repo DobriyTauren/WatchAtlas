@@ -1,0 +1,39 @@
+<section class="@CssClass" @attributes="AdditionalAttributes">
+    @ChildContent
+</section>
+
+@code {
+    [Parameter]
+    public string Variant { get; set; } = "default";
+
+    [Parameter]
+    public string Padding { get; set; } = "md";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = default!;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => string.Join(" ", new[]
+    {
+        "app-card",
+        Variant switch
+        {
+            "panel" => "app-card-panel",
+            "soft" => "app-card-soft",
+            "strong" => "app-card-strong",
+            _ => "app-card-default"
+        },
+        Padding switch
+        {
+            "sm" => "app-card-padding-sm",
+            "lg" => "app-card-padding-lg",
+            _ => "app-card-padding-md"
+        },
+        Class
+    }.Where(value => !string.IsNullOrWhiteSpace(value)));
+}

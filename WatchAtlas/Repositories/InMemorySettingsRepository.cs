@@ -1,28 +1,54 @@
+using System.Text.Json;
+using Microsoft.JSInterop;
 using WatchAtlas.Models;
 
 namespace WatchAtlas.Repositories;
 
-public class InMemorySettingsRepository : ISettingsRepository
+public class LocalStorageSettingsRepository(IJSRuntime jsRuntime) : ISettingsRepository
 {
-    private AppSettings _settings = AppSettings.Default;
+    private const string StorageKey = "watchatlas.settings";
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+    private AppSettings? _settings;
 
-    public Task<AppSettings> GetAsync(CancellationToken cancellationToken = default)
-        => Task.FromResult(new AppSettings
-        {
-            ThemeMode = _settings.ThemeMode,
-            UseDenseLibraryGrid = _settings.UseDenseLibraryGrid,
-            ShowCompletedItemsFirst = _settings.ShowCompletedItemsFirst
-        });
-
-    public Task SaveAsync(AppSettings settings, CancellationToken cancellationToken = default)
+    public async Task<AppSettings> GetAsync(CancellationToken cancellationToken = default)
     {
-        _settings = new AppSettings
+        if (_settings is null)
         {
-            ThemeMode = settings.ThemeMode,
-            UseDenseLibraryGrid = settings.UseDenseLibraryGrid,
-            ShowCompletedItemsFirst = settings.ShowCompletedItemsFirst
-        };
+            var json = await jsRuntime.InvokeAsync<string?>("watchAtlasStorage.getItem", StorageKey);
+            _settings = Deserialize(json);
+        }
 
-        return Task.CompletedTask;
+        return Clone(_settings);
     }
+
+    public async Task SaveAsync(AppSettings settings, CancellationToken cancellationToken = default)
+    {
+        _settings = Clone(settings);
+        var json = JsonSerializer.Serialize(_settings, JsonOptions);
+        await jsRuntime.InvokeVoidAsync("watchAtlasStorage.setItem", StorageKey, json);
+    }
+
+    private static AppSettings Deserialize(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return AppSettings.Default;
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? AppSettings.Default;
+        }
+        catch (JsonException)
+        {
+            return AppSettings.Default;
+        }
+    }
+
+    private static AppSettings Clone(AppSettings settings) => new()
+    {
+        ThemeMode = settings.ThemeMode,
+        UseDenseLibraryGrid = settings.UseDenseLibraryGrid,
+        ShowCompletedItemsFirst = settings.ShowCompletedItemsFirst
+    };
 }

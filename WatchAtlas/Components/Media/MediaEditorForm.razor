@@ -8,25 +8,26 @@
         }
 
         <div class="grid gap-4 sm:grid-cols-2">
-            <div class="space-y-2">
-                <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-media-type")">Media Type</label>
-                <InputSelect id="@($"{FieldPrefix}-media-type")" class="input-shell" @bind-Value="Media.Type">
+            <AppSelect TValue="MediaType"
+                       Id="@($"{FieldPrefix}-media-type")"
+                       Label="Media Type"
+                       Value="@Media.Type"
+                       ValueChanged="HandleMediaTypeChanged">
                     <option value="@MediaType.Movie">Movie</option>
                     <option value="@MediaType.Series">Series</option>
-                </InputSelect>
-            </div>
+                </AppSelect>
 
-            <div class="space-y-2">
-                <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-title")">Title</label>
-                <InputText id="@($"{FieldPrefix}-title")" class="input-shell" @bind-Value="Media.Title" />
-            </div>
+            <AppInput Id="@($"{FieldPrefix}-title")"
+                      Label="Title"
+                      Value="@Media.Title"
+                      ValueChanged="HandleTitleChanged" />
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
-            <div class="space-y-2">
-                <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-cover-url")">Cover Image URL</label>
-                <InputText id="@($"{FieldPrefix}-cover-url")" class="input-shell" @bind-Value="Media.CoverImageUrl" />
-            </div>
+            <AppInput Id="@($"{FieldPrefix}-cover-url")"
+                      Label="Cover Image URL"
+                      Value="@Media.CoverImageUrl"
+                      ValueChanged="HandleCoverChanged" />
 
             <div class="space-y-2">
                 <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-rating")">Rating</label>
@@ -34,23 +35,23 @@
             </div>
         </div>
 
-        <div class="space-y-2">
-            <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-genres")">Genres</label>
-            <input id="@($"{FieldPrefix}-genres")"
-                   class="input-shell"
-                   @bind="GenresText"
-                   placeholder="Drama, Sci-Fi, Comedy" />
-        </div>
+        <AppInput Id="@($"{FieldPrefix}-genres")"
+                  Label="Genres"
+                  Value="@GenresText"
+                  ValueChanged="HandleGenresChanged"
+                  Placeholder="Drama, Sci-Fi, Comedy" />
 
-        <div class="space-y-2">
-            <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-description")">Description</label>
-            <InputTextArea id="@($"{FieldPrefix}-description")" class="input-shell min-h-32 resize-y" @bind-Value="Media.Description" />
-        </div>
+        <AppTextarea Id="@($"{FieldPrefix}-description")"
+                     Label="Description"
+                     Value="@Media.Description"
+                     ValueChanged="HandleDescriptionChanged"
+                     TextareaClassName="min-h-32" />
 
-        <div class="space-y-2">
-            <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-notes")">Notes</label>
-            <InputTextArea id="@($"{FieldPrefix}-notes")" class="input-shell min-h-28 resize-y" @bind-Value="Media.Notes" />
-        </div>
+        <AppTextarea Id="@($"{FieldPrefix}-notes")"
+                     Label="Notes"
+                     Value="@Media.Notes"
+                     ValueChanged="HandleNotesChanged"
+                     TextareaClassName="min-h-28" />
 
         @if (Media.Type == MediaType.Movie)
         {
@@ -66,10 +67,9 @@
                         <InputNumber id="@($"{FieldPrefix}-movie-duration")" class="input-shell" @bind-Value="MovieDetails.DurationMinutes" />
                     </div>
 
-                    <div class="flex items-center gap-3 rounded-2xl border border-border bg-surface-soft/70 px-4 py-3">
-                        <InputCheckbox id="@($"{FieldPrefix}-movie-watched")" @bind-Value="MovieDetails.IsWatched" />
-                        <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-movie-watched")">Marked as watched</label>
-                    </div>
+                    <AppCheckbox Label="Marked as watched"
+                                 Value="@MovieDetails.IsWatched"
+                                 ValueChanged="HandleMovieWatchedChanged" />
                 </div>
 
                 <div class="space-y-2">
@@ -87,7 +87,7 @@
                         <p class="mt-1 text-sm text-muted">Add seasons and episodes now so persistence, statistics, and progress tracking all have real data to work with.</p>
                     </div>
 
-                    <button class="secondary-button" type="button" @onclick="AddSeason">Add Season</button>
+                    <AppButton Variant="secondary" OnClick="AddSeasonAsync">Add Season</AppButton>
                 </div>
 
                 @if (SeriesDetails.Seasons.Count == 0)
@@ -114,7 +114,7 @@
                                     </div>
                                 </div>
 
-                                <button class="nav-chip" type="button" @onclick="() => RemoveSeason(season)">Remove</button>
+                                <AppButton Variant="ghost" Size="sm" OnClick="@((MouseEventArgs args) => RemoveSeasonAsync(season, args))">Remove</AppButton>
                             </div>
 
                             <div class="space-y-3">
@@ -145,24 +145,24 @@
                                             </div>
 
                                             <div class="grid gap-4 sm:grid-cols-[auto,1fr,auto] sm:items-center">
-                                                <div class="flex items-center gap-3 rounded-2xl border border-border bg-surface-soft/70 px-4 py-3">
-                                                    <InputCheckbox @bind-Value="episode.IsWatched" />
-                                                    <label class="text-sm font-semibold text-text">Watched</label>
-                                                </div>
+                                                <AppCheckbox Label="Watched"
+                                                             Value="@episode.IsWatched"
+                                                             ValueChanged="value => HandleEpisodeWatchedChanged(episode, value)"
+                                                             Class="px-4 py-3" />
 
                                                 <div class="space-y-2">
                                                     <label class="text-sm font-semibold text-text">Watched Date</label>
                                                     <InputDate TValue="DateTime?" class="input-shell" @bind-Value="episode.WatchedDate" />
                                                 </div>
 
-                                                <button class="nav-chip" type="button" @onclick="() => RemoveEpisode(season, episode)">Remove</button>
+                                                <AppButton Variant="ghost" Size="sm" OnClick="@((MouseEventArgs args) => RemoveEpisodeAsync(season, episode, args))">Remove</AppButton>
                                             </div>
                                         </article>
                                     }
                                 }
                             </div>
 
-                            <button class="secondary-button" type="button" @onclick="() => AddEpisode(season)">Add Episode</button>
+                            <AppButton Variant="secondary" OnClick="@((MouseEventArgs args) => AddEpisodeAsync(season, args))">Add Episode</AppButton>
                         </section>
                     }
                 }
@@ -170,16 +170,16 @@
         }
 
         <div class="flex flex-wrap gap-3">
-            <button class="primary-button" type="submit" disabled="@IsBusy">@SubmitLabel</button>
+            <AppButton Type="submit" Disabled="@IsBusy">@SubmitLabel</AppButton>
 
             @if (AllowDelete)
             {
-                <button class="secondary-button" type="button" @onclick="HandleDeleteAsync" disabled="@IsBusy">@DeleteLabel</button>
+                <AppButton Variant="secondary" Disabled="@IsBusy" OnClick="HandleDeleteClickAsync">@DeleteLabel</AppButton>
             }
 
             @if (!string.IsNullOrWhiteSpace(CancelHref))
             {
-                <a class="secondary-button" href="@CancelHref">Cancel</a>
+                <AppButton Href="@CancelHref" Variant="secondary">Cancel</AppButton>
             }
         </div>
     </div>
@@ -257,6 +257,15 @@
         await OnDeleteRequested.InvokeAsync();
     }
 
+    private Task HandleDeleteClickAsync(MouseEventArgs _)
+        => HandleDeleteAsync();
+
+    private Task AddSeasonAsync(MouseEventArgs _)
+    {
+        AddSeason();
+        return Task.CompletedTask;
+    }
+
     private void AddSeason()
     {
         SeriesDetails.Seasons.Add(new Season
@@ -269,6 +278,12 @@
     private void RemoveSeason(Season season)
         => SeriesDetails.Seasons.Remove(season);
 
+    private Task RemoveSeasonAsync(Season season, MouseEventArgs _)
+    {
+        RemoveSeason(season);
+        return Task.CompletedTask;
+    }
+
     private static void AddEpisode(Season season)
     {
         season.Episodes.Add(new Episode
@@ -280,6 +295,18 @@
 
     private static void RemoveEpisode(Season season, Episode episode)
         => season.Episodes.Remove(episode);
+
+    private Task AddEpisodeAsync(Season season, MouseEventArgs _)
+    {
+        AddEpisode(season);
+        return Task.CompletedTask;
+    }
+
+    private Task RemoveEpisodeAsync(Season season, Episode episode, MouseEventArgs _)
+    {
+        RemoveEpisode(season, episode);
+        return Task.CompletedTask;
+    }
 
     private string? Validate()
     {
@@ -357,5 +384,63 @@
                 return season;
             })
             .ToList();
+    }
+
+    private Task HandleMediaTypeChanged(MediaType value)
+    {
+        Media.Type = value;
+        return Task.CompletedTask;
+    }
+
+    private Task HandleTitleChanged(string? value)
+    {
+        Media.Title = value ?? string.Empty;
+        return Task.CompletedTask;
+    }
+
+    private Task HandleCoverChanged(string? value)
+    {
+        Media.CoverImageUrl = value;
+        return Task.CompletedTask;
+    }
+
+    private Task HandleGenresChanged(string? value)
+    {
+        GenresText = value ?? string.Empty;
+        return Task.CompletedTask;
+    }
+
+    private Task HandleDescriptionChanged(string? value)
+    {
+        Media.Description = value;
+        return Task.CompletedTask;
+    }
+
+    private Task HandleNotesChanged(string? value)
+    {
+        Media.Notes = value;
+        return Task.CompletedTask;
+    }
+
+    private Task HandleMovieWatchedChanged(bool value)
+    {
+        MovieDetails.IsWatched = value;
+        if (!value)
+        {
+            MovieDetails.WatchedDate = null;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task HandleEpisodeWatchedChanged(Episode episode, bool value)
+    {
+        episode.IsWatched = value;
+        if (!value)
+        {
+            episode.WatchedDate = null;
+        }
+
+        return Task.CompletedTask;
     }
 }

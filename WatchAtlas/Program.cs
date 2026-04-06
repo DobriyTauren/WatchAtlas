@@ -11,7 +11,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped<IMediaRepository, LocalStorageMediaRepository>();
-builder.Services.AddScoped<ISettingsRepository, InMemorySettingsRepository>();
+builder.Services.AddScoped<ISettingsRepository, LocalStorageSettingsRepository>();
 builder.Services.AddScoped<IThemeService, ThemeService>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 builder.Services.AddScoped<IImageService, ImageService>();

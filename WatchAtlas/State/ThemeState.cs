@@ -21,15 +21,16 @@ public class ThemeState(
         }
 
         await settingsState.EnsureLoadedAsync(cancellationToken);
-        CurrentTheme = themeService.GetTheme(settingsState.Current.ThemeMode);
+        CurrentTheme = await themeService.InitializeAsync(cancellationToken);
+        settingsState.Current.ThemeMode = CurrentTheme.Mode;
         _isInitialized = true;
         NotifyStateChanged();
     }
 
     public async Task ApplyThemeAsync(ThemeMode mode, CancellationToken cancellationToken = default)
     {
-        CurrentTheme = themeService.GetTheme(mode);
-        await settingsState.UpdateThemeAsync(mode, cancellationToken);
+        CurrentTheme = await themeService.ApplyThemeAsync(mode, cancellationToken);
+        settingsState.Current.ThemeMode = CurrentTheme.Mode;
         NotifyStateChanged();
     }
 }

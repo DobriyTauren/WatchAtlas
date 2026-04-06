@@ -1,0 +1,43 @@
+<label class="@WrapperClass">
+    <input type="checkbox"
+           class="app-checkbox-input"
+           checked="@Value"
+           disabled="@Disabled"
+           @onchange="HandleChanged"
+           @attributes="AdditionalAttributes" />
+    <span class="app-checkbox-copy">
+        <span class="app-checkbox-label">@Label</span>
+        @if (!string.IsNullOrWhiteSpace(Description))
+        {
+            <span class="app-checkbox-description">@Description</span>
+        }
+    </span>
+</label>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Description { get; set; }
+
+    [Parameter]
+    public bool Value { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ValueChanged { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string WrapperClass => string.Join(" ", new[] { "app-checkbox", Class }.Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    private Task HandleChanged(ChangeEventArgs args)
+        => ValueChanged.InvokeAsync(args.Value is bool value && value);
+}

@@ -1,22 +1,22 @@
-<section class="shell-card p-8 text-center sm:p-10">
+<AppCard Class="text-center sm:p-10" Padding="lg">
     <div class="mx-auto flex max-w-2xl flex-col items-center gap-4">
-        <span class="section-chip">@Badge</span>
+        <AppBadge>@Badge</AppBadge>
         <h2 class="text-2xl">@Title</h2>
         <p class="text-sm leading-7 text-muted sm:text-base">@Description</p>
 
         <div class="flex flex-wrap justify-center gap-3 pt-2">
             @if (!string.IsNullOrWhiteSpace(PrimaryHref) && !string.IsNullOrWhiteSpace(PrimaryLabel))
             {
-                <a class="primary-button" href="@PrimaryHref">@PrimaryLabel</a>
+                <AppButton Href="@PrimaryHref">@PrimaryLabel</AppButton>
             }
 
             @if (!string.IsNullOrWhiteSpace(SecondaryHref) && !string.IsNullOrWhiteSpace(SecondaryLabel))
             {
-                <a class="secondary-button" href="@SecondaryHref">@SecondaryLabel</a>
+                <AppButton Href="@SecondaryHref" Variant="secondary">@SecondaryLabel</AppButton>
             }
         </div>
     </div>
-</section>
+</AppCard>
 
 @code {
     [Parameter]

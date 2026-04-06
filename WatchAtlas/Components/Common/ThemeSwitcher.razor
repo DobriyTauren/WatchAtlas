@@ -1,0 +1,74 @@
+@inject ThemeState ThemeState
+
+<div class="@WrapperClass">
+    <div class="flex flex-wrap items-center gap-3">
+        @if (ShowCurrentButton)
+        {
+            <AppButton Variant="secondary" Size="sm" OnClick="CycleThemeAsync">
+                Theme: @ThemeState.CurrentTheme.DisplayName
+            </AppButton>
+        }
+
+        @if (ShowPalette && Compact)
+        {
+            @foreach (var theme in ThemeState.AvailableThemes)
+            {
+                <button class="@GetCompactButtonClass(theme)" type="button" @onclick="() => ThemeState.ApplyThemeAsync(theme.Mode)">
+                    @theme.AccentLabel
+                </button>
+            }
+        }
+    </div>
+
+    @if (ShowPalette && !Compact)
+    {
+        <div class="grid gap-3 md:grid-cols-3">
+            @foreach (var theme in ThemeState.AvailableThemes)
+            {
+                <button class="@GetCardClass(theme)" type="button" @onclick="() => ThemeState.ApplyThemeAsync(theme.Mode)">
+                    <span class="flex items-center justify-between gap-3">
+                        <span class="text-left text-sm font-semibold text-text">@theme.DisplayName</span>
+                        <span class="flex items-center gap-2">
+                            <span class="h-3 w-3 rounded-full border border-white/50" style="@($"background:{theme.AccentHex}")"></span>
+                            <span class="h-3 w-3 rounded-full border border-white/50" style="@($"background:{theme.HighlightHex}")"></span>
+                            <span class="h-3 w-3 rounded-full border border-white/50" style="@($"background:{theme.SurfaceHex}")"></span>
+                        </span>
+                    </span>
+                    <span class="text-left text-sm leading-6 text-muted">@theme.Description</span>
+                    <span class="text-left text-xs font-semibold uppercase tracking-[0.24em] text-muted">@theme.AccentLabel</span>
+                </button>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public bool Compact { get; set; }
+
+    [Parameter]
+    public bool ShowPalette { get; set; } = true;
+
+    [Parameter]
+    public bool ShowCurrentButton { get; set; } = true;
+
+    private string WrapperClass => ShowPalette && !Compact ? "space-y-4" : "space-y-3";
+
+    private Task CycleThemeAsync()
+    {
+        var themes = ThemeState.AvailableThemes;
+        var currentIndex = themes.ToList().FindIndex(theme => theme.Mode == ThemeState.CurrentTheme.Mode);
+        var nextTheme = themes[(currentIndex + 1) % themes.Count];
+        return ThemeState.ApplyThemeAsync(nextTheme.Mode);
+    }
+
+    private string GetCompactButtonClass(ThemeSettings theme)
+        => theme.Mode == ThemeState.CurrentTheme.Mode
+            ? "theme-choice theme-choice-active"
+            : "theme-choice";
+
+    private string GetCardClass(ThemeSettings theme)
+        => theme.Mode == ThemeState.CurrentTheme.Mode
+            ? "theme-card theme-card-active"
+            : "theme-card";
+}

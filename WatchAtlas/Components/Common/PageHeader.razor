@@ -1,27 +1,8 @@
-<div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-    <div class="space-y-3">
-        @if (!string.IsNullOrWhiteSpace(Eyebrow))
-        {
-            <p class="text-sm font-semibold uppercase tracking-[0.24em] text-muted">@Eyebrow</p>
-        }
-
-        <div class="space-y-2">
-            <h1 class="text-3xl sm:text-4xl">@Title</h1>
-
-            @if (!string.IsNullOrWhiteSpace(Subtitle))
-            {
-                <p class="max-w-3xl text-sm leading-7 text-muted sm:text-base">@Subtitle</p>
-            }
-        </div>
-    </div>
-
-    @if (Actions is not null)
-    {
-        <div class="flex flex-wrap items-center gap-3">
-            @Actions
-        </div>
-    }
-</div>
+<SectionHeader Eyebrow="@Eyebrow"
+               Title="@Title"
+               Description="@Subtitle"
+               IsPageTitle="true"
+               Actions="@Actions" />
 
 @code {
     [Parameter]

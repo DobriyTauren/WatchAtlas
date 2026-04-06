@@ -1,0 +1,27 @@
+<div class="space-y-2">
+    <div class="flex items-center justify-between gap-3">
+        @if (!string.IsNullOrWhiteSpace(Label))
+        {
+            <span class="text-sm font-semibold text-text">@Label</span>
+        }
+
+        <span class="text-sm text-muted">@ProgressPercent.ToString("0")%</span>
+    </div>
+
+    <div class="progress-shell">
+        <div class="progress-fill" style="width: @($"{ProgressPercent:0.##}%")"></div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public double Value { get; set; }
+
+    [Parameter]
+    public double Max { get; set; } = 100;
+
+    private double ProgressPercent => Max <= 0 ? 0 : Math.Clamp(Value / Max * 100d, 0, 100);
+}

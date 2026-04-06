@@ -7,7 +7,7 @@
 <section class="space-y-8">
     <PageHeader Eyebrow="New Media"
                 Title="Add a movie or series to your library."
-                Subtitle="Phase 2 wires this page into browser storage, so saving here now persists immediately in localStorage and flows through the shared state." />
+                Subtitle="The editor now saves into browser storage and uses the shared design system so creation flows feel consistent with the rest of the app." />
 
     <section class="grid gap-4 xl:grid-cols-[1.25fr,0.9fr]">
         <article class="shell-card p-6 sm:p-8">
@@ -17,7 +17,7 @@
                              SubmitLabel="Save Entry"
                              CancelHref="/library"
                              FieldPrefix="media-new"
-                             ExternalErrorMessage="ErrorMessage"
+                             ExternalErrorMessage="@ErrorMessage"
                              IsBusy="IsSaving"
                              OnSubmitRequested="SaveAsync" />
         </article>

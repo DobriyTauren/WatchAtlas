@@ -1,0 +1,58 @@
+@if (IsOpen)
+{
+    <div class="app-modal-backdrop" @onclick="HandleBackdropClick">
+        <div class="app-modal-panel" @onclick:stopPropagation="true">
+            @if (!string.IsNullOrWhiteSpace(Title) || !string.IsNullOrWhiteSpace(Description))
+            {
+                <div class="space-y-2">
+                    @if (!string.IsNullOrWhiteSpace(Title))
+                    {
+                        <h2 class="text-2xl">@Title</h2>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Description))
+                    {
+                        <p class="text-sm leading-7 text-muted">@Description</p>
+                    }
+                </div>
+            }
+
+            <div>
+                @ChildContent
+            </div>
+
+            @if (Footer is not null)
+            {
+                <div class="flex flex-wrap justify-end gap-3">
+                    @Footer
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Description { get; set; }
+
+    [Parameter]
+    public bool CloseOnBackdropClick { get; set; } = true;
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment? Footer { get; set; }
+
+    private Task HandleBackdropClick()
+        => CloseOnBackdropClick ? OnClose.InvokeAsync() : Task.CompletedTask;
+}
