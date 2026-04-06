@@ -81,6 +81,15 @@ public class LibraryState(IMediaRepository repository) : StateStoreBase
         await RefreshAsync();
     }
 
+    public Task<LibraryStorageModel> ExportStorageAsync()
+        => repository.ExportAsync();
+
+    public async Task ReplaceFromStorageAsync(LibraryStorageModel storage)
+    {
+        await repository.ReplaceAllAsync(storage);
+        await RefreshAsync();
+    }
+
     public async Task ResetAsync()
     {
         await repository.ResetAsync();

@@ -5,6 +5,16 @@ namespace WatchAtlas.Helpers;
 
 public static class LibraryCloneHelper
 {
+    public static AppSettings Clone(AppSettings source) => new()
+    {
+        ThemeMode = source.ThemeMode,
+        LibraryViewMode = source.LibraryViewMode,
+        DefaultLibrarySortBy = source.DefaultLibrarySortBy,
+        DefaultLibrarySortDescending = source.DefaultLibrarySortDescending,
+        UseDenseLibraryGrid = source.UseDenseLibraryGrid,
+        ShowCompletedItemsFirst = source.ShowCompletedItemsFirst
+    };
+
     public static MediaItem Clone(MediaItem source) => new()
     {
         Id = source.Id,
@@ -72,5 +82,13 @@ public static class LibraryCloneHelper
         MediaItems = source.MediaItems.Select(Clone).ToList(),
         Movies = source.Movies.Select(details => Clone(details)!).ToList(),
         Series = source.Series.Select(details => Clone(details)!).ToList()
+    };
+
+    public static LibraryBackupModel Clone(LibraryBackupModel source) => new()
+    {
+        BackupVersion = source.BackupVersion,
+        ExportedAtUtc = source.ExportedAtUtc,
+        Library = Clone(source.Library),
+        Settings = Clone(source.Settings)
     };
 }

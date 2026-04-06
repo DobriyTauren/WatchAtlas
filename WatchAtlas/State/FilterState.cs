@@ -86,15 +86,15 @@ public class FilterState : StateStoreBase
         NotifyStateChanged();
     }
 
-    public void Reset()
+    public void Reset(LibrarySortBy? sortBy = null, bool? descending = null)
     {
         Options.SearchTerm = string.Empty;
         Options.Genre = null;
         Options.MediaType = null;
         Options.Status = null;
         Options.SeriesId = null;
-        Options.SortBy = LibrarySortBy.UpdatedAt;
-        Options.Descending = true;
+        Options.SortBy = sortBy ?? LibrarySortBy.UpdatedAt;
+        Options.Descending = descending ?? true;
         NotifyStateChanged();
     }
 

@@ -1,4 +1,5 @@
 using WatchAtlas.Models;
+using WatchAtlas.Models.Library;
 
 namespace WatchAtlas.Repositories;
 
@@ -13,5 +14,7 @@ public interface IMediaRepository
     Task SaveMovieDetailsAsync(MovieDetails details);
     Task<SeriesDetails?> GetSeriesDetailsAsync(Guid mediaItemId);
     Task SaveSeriesDetailsAsync(SeriesDetails details);
+    Task<LibraryStorageModel> ExportAsync();
+    Task ReplaceAllAsync(LibraryStorageModel storage);
     Task ResetAsync();
 }

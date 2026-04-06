@@ -1,3 +1,4 @@
+using WatchAtlas.Helpers;
 using WatchAtlas.Models;
 using WatchAtlas.Models.Enums;
 using WatchAtlas.Repositories;
@@ -39,6 +40,66 @@ public class SettingsState(ISettingsRepository repository) : StateStoreBase
 
         Current.LibraryViewMode = viewMode;
         await repository.SaveAsync(Current, cancellationToken);
+        NotifyStateChanged();
+    }
+
+    public async Task UpdateDefaultSortAsync(
+        LibrarySortBy sortBy,
+        bool descending,
+        CancellationToken cancellationToken = default)
+    {
+        await EnsureLoadedAsync(cancellationToken);
+        if (Current.DefaultLibrarySortBy == sortBy &&
+            Current.DefaultLibrarySortDescending == descending)
+        {
+            return;
+        }
+
+        Current.DefaultLibrarySortBy = sortBy;
+        Current.DefaultLibrarySortDescending = descending;
+        await repository.SaveAsync(Current, cancellationToken);
+        NotifyStateChanged();
+    }
+
+    public async Task UpdateDenseLibraryGridAsync(bool value, CancellationToken cancellationToken = default)
+    {
+        await EnsureLoadedAsync(cancellationToken);
+        if (Current.UseDenseLibraryGrid == value)
+        {
+            return;
+        }
+
+        Current.UseDenseLibraryGrid = value;
+        await repository.SaveAsync(Current, cancellationToken);
+        NotifyStateChanged();
+    }
+
+    public async Task UpdateCompletedItemsFirstAsync(bool value, CancellationToken cancellationToken = default)
+    {
+        await EnsureLoadedAsync(cancellationToken);
+        if (Current.ShowCompletedItemsFirst == value)
+        {
+            return;
+        }
+
+        Current.ShowCompletedItemsFirst = value;
+        await repository.SaveAsync(Current, cancellationToken);
+        NotifyStateChanged();
+    }
+
+    public async Task ReplaceAsync(AppSettings settings, CancellationToken cancellationToken = default)
+    {
+        Current = LibraryCloneHelper.Clone(settings);
+        IsLoaded = true;
+        await repository.SaveAsync(Current, cancellationToken);
+        NotifyStateChanged();
+    }
+
+    public async Task ResetAsync(CancellationToken cancellationToken = default)
+    {
+        await repository.ResetAsync(cancellationToken);
+        Current = AppSettings.Default;
+        IsLoaded = true;
         NotifyStateChanged();
     }
 }

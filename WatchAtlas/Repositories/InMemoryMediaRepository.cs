@@ -129,6 +129,18 @@ public class LocalStorageMediaRepository(IJSRuntime jsRuntime) : IMediaRepositor
         await PersistAsync(storage);
     }
 
+    public async Task<LibraryStorageModel> ExportAsync()
+    {
+        var storage = await GetStorageAsync();
+        return LibraryCloneHelper.Clone(storage);
+    }
+
+    public async Task ReplaceAllAsync(LibraryStorageModel storage)
+    {
+        var normalized = NormalizeStorage(storage);
+        await PersistAsync(normalized);
+    }
+
     public async Task ResetAsync()
     {
         _cache = LibraryStorageModel.CreateDefault();
@@ -181,6 +193,30 @@ public class LocalStorageMediaRepository(IJSRuntime jsRuntime) : IMediaRepositor
             .Select(genre => genre.Trim())
             .Where(genre => !string.IsNullOrWhiteSpace(genre))
             .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return normalized;
+    }
+
+    private static LibraryStorageModel NormalizeStorage(LibraryStorageModel storage)
+    {
+        var normalized = LibraryCloneHelper.Clone(storage);
+
+        normalized.SchemaVersion = LibraryStorageModel.CurrentSchemaVersion;
+        normalized.MediaItems ??= new();
+        normalized.Movies ??= new();
+        normalized.Series ??= new();
+        normalized.MediaItems = normalized.MediaItems
+            .Select(NormalizeMediaItem)
+            .OrderByDescending(item => item.UpdatedAt)
+            .ToList();
+        normalized.Movies = normalized.Movies
+            .Where(details => normalized.MediaItems.Any(item => item.Id == details.MediaItemId))
+            .Select(NormalizeMovieDetails)
+            .ToList();
+        normalized.Series = normalized.Series
+            .Where(details => normalized.MediaItems.Any(item => item.Id == details.MediaItemId))
+            .Select(NormalizeSeriesDetails)
             .ToList();
 
         return normalized;

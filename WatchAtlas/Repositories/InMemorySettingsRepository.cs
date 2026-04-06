@@ -28,6 +28,12 @@ public class LocalStorageSettingsRepository(IJSRuntime jsRuntime) : ISettingsRep
         await jsRuntime.InvokeVoidAsync("watchAtlasStorage.setItem", StorageKey, json);
     }
 
+    public async Task ResetAsync(CancellationToken cancellationToken = default)
+    {
+        _settings = AppSettings.Default;
+        await jsRuntime.InvokeVoidAsync("watchAtlasStorage.removeItem", StorageKey);
+    }
+
     private static AppSettings Deserialize(string? json)
     {
         if (string.IsNullOrWhiteSpace(json))
@@ -49,6 +55,8 @@ public class LocalStorageSettingsRepository(IJSRuntime jsRuntime) : ISettingsRep
     {
         ThemeMode = settings.ThemeMode,
         LibraryViewMode = settings.LibraryViewMode,
+        DefaultLibrarySortBy = settings.DefaultLibrarySortBy,
+        DefaultLibrarySortDescending = settings.DefaultLibrarySortDescending,
         UseDenseLibraryGrid = settings.UseDenseLibraryGrid,
         ShowCompletedItemsFirst = settings.ShowCompletedItemsFirst
     };

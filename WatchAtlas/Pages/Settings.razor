@@ -1,43 +1,385 @@
 @page "/settings"
+@implements IDisposable
+@using System.IO
+@inject IImportExportService ImportExportService
+@inject IJSRuntime JsRuntime
+@inject LibraryState LibraryState
 @inject SettingsState SettingsState
+@inject ThemeState ThemeState
+@inject FilterState FilterState
 
 <PageTitle>Settings</PageTitle>
 
 <section class="space-y-8">
     <PageHeader Eyebrow="Settings"
-                Title="Tune the app shell and shared presentation layer."
-                Subtitle="Phase 3 turns the existing theme groundwork into a persisted design system with reusable UI primitives and live theme switching." />
+                Title="Control your app preferences and local data safety."
+                Subtitle="Theme, layout, and backup settings all stay in browser storage, so this page is where you shape the default browsing experience and protect the library with export, import, and reset tools." />
 
-    <section class="grid gap-4 xl:grid-cols-[1.2fr,1fr]">
+    @if (!string.IsNullOrWhiteSpace(FeedbackMessage))
+    {
+        <div class="soft-block border border-emerald-200/70 p-4 text-sm text-emerald-700">
+            @FeedbackMessage
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="soft-block border border-red-200/70 p-4 text-sm text-red-700">
+            @ErrorMessage
+        </div>
+    }
+
+    <section class="grid gap-4 xl:grid-cols-[1.15fr,1fr]">
         <AppCard>
-            <div class="flex flex-col gap-6">
-                <SectionHeader Eyebrow="Theme System"
-                               Title="Themes"
-                               Description="Theme changes now apply live, persist in browser settings, and update the root document theme before Blazor finishes hydrating." />
+            <div class="space-y-6">
+                <SectionHeader Eyebrow="Appearance"
+                               Title="Theme and library defaults"
+                               Description="These preferences shape how the library opens and how new browsing sessions feel before you start filtering." />
 
-                <ThemeSwitcher ShowCurrentButton="false" />
+                <div class="space-y-4">
+                    <div class="soft-block p-5">
+                        <p class="text-sm font-semibold text-text">Theme</p>
+                        <p class="mt-2 text-sm leading-7 text-muted">Switch live between the soft light, dark, and pastel palettes. The selected theme is preserved after reload.</p>
+                        <div class="mt-4">
+                            <ThemeSwitcher ShowCurrentButton="false" />
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 md:grid-cols-[1fr,1.1fr]">
+                        <div class="soft-block p-5">
+                            <p class="text-sm font-semibold text-text">Preferred library view</p>
+                            <p class="mt-2 text-sm leading-7 text-muted">Choose the browsing layout that opens by default on the library page.</p>
+                            <div class="mt-4">
+                                <ViewModeToggle Value="@SettingsState.Current.LibraryViewMode" ValueChanged="HandleViewModeChanged" />
+                            </div>
+                        </div>
+
+                        <div class="soft-block p-5">
+                            <SortDropdown Id="settings-default-sort"
+                                          Label="Default library sort"
+                                          Value="@SelectedDefaultSortKey"
+                                          ValueChanged="HandleDefaultSortChanged"
+                                          Options="@SortOptions" />
+                            <p class="mt-3 text-sm leading-7 text-muted">Used when the library opens or when you reset active filters.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="soft-block p-5">
+                            <AppCheckbox Label="Use dense grid cards"
+                                         Description="Show a tighter grid layout on the library page when grid view is active."
+                                         Value="@SettingsState.Current.UseDenseLibraryGrid"
+                                         ValueChanged="HandleDenseGridChanged" />
+                        </div>
+
+                        <div class="soft-block p-5">
+                            <AppCheckbox Label="Pin completed items first"
+                                         Description="Keep completed entries grouped first while preserving the current sort within each group."
+                                         Value="@SettingsState.Current.ShowCompletedItemsFirst"
+                                         ValueChanged="HandleCompletedFirstChanged" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </AppCard>
 
         <AppCard>
-            <div class="space-y-5">
-                <SectionHeader Eyebrow="Design System"
-                               Title="Architecture Notes"
-                               Description="The design layer now reuses token-driven components instead of repeating raw utility combinations across pages." />
+            <div class="space-y-6">
+                <SectionHeader Eyebrow="Backup"
+                               Title="Export and restore your library"
+                               Description="Create a JSON backup with your media data and settings, or replace the current browser storage from a saved backup file." />
+
+                <div class="soft-block p-5">
+                    <p class="text-sm font-semibold text-text">Export backup</p>
+                    <p class="mt-2 text-sm leading-7 text-muted">Exports the full library snapshot, including movies, series, seasons, episodes, and current app settings.</p>
+                    <div class="mt-4 flex flex-wrap gap-3">
+                        <AppButton Disabled="@IsExporting" OnClick="ExportBackupAsync">
+                            @(IsExporting ? "Preparing Export..." : "Export JSON Backup")
+                        </AppButton>
+                    </div>
+                </div>
+
+                <div class="soft-block p-5">
+                    <p class="text-sm font-semibold text-text">Import backup</p>
+                    <p class="mt-2 text-sm leading-7 text-muted">The current MVP replaces local data after confirmation, so import is safe from partial merges but will overwrite the current browser snapshot.</p>
+                    <div class="mt-4 flex flex-wrap items-center gap-3">
+                        <label class="app-button app-button-secondary app-button-md cursor-pointer">
+                            <InputFile OnChange="HandleImportSelectedAsync"
+                                       accept=".json,application/json"
+                                       class="sr-only" />
+                            Choose Backup File
+                        </label>
+                        @if (!string.IsNullOrWhiteSpace(SelectedImportFileName))
+                        {
+                            <span class="text-sm text-muted">@SelectedImportFileName</span>
+                        }
+                    </div>
+                </div>
+
                 <div class="space-y-4 text-sm leading-7 text-muted">
-                    <p><span class="font-semibold text-text">Storage:</span> settings and media both persist through browser storage repositories, so theme and library preferences survive reloads.</p>
-                    <p><span class="font-semibold text-text">Hosting:</span> the app uses a project-site base path and an SPA fallback page for GitHub Pages compatibility.</p>
-                    <p><span class="font-semibold text-text">State:</span> theme, library, filters, and settings live in scoped services instead of a heavier external state library.</p>
-                    <p><span class="font-semibold text-text">Components:</span> buttons, fields, cards, badges, progress, modals, and theme selection now share one visual language.</p>
+                    <p><span class="font-semibold text-text">Stored locally:</span> both settings and library data stay in your browser, so export is the main recovery path before clearing data or switching devices.</p>
+                    <p><span class="font-semibold text-text">Validation:</span> invalid JSON and unsupported backup structures are blocked before anything is written into storage.</p>
+                    <p><span class="font-semibold text-text">Import behavior:</span> a valid backup restores media items first, then applies the saved app settings and theme so the app comes back in a consistent state.</p>
                 </div>
             </div>
         </AppCard>
     </section>
+
+    <AppCard Variant="strong">
+        <div class="space-y-5">
+            <SectionHeader Eyebrow="Danger Zone"
+                           Title="Reset local WatchAtlas data"
+                           Description="This permanently clears the saved library and app settings from browser storage, then returns the UI to its default state." />
+
+            <div class="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-red-200/70 bg-red-50/70 p-5 dark:border-red-400/20 dark:bg-red-500/10">
+                <div class="space-y-2">
+                    <p class="text-sm font-semibold text-red-700 dark:text-red-200">Reset library and preferences</p>
+                    <p class="text-sm leading-7 text-red-700/80 dark:text-red-100/80">Use this if you want to fully wipe local browser data and start the watch library from scratch.</p>
+                </div>
+
+                <AppButton Disabled="@IsResetting" OnClick="OpenResetModalAsync">Reset All Local Data</AppButton>
+            </div>
+        </div>
+    </AppCard>
+
+    <AppModal IsOpen="@IsImportModalOpen"
+              Title="Replace local data with this backup?"
+              Description="Import replaces the current browser snapshot. Export first if you want an extra recovery point."
+              OnClose="CloseImportModalAsync">
+        <ChildContent>
+            <div class="space-y-4 text-sm leading-7 text-muted">
+                <p><strong>@(PendingImportBackup?.Library.MediaItems.Count ?? 0)</strong> media item(s) and the saved app preferences from <strong>@(SelectedImportFileName ?? "the selected file")</strong> are ready to restore.</p>
+                <p>The current library, filters, theme preferences, and saved settings will be replaced immediately after confirmation.</p>
+            </div>
+        </ChildContent>
+        <Footer>
+            <AppButton Variant="secondary" Disabled="@IsImporting" OnClick="CloseImportModalButtonAsync">Cancel</AppButton>
+            <AppButton Disabled="@IsImporting" OnClick="ConfirmImportAsync">Replace Local Data</AppButton>
+        </Footer>
+    </AppModal>
+
+    <AppModal IsOpen="@IsResetModalOpen"
+              Title="Reset all local data?"
+              Description="This clears the saved library and browser settings permanently."
+              OnClose="CloseResetModalAsync">
+        <ChildContent>
+            <p class="text-sm leading-7 text-muted">
+                All movies, series, seasons, episodes, uploaded cover images, filters, and saved preferences will be removed from browser storage.
+            </p>
+        </ChildContent>
+        <Footer>
+            <AppButton Variant="secondary" Disabled="@IsResetting" OnClick="CloseResetModalButtonAsync">Cancel</AppButton>
+            <AppButton Disabled="@IsResetting" OnClick="ConfirmResetAsync">Reset Everything</AppButton>
+        </Footer>
+    </AppModal>
 </section>
 
 @code {
+    private static readonly IReadOnlyList<SortDropdown.SortDropdownOption> SortOptions = LibrarySortOptionHelper.Options
+        .Select(option => new SortDropdown.SortDropdownOption
+        {
+            Key = option.Key,
+            Label = option.Label
+        })
+        .ToList();
+
+    private string? FeedbackMessage { get; set; }
+    private string? ErrorMessage { get; set; }
+    private string? SelectedImportFileName { get; set; }
+    private LibraryBackupModel? PendingImportBackup { get; set; }
+    private bool IsExporting { get; set; }
+    private bool IsImporting { get; set; }
+    private bool IsResetting { get; set; }
+    private bool IsImportModalOpen { get; set; }
+    private bool IsResetModalOpen { get; set; }
+
+    private string SelectedDefaultSortKey => LibrarySortOptionHelper.ToKey(
+        SettingsState.Current.DefaultLibrarySortBy,
+        SettingsState.Current.DefaultLibrarySortDescending);
+
     protected override async Task OnInitializedAsync()
     {
+        SettingsState.Changed += HandleStateChanged;
         await SettingsState.EnsureLoadedAsync();
+        await LibraryState.EnsureLoadedAsync();
+    }
+
+    private Task HandleViewModeChanged(LibraryViewMode mode)
+        => SettingsState.UpdateLibraryViewModeAsync(mode);
+
+    private Task HandleDenseGridChanged(bool value)
+        => SettingsState.UpdateDenseLibraryGridAsync(value);
+
+    private Task HandleCompletedFirstChanged(bool value)
+        => SettingsState.UpdateCompletedItemsFirstAsync(value);
+
+    private Task HandleDefaultSortChanged(string value)
+    {
+        var option = LibrarySortOptionHelper.Parse(value);
+        return SettingsState.UpdateDefaultSortAsync(option.SortBy, option.Descending);
+    }
+
+    private async Task ExportBackupAsync(MouseEventArgs _)
+    {
+        try
+        {
+            IsExporting = true;
+            ClearMessages();
+
+            var backup = new LibraryBackupModel
+            {
+                BackupVersion = LibraryBackupModel.CurrentBackupVersion,
+                ExportedAtUtc = DateTime.UtcNow,
+                Library = await LibraryState.ExportStorageAsync(),
+                Settings = LibraryCloneHelper.Clone(SettingsState.Current)
+            };
+
+            var fileName = $"watchatlas-backup-{DateTime.Now:yyyyMMdd-HHmmss}.json";
+            var json = ImportExportService.Export(backup);
+            await JsRuntime.InvokeVoidAsync("watchAtlasStorage.downloadTextFile", fileName, json, "application/json;charset=utf-8");
+            FeedbackMessage = "Backup exported successfully.";
+        }
+        catch (Exception exception)
+        {
+            ErrorMessage = exception.Message;
+        }
+        finally
+        {
+            IsExporting = false;
+        }
+    }
+
+    private async Task HandleImportSelectedAsync(InputFileChangeEventArgs args)
+    {
+        ClearMessages();
+        PendingImportBackup = null;
+        IsImportModalOpen = false;
+
+        var file = args.File;
+        if (file is null)
+        {
+            SelectedImportFileName = null;
+            return;
+        }
+
+        SelectedImportFileName = file.Name;
+
+        try
+        {
+            await using var stream = file.OpenReadStream(10 * 1024 * 1024);
+            using var reader = new StreamReader(stream);
+            var json = await reader.ReadToEndAsync();
+            var result = ImportExportService.Import(json);
+
+            if (!result.IsSuccessful)
+            {
+                ErrorMessage = result.ErrorMessage ?? "The selected backup could not be imported.";
+                return;
+            }
+
+            PendingImportBackup = result.Backup;
+            IsImportModalOpen = true;
+        }
+        catch (Exception exception)
+        {
+            ErrorMessage = exception.Message;
+        }
+    }
+
+    private Task OpenResetModalAsync(MouseEventArgs _)
+    {
+        ClearMessages();
+        IsResetModalOpen = true;
+        return Task.CompletedTask;
+    }
+
+    private Task CloseImportModalButtonAsync(MouseEventArgs _)
+        => CloseImportModalAsync();
+
+    private Task CloseImportModalAsync()
+    {
+        IsImportModalOpen = false;
+        return Task.CompletedTask;
+    }
+
+    private Task CloseResetModalButtonAsync(MouseEventArgs _)
+        => CloseResetModalAsync();
+
+    private Task CloseResetModalAsync()
+    {
+        IsResetModalOpen = false;
+        return Task.CompletedTask;
+    }
+
+    private async Task ConfirmImportAsync(MouseEventArgs _)
+    {
+        if (PendingImportBackup is null)
+        {
+            return;
+        }
+
+        try
+        {
+            IsImporting = true;
+            ClearMessages();
+
+            await LibraryState.ReplaceFromStorageAsync(PendingImportBackup.Library);
+            await SettingsState.ReplaceAsync(PendingImportBackup.Settings);
+            await ThemeState.ApplyThemeAsync(PendingImportBackup.Settings.ThemeMode);
+            FilterState.Reset(SettingsState.Current.DefaultLibrarySortBy, SettingsState.Current.DefaultLibrarySortDescending);
+
+            FeedbackMessage = "Backup restored successfully.";
+            IsImportModalOpen = false;
+            SelectedImportFileName = null;
+            PendingImportBackup = null;
+        }
+        catch (Exception exception)
+        {
+            ErrorMessage = exception.Message;
+        }
+        finally
+        {
+            IsImporting = false;
+        }
+    }
+
+    private async Task ConfirmResetAsync(MouseEventArgs _)
+    {
+        try
+        {
+            IsResetting = true;
+            ClearMessages();
+
+            await LibraryState.ResetAsync();
+            await SettingsState.ResetAsync();
+            await ThemeState.ApplyThemeAsync(SettingsState.Current.ThemeMode);
+            FilterState.Reset(SettingsState.Current.DefaultLibrarySortBy, SettingsState.Current.DefaultLibrarySortDescending);
+
+            FeedbackMessage = "All local WatchAtlas data has been cleared.";
+            IsResetModalOpen = false;
+            SelectedImportFileName = null;
+            PendingImportBackup = null;
+        }
+        catch (Exception exception)
+        {
+            ErrorMessage = exception.Message;
+        }
+        finally
+        {
+            IsResetting = false;
+        }
+    }
+
+    private void ClearMessages()
+    {
+        FeedbackMessage = null;
+        ErrorMessage = null;
+    }
+
+    private void HandleStateChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        SettingsState.Changed -= HandleStateChanged;
     }
 }

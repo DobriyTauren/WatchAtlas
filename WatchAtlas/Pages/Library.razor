@@ -133,22 +133,16 @@
 </section>
 
 @code {
-    private static readonly IReadOnlyList<SortDropdown.SortDropdownOption> SortOptions =
-    [
-        new() { Key = "updated-desc", Label = "Recently updated" },
-        new() { Key = "updated-asc", Label = "Least recently updated" },
-        new() { Key = "created-desc", Label = "Recently added" },
-        new() { Key = "created-asc", Label = "Oldest first" },
-        new() { Key = "title-asc", Label = "Title A-Z" },
-        new() { Key = "title-desc", Label = "Title Z-A" },
-        new() { Key = "rating-desc", Label = "Highest rating" },
-        new() { Key = "rating-asc", Label = "Lowest rating" },
-        new() { Key = "progress-desc", Label = "Most progress" },
-        new() { Key = "progress-asc", Label = "Least progress" }
-    ];
+    private static readonly IReadOnlyList<SortDropdown.SortDropdownOption> SortOptions = LibrarySortOptionHelper.Options
+        .Select(option => new SortDropdown.SortDropdownOption
+        {
+            Key = option.Key,
+            Label = option.Label
+        })
+        .ToList();
 
     private LibraryQueryResult QueryResult => FilterState.Apply(LibraryState.Entries);
-    private IReadOnlyList<LibraryEntry> FilteredEntries => QueryResult.Items;
+    private IReadOnlyList<LibraryEntry> FilteredEntries => GetVisibleEntries();
     private IReadOnlyList<string> AvailableGenres => LibraryState.Entries
         .SelectMany(entry => entry.Media.Genres)
         .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -161,7 +155,7 @@
     private LibraryViewMode CurrentViewMode => SettingsState.Current.LibraryViewMode;
     private string SelectedGenreValue => FilterState.Options.Genre ?? string.Empty;
     private string SelectedSeriesValue => FilterState.Options.SeriesId?.ToString() ?? string.Empty;
-    private string SelectedSortKey => $"{GetSortKey(FilterState.Options.SortBy)}-{(FilterState.Options.Descending ? "desc" : "asc")}";
+    private string SelectedSortKey => LibrarySortOptionHelper.ToKey(FilterState.Options.SortBy, FilterState.Options.Descending);
     private string SummaryCopy => QueryResult.TotalCount == QueryResult.FilteredCount
         ? "Everything currently in your watch library is visible."
         : $"{QueryResult.FilteredCount} of {QueryResult.TotalCount} items match the current filters.";
@@ -173,6 +167,7 @@
         SettingsState.Changed += HandleStateChanged;
         await LibraryState.EnsureLoadedAsync();
         await SettingsState.EnsureLoadedAsync();
+        ApplyStoredSortDefaultsIfNeeded();
     }
 
     private Task HandleSearchChanged(string? value)
@@ -183,23 +178,9 @@
 
     private Task HandleSortChanged(string value)
     {
-        var parts = value.Split('-', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (parts.Length != 2)
-        {
-            return Task.CompletedTask;
-        }
-
-        var sortBy = parts[0] switch
-        {
-            "title" => LibrarySortBy.Title,
-            "rating" => LibrarySortBy.Rating,
-            "created" => LibrarySortBy.CreatedAt,
-            "progress" => LibrarySortBy.Progress,
-            _ => LibrarySortBy.UpdatedAt
-        };
-
-        FilterState.SetSortBy(sortBy);
-        FilterState.SetDescending(parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase));
+        var option = LibrarySortOptionHelper.Parse(value);
+        FilterState.SetSortBy(option.SortBy);
+        FilterState.SetDescending(option.Descending);
         return Task.CompletedTask;
     }
 
@@ -226,7 +207,7 @@
 
     private Task ClearFiltersAsync(MouseEventArgs _)
     {
-        FilterState.Reset();
+        FilterState.Reset(SettingsState.Current.DefaultLibrarySortBy, SettingsState.Current.DefaultLibrarySortDescending);
         return Task.CompletedTask;
     }
 
@@ -239,14 +220,34 @@
     private string GetDirectionButtonClass()
         => FilterState.Options.Descending ? "nav-chip nav-chip-active" : "nav-chip";
 
-    private static string GetSortKey(LibrarySortBy sortBy) => sortBy switch
+    private void ApplyStoredSortDefaultsIfNeeded()
     {
-        LibrarySortBy.Title => "title",
-        LibrarySortBy.Rating => "rating",
-        LibrarySortBy.CreatedAt => "created",
-        LibrarySortBy.Progress => "progress",
-        _ => "updated"
-    };
+        var hasActiveFilters =
+            !string.IsNullOrWhiteSpace(FilterState.Options.SearchTerm) ||
+            !string.IsNullOrWhiteSpace(FilterState.Options.Genre) ||
+            FilterState.Options.MediaType is not null ||
+            FilterState.Options.Status is not null ||
+            FilterState.Options.SeriesId is not null;
+
+        var hasDefaultSort = FilterState.Options.SortBy == LibrarySortBy.UpdatedAt && FilterState.Options.Descending;
+        if (!hasActiveFilters && hasDefaultSort)
+        {
+            FilterState.SetSortBy(SettingsState.Current.DefaultLibrarySortBy);
+            FilterState.SetDescending(SettingsState.Current.DefaultLibrarySortDescending);
+        }
+    }
+
+    private IReadOnlyList<LibraryEntry> GetVisibleEntries()
+    {
+        if (!SettingsState.Current.ShowCompletedItemsFirst)
+        {
+            return QueryResult.Items;
+        }
+
+        return QueryResult.Items
+            .OrderByDescending(entry => WatchStatusHelper.GetStatus(entry) == WatchStatus.Completed)
+            .ToList();
+    }
 
     private void HandleStateChanged() => InvokeAsync(StateHasChanged);
 

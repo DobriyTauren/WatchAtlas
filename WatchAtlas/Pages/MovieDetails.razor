@@ -40,16 +40,16 @@
         }
 
         <section class="grid gap-4 xl:grid-cols-[0.95fr,1.15fr]">
-            <AppCard Class="overflow-hidden">
+            <AppCard Class="overflow-hidden p-0">
                 @if (!string.IsNullOrWhiteSpace(Entry.Media.CoverImageUrl))
                 {
                     <img src="@Entry.Media.CoverImageUrl"
                          alt="@($"{Entry.Media.Title} cover")"
-                         class="h-80 w-full rounded-3xl object-cover" />
+                         class="h-full min-h-[24rem] w-full object-cover xl:min-h-[32rem]" />
                 }
                 else
                 {
-                    <div class="movie-cover-fallback">
+                    <div class="movie-cover-fallback h-full min-h-[24rem] xl:min-h-[32rem]">
                         <span class="movie-cover-fallback__badge">Movie</span>
                         <h2 class="movie-cover-fallback__title">@Entry.Media.Title</h2>
                         <p class="movie-cover-fallback__copy">Add a cover image from the edit page to make this movie card feel more complete.</p>
