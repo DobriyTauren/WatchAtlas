@@ -1,16 +1,17 @@
 <div class="space-y-6">
-    <div class="grid gap-4 sm:grid-cols-2">
-        <div class="app-field">
-            <label class="app-field-label" for="@($"{FieldPrefix}-title")">Title</label>
-            <InputText id="@($"{FieldPrefix}-title")" class="app-input" @bind-Value="Model.Title" />
-            <ValidationMessage For="@(() => Model.Title)" class="mt-2 block text-sm text-red-600" />
-        </div>
-
-        <div class="app-field">
-            <label class="app-field-label" for="@($"{FieldPrefix}-cover-url")">Cover Image URL</label>
-            <InputText id="@($"{FieldPrefix}-cover-url")" class="app-input" @bind-Value="Model.CoverImageUrl" />
-        </div>
+    <div class="app-field">
+        <label class="app-field-label" for="@($"{FieldPrefix}-title")">Title</label>
+        <InputText id="@($"{FieldPrefix}-title")" class="app-input" @bind-Value="Model.Title" />
+        <ValidationMessage For="@(() => Model.Title)" class="mt-2 block text-sm text-red-600" />
     </div>
+
+    <CoverUploader Value="@Model.CoverImageUrl"
+                   ValueChanged="HandleCoverChanged"
+                   FieldPrefix="@FieldPrefix"
+                   PlaceholderBadge="Movie"
+                   PlaceholderTitle="@GetPlaceholderTitle()"
+                   PlaceholderCopy="Choose an external cover URL or upload a poster image from this device." />
+    <ValidationMessage For="@(() => Model.CoverImageUrl)" class="mt-2 block text-sm text-red-600" />
 
     <div class="grid gap-4 sm:grid-cols-2">
         <div class="app-field">
@@ -67,6 +68,12 @@
     [Parameter]
     public string FieldPrefix { get; set; } = "movie-form";
 
+    private Task HandleCoverChanged(string? value)
+    {
+        Model.CoverImageUrl = value;
+        return Task.CompletedTask;
+    }
+
     private Task HandleWatchedChanged(bool value)
     {
         Model.IsWatched = value;
@@ -77,4 +84,7 @@
 
         return Task.CompletedTask;
     }
+
+    private string GetPlaceholderTitle()
+        => string.IsNullOrWhiteSpace(Model.Title) ? "Movie cover preview" : Model.Title;
 }

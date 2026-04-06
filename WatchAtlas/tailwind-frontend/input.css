@@ -495,6 +495,50 @@
     .series-accordion__meta {
         @apply flex flex-wrap gap-3 text-sm text-muted;
     }
+
+    .cover-uploader__mode {
+        @apply inline-flex items-center gap-1 rounded-full border border-border/70 p-1;
+        background-color: rgb(var(--surface-soft) / 0.85);
+    }
+
+    .cover-uploader__dropzone {
+        @apply space-y-4 rounded-[1.5rem] border border-dashed border-border/80 p-5;
+        background-color: rgb(var(--surface-soft) / 0.55);
+    }
+
+    .cover-uploader__file-input {
+        @apply w-full rounded-2xl border border-border bg-surface-soft/90 px-4 py-3 text-sm text-text file:mr-4 file:rounded-full file:border-0 file:bg-accent-soft file:px-4 file:py-2 file:text-sm file:font-semibold file:text-text;
+    }
+
+    .cover-uploader__preview-shell {
+        @apply overflow-hidden rounded-[1.75rem] border border-border/70 bg-surface-soft/60 p-3;
+        min-height: 18rem;
+    }
+
+    .cover-uploader__preview-image {
+        @apply h-full min-h-[16.5rem] w-full rounded-[1.35rem] object-cover;
+    }
+
+    .cover-uploader__fallback {
+        @apply flex h-full min-h-[16.5rem] flex-col justify-end gap-4 p-6;
+        border-radius: 1.35rem;
+        background-image:
+            radial-gradient(circle at top right, rgb(var(--orb-secondary) / 0.3), transparent 12rem),
+            linear-gradient(155deg, rgb(var(--accent-soft) / 0.92), rgb(var(--surface-soft-strong) / 0.95));
+    }
+
+    .cover-uploader__fallback-badge {
+        @apply inline-flex w-fit rounded-full border border-border/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-muted;
+        background-color: rgb(var(--surface-strong) / 0.78);
+    }
+
+    .cover-uploader__fallback-title {
+        @apply text-2xl text-text;
+    }
+
+    .cover-uploader__fallback-copy {
+        @apply max-w-md text-sm leading-7 text-muted;
+    }
 }
 
 @layer utilities {

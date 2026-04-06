@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using WatchAtlas.Helpers;
 using WatchAtlas.Models;
 using WatchAtlas.Models.Enums;
 
@@ -24,6 +25,13 @@ public class SeriesFormModel : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
+        if (!CoverImageValueHelper.IsValidStoredValue(CoverImageUrl))
+        {
+            yield return new ValidationResult(
+                "Enter a valid http/https image URL or upload an image file.",
+                new[] { nameof(CoverImageUrl) });
+        }
+
         var seasonNumbers = new HashSet<int>();
 
         foreach (var season in Seasons)
@@ -97,7 +105,7 @@ public class SeriesFormModel : IValidatableObject
     {
         media.Type = MediaType.Series;
         media.Title = Title?.Trim() ?? string.Empty;
-        media.CoverImageUrl = Normalize(CoverImageUrl);
+        media.CoverImageUrl = CoverImageValueHelper.Normalize(CoverImageUrl);
         media.Description = Normalize(Description);
         media.Genres = GenresText
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)

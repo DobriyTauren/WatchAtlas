@@ -1,16 +1,17 @@
 <div class="space-y-6">
-    <div class="grid gap-4 sm:grid-cols-2">
-        <div class="app-field">
-            <label class="app-field-label" for="@($"{FieldPrefix}-title")">Title</label>
-            <InputText id="@($"{FieldPrefix}-title")" class="app-input" @bind-Value="Model.Title" />
-            <ValidationMessage For="@(() => Model.Title)" class="mt-2 block text-sm text-red-600" />
-        </div>
-
-        <div class="app-field">
-            <label class="app-field-label" for="@($"{FieldPrefix}-cover-url")">Cover Image URL</label>
-            <InputText id="@($"{FieldPrefix}-cover-url")" class="app-input" @bind-Value="Model.CoverImageUrl" />
-        </div>
+    <div class="app-field">
+        <label class="app-field-label" for="@($"{FieldPrefix}-title")">Title</label>
+        <InputText id="@($"{FieldPrefix}-title")" class="app-input" @bind-Value="Model.Title" />
+        <ValidationMessage For="@(() => Model.Title)" class="mt-2 block text-sm text-red-600" />
     </div>
+
+    <CoverUploader Value="@Model.CoverImageUrl"
+                   ValueChanged="HandleCoverChanged"
+                   FieldPrefix="@FieldPrefix"
+                   PlaceholderBadge="Series"
+                   PlaceholderTitle="@GetPlaceholderTitle()"
+                   PlaceholderCopy="Choose an external cover URL or upload a local series key art image." />
+    <ValidationMessage For="@(() => Model.CoverImageUrl)" class="mt-2 block text-sm text-red-600" />
 
     <div class="grid gap-4 sm:grid-cols-2">
         <AppInput Id="@($"{FieldPrefix}-genres")"
@@ -173,6 +174,12 @@
     [Parameter]
     public string FieldPrefix { get; set; } = "series-form";
 
+    private Task HandleCoverChanged(string? value)
+    {
+        Model.CoverImageUrl = value;
+        return Task.CompletedTask;
+    }
+
     private Task AddSeasonAsync(MouseEventArgs _)
     {
         Model.AddSeason();
@@ -235,4 +242,7 @@
 
         return Task.CompletedTask;
     }
+
+    private string GetPlaceholderTitle()
+        => string.IsNullOrWhiteSpace(Model.Title) ? "Series cover preview" : Model.Title;
 }

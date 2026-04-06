@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using WatchAtlas.Helpers;
 using WatchAtlas.Models;
 using WatchAtlas.Models.Enums;
 
@@ -29,6 +30,13 @@ public class MovieFormModel : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
+        if (!CoverImageValueHelper.IsValidStoredValue(CoverImageUrl))
+        {
+            yield return new ValidationResult(
+                "Enter a valid http/https image URL or upload an image file.",
+                new[] { nameof(CoverImageUrl) });
+        }
+
         if (WatchedDate.HasValue && !IsWatched)
         {
             yield return new ValidationResult(
@@ -57,7 +65,7 @@ public class MovieFormModel : IValidatableObject
     {
         media.Type = MediaType.Movie;
         media.Title = Title?.Trim() ?? string.Empty;
-        media.CoverImageUrl = Normalize(CoverImageUrl);
+        media.CoverImageUrl = CoverImageValueHelper.Normalize(CoverImageUrl);
         media.Description = Normalize(Description);
         media.Genres = GenresText
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -84,7 +92,6 @@ public class MovieFormModel : IValidatableObject
             .Cast<string>()
             .ToList();
     }
-
     private static string? Normalize(string? value)
         => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }

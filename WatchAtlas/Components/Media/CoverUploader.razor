@@ -1,0 +1,227 @@
+@inject IImageService ImageService
+
+<div class="space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <label class="app-field-label">@Label</label>
+            <p class="app-field-help">Use an external image URL or upload a local file that will be stored as base64 in browser storage.</p>
+        </div>
+
+        <div class="cover-uploader__mode">
+            <button class="@GetModeButtonClass(CoverImageInputMode.Url)" type="button" @onclick="() => SetMode(CoverImageInputMode.Url)">URL</button>
+            <button class="@GetModeButtonClass(CoverImageInputMode.Upload)" type="button" @onclick="() => SetMode(CoverImageInputMode.Upload)">Upload</button>
+        </div>
+    </div>
+
+    <div class="grid gap-4 xl:grid-cols-[1.15fr,0.9fr]">
+        <div class="space-y-4">
+            @if (SelectedMode == CoverImageInputMode.Url)
+            {
+                <AppInput Id="@($"{FieldPrefix}-cover-url")"
+                          Label="External Image URL"
+                          Value="@UrlDraft"
+                          ValueChanged="HandleUrlChanged"
+                          Placeholder="https://example.com/cover.jpg"
+                          HelpText="Accepted: absolute http/https image URLs." />
+            }
+            else
+            {
+                <div class="cover-uploader__dropzone">
+                    <div class="space-y-2">
+                        <p class="text-sm font-semibold text-text">Upload Image File</p>
+                        <p class="text-sm leading-7 text-muted">Accepted: JPG, PNG, WEBP, GIF. Max size: @(ImageService.MaxFileSizeBytes / 1024 / 1024) MB.</p>
+                    </div>
+
+                    <InputFile id="@($"{FieldPrefix}-cover-upload")"
+                               OnChange="HandleFileSelectedAsync"
+                               accept="@ImageService.AcceptedFileTypes"
+                               class="cover-uploader__file-input" />
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(WarningMessage))
+            {
+                <div class="soft-block-strong border border-red-200/70 p-4 text-sm text-red-700">
+                    @WarningMessage
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(InfoMessage))
+            {
+                <div class="soft-block-strong border border-emerald-200/70 p-4 text-sm text-emerald-700">
+                    @InfoMessage
+                </div>
+            }
+
+            <div class="flex flex-wrap gap-3">
+                @if (!string.IsNullOrWhiteSpace(Value))
+                {
+                    <AppButton Variant="secondary" Size="sm" OnClick="RemoveImageAsync">Remove Image</AppButton>
+                }
+            </div>
+        </div>
+
+        <div class="cover-uploader__preview-shell">
+            @if (HasPreview)
+            {
+                <img src="@Value"
+                     alt="@GetPreviewAlt()"
+                     class="cover-uploader__preview-image"
+                     @onerror="HandlePreviewError" />
+            }
+            else
+            {
+                <div class="cover-uploader__fallback">
+                    <span class="cover-uploader__fallback-badge">@PlaceholderBadge</span>
+                    <h3 class="cover-uploader__fallback-title">@GetFallbackTitle()</h3>
+                    <p class="cover-uploader__fallback-copy">@PlaceholderCopy</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string UrlDraft { get; set; } = string.Empty;
+    private string? WarningMessage { get; set; }
+    private string? InfoMessage { get; set; }
+    private string? LastBoundValue { get; set; }
+    private CoverImageInputMode SelectedMode { get; set; } = CoverImageInputMode.Url;
+    private bool PreviewErrored { get; set; }
+
+    [Parameter]
+    public string Label { get; set; } = "Cover Image";
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public string FieldPrefix { get; set; } = "cover-uploader";
+
+    [Parameter]
+    public string PlaceholderBadge { get; set; } = "Cover";
+
+    [Parameter]
+    public string PlaceholderTitle { get; set; } = "No cover selected yet";
+
+    [Parameter]
+    public string PlaceholderCopy { get; set; } = "Add an image URL or upload a local file to preview it here.";
+
+    protected override void OnParametersSet()
+    {
+        if (Value != LastBoundValue)
+        {
+            LastBoundValue = Value;
+            PreviewErrored = false;
+
+            if (CoverImageValueHelper.IsExternalUrl(Value))
+            {
+                UrlDraft = Value ?? string.Empty;
+                SelectedMode = CoverImageInputMode.Url;
+            }
+            else if (CoverImageValueHelper.IsEmbeddedImage(Value))
+            {
+                SelectedMode = CoverImageInputMode.Upload;
+            }
+            else if (string.IsNullOrWhiteSpace(Value))
+            {
+                UrlDraft = string.Empty;
+            }
+        }
+    }
+
+    private bool HasPreview => !string.IsNullOrWhiteSpace(Value) && !PreviewErrored;
+
+    private Task SetMode(CoverImageInputMode mode)
+    {
+        SelectedMode = mode;
+        WarningMessage = null;
+        InfoMessage = null;
+        return Task.CompletedTask;
+    }
+
+    private async Task HandleUrlChanged(string? value)
+    {
+        UrlDraft = value ?? string.Empty;
+        InfoMessage = null;
+        PreviewErrored = false;
+
+        if (string.IsNullOrWhiteSpace(UrlDraft))
+        {
+            WarningMessage = null;
+            await ValueChanged.InvokeAsync(null);
+            LastBoundValue = null;
+            return;
+        }
+
+        if (!ImageService.IsValidExternalImageUrl(UrlDraft))
+        {
+            WarningMessage = "Enter a valid absolute http/https image URL.";
+            return;
+        }
+
+        WarningMessage = null;
+        var normalized = ImageService.NormalizeCoverImage(UrlDraft);
+        await ValueChanged.InvokeAsync(normalized);
+        LastBoundValue = normalized;
+    }
+
+    private async Task HandleFileSelectedAsync(InputFileChangeEventArgs args)
+    {
+        WarningMessage = null;
+        InfoMessage = null;
+        PreviewErrored = false;
+
+        var file = args.File;
+        if (file is null)
+        {
+            return;
+        }
+
+        var result = await ImageService.ProcessUploadedImageAsync(file);
+        if (!result.IsSuccess)
+        {
+            WarningMessage = result.ErrorMessage;
+            return;
+        }
+
+        await ValueChanged.InvokeAsync(result.ImageDataUrl);
+        LastBoundValue = result.ImageDataUrl;
+        SelectedMode = CoverImageInputMode.Upload;
+        InfoMessage = "Image uploaded and stored locally for this item.";
+    }
+
+    private async Task RemoveImageAsync(MouseEventArgs _)
+    {
+        UrlDraft = string.Empty;
+        WarningMessage = null;
+        InfoMessage = null;
+        PreviewErrored = false;
+        await ValueChanged.InvokeAsync(null);
+        LastBoundValue = null;
+    }
+
+    private Task HandlePreviewError(EventArgs _)
+    {
+        PreviewErrored = true;
+
+        if (CoverImageValueHelper.IsExternalUrl(Value))
+        {
+            WarningMessage ??= "The image URL could not be loaded for preview.";
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private string GetModeButtonClass(CoverImageInputMode mode)
+        => SelectedMode == mode ? "nav-chip nav-chip-active" : "nav-chip";
+
+    private string GetFallbackTitle()
+        => string.IsNullOrWhiteSpace(PlaceholderTitle) ? "No cover selected yet" : PlaceholderTitle;
+
+    private string GetPreviewAlt()
+        => string.IsNullOrWhiteSpace(PlaceholderTitle) ? "Cover preview" : $"{PlaceholderTitle} cover preview";
+}
