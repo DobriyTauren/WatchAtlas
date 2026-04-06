@@ -4,6 +4,6 @@ namespace WatchAtlas.Services;
 
 public interface IImportExportService
 {
-    string Export(IEnumerable<LibraryEntry> entries);
-    IReadOnlyList<LibraryEntry> Import(string json);
+    string Export(LibraryStorageModel storage);
+    LibraryStorageModel Import(string json);
 }

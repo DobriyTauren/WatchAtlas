@@ -1,74 +1,34 @@
 @page "/media/new"
+@inject LibraryState LibraryState
+@inject NavigationManager NavigationManager
 
 <PageTitle>Add Media</PageTitle>
 
 <section class="space-y-8">
     <PageHeader Eyebrow="New Media"
-                Title="Create the entry flow for movies and series."
-                Subtitle="The actual save flow lands in the next phase. For now, this page establishes the form layout, sections, and responsive card structure." />
+                Title="Add a movie or series to your library."
+                Subtitle="Phase 2 wires this page into browser storage, so saving here now persists immediately in localStorage and flows through the shared state." />
 
     <section class="grid gap-4 xl:grid-cols-[1.25fr,0.9fr]">
-        <article class="shell-card space-y-6 p-6 sm:p-8">
-            <div class="grid gap-4 sm:grid-cols-2">
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-text" for="media-type">Media Type</label>
-                    <select id="media-type" class="input-shell" @bind="SelectedType">
-                        <option value="@MediaType.Movie">Movie</option>
-                        <option value="@MediaType.Series">Series</option>
-                    </select>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-text" for="media-title">Title</label>
-                    <input id="media-title" class="input-shell" placeholder="Enter title" />
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <label class="text-sm font-semibold text-text" for="media-description">Description</label>
-                <textarea id="media-description" class="input-shell min-h-36 resize-y" placeholder="Add a short description or notes"></textarea>
-            </div>
-
-            <div class="grid gap-4 sm:grid-cols-2">
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-text" for="cover-url">Cover Image URL</label>
-                    <input id="cover-url" class="input-shell" placeholder="https://example.com/cover.jpg" />
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-text" for="rating">Rating</label>
-                    <input id="rating" class="input-shell" type="number" min="1" max="10" placeholder="1-10" />
-                </div>
-            </div>
-
-            @if (SelectedType == MediaType.Movie)
-            {
-                <div class="soft-block-strong p-5">
-                    <h2 class="text-xl">Movie Fields</h2>
-                    <p class="mt-2 text-sm leading-7 text-muted">Duration, watched toggle, and watched date can slot in here with minimal restructuring.</p>
-                </div>
-            }
-            else
-            {
-                <div class="soft-block-strong p-5">
-                    <h2 class="text-xl">Series Builder</h2>
-                    <p class="mt-2 text-sm leading-7 text-muted">Season and episode builders will connect here once we move into the CRUD phase.</p>
-                </div>
-            }
-
-            <div class="flex flex-wrap gap-3">
-                <button class="primary-button" type="button">Save in Next Phase</button>
-                <a class="secondary-button" href="/library">Back to Library</a>
-            </div>
+        <article class="shell-card p-6 sm:p-8">
+            <MediaEditorForm Media="Media"
+                             MovieDetails="Movie"
+                             SeriesDetails="Series"
+                             SubmitLabel="Save Entry"
+                             CancelHref="/library"
+                             FieldPrefix="media-new"
+                             ExternalErrorMessage="ErrorMessage"
+                             IsBusy="IsSaving"
+                             OnSubmitRequested="SaveAsync" />
         </article>
 
         <article class="shell-card p-6 sm:p-8">
             <div class="space-y-4">
-                <h2 class="text-2xl">Form Roadmap</h2>
+                <h2 class="text-2xl">Storage Notes</h2>
                 <div class="space-y-4 text-sm leading-7 text-muted">
-                    <p>Shared models are already in place for movies, series, seasons, and episodes.</p>
-                    <p>Repository abstractions will let us plug this form into browser storage without rewriting the page.</p>
-                    <p>Import/export and image handling already have interfaces reserved in the service layer.</p>
+                    <p>Saving here creates a real `MediaItem` and matching movie or series details in browser storage.</p>
+                    <p>Refreshing the page keeps your entries because the repository now reads from `localStorage` through JS interop.</p>
+                    <p>The same state and statistics services powering the home and library pages update after each save.</p>
                 </div>
             </div>
         </article>
@@ -76,5 +36,33 @@
 </section>
 
 @code {
-    private MediaType SelectedType { get; set; } = MediaType.Movie;
+    private MediaItem Media { get; set; } = new()
+    {
+        Type = MediaType.Movie
+    };
+
+    private MovieDetails Movie { get; set; } = new();
+    private SeriesDetails Series { get; set; } = new();
+    private bool IsSaving { get; set; }
+    private string? ErrorMessage { get; set; }
+
+    private async Task SaveAsync()
+    {
+        try
+        {
+            IsSaving = true;
+            ErrorMessage = null;
+
+            await LibraryState.AddAsync(Media, Movie, Series);
+            NavigationManager.NavigateTo($"/media/{Media.Id}");
+        }
+        catch (Exception exception)
+        {
+            ErrorMessage = exception.Message;
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
 }

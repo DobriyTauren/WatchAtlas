@@ -1,0 +1,361 @@
+<EditForm Model="Media" OnSubmit="HandleSubmitAsync">
+    <div class="space-y-6">
+        @if (!string.IsNullOrWhiteSpace(DisplayedErrorMessage))
+        {
+            <div class="soft-block-strong border border-red-200/70 p-4 text-sm text-red-700">
+                @DisplayedErrorMessage
+            </div>
+        }
+
+        <div class="grid gap-4 sm:grid-cols-2">
+            <div class="space-y-2">
+                <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-media-type")">Media Type</label>
+                <InputSelect id="@($"{FieldPrefix}-media-type")" class="input-shell" @bind-Value="Media.Type">
+                    <option value="@MediaType.Movie">Movie</option>
+                    <option value="@MediaType.Series">Series</option>
+                </InputSelect>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-title")">Title</label>
+                <InputText id="@($"{FieldPrefix}-title")" class="input-shell" @bind-Value="Media.Title" />
+            </div>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+            <div class="space-y-2">
+                <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-cover-url")">Cover Image URL</label>
+                <InputText id="@($"{FieldPrefix}-cover-url")" class="input-shell" @bind-Value="Media.CoverImageUrl" />
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-rating")">Rating</label>
+                <InputNumber id="@($"{FieldPrefix}-rating")" class="input-shell" @bind-Value="Media.PersonalRating" />
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-genres")">Genres</label>
+            <input id="@($"{FieldPrefix}-genres")"
+                   class="input-shell"
+                   @bind="GenresText"
+                   placeholder="Drama, Sci-Fi, Comedy" />
+        </div>
+
+        <div class="space-y-2">
+            <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-description")">Description</label>
+            <InputTextArea id="@($"{FieldPrefix}-description")" class="input-shell min-h-32 resize-y" @bind-Value="Media.Description" />
+        </div>
+
+        <div class="space-y-2">
+            <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-notes")">Notes</label>
+            <InputTextArea id="@($"{FieldPrefix}-notes")" class="input-shell min-h-28 resize-y" @bind-Value="Media.Notes" />
+        </div>
+
+        @if (Media.Type == MediaType.Movie)
+        {
+            <div class="soft-block space-y-4 p-5">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="text-xl">Movie Details</h2>
+                    <span class="section-chip-muted">Runtime & status</span>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-movie-duration")">Duration (minutes)</label>
+                        <InputNumber id="@($"{FieldPrefix}-movie-duration")" class="input-shell" @bind-Value="MovieDetails.DurationMinutes" />
+                    </div>
+
+                    <div class="flex items-center gap-3 rounded-2xl border border-border bg-surface-soft/70 px-4 py-3">
+                        <InputCheckbox id="@($"{FieldPrefix}-movie-watched")" @bind-Value="MovieDetails.IsWatched" />
+                        <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-movie-watched")">Marked as watched</label>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-text" for="@($"{FieldPrefix}-movie-watched-date")">Watched Date</label>
+                    <InputDate TValue="DateTime?" id="@($"{FieldPrefix}-movie-watched-date")" class="input-shell" @bind-Value="MovieDetails.WatchedDate" />
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl">Series Builder</h2>
+                        <p class="mt-1 text-sm text-muted">Add seasons and episodes now so persistence, statistics, and progress tracking all have real data to work with.</p>
+                    </div>
+
+                    <button class="secondary-button" type="button" @onclick="AddSeason">Add Season</button>
+                </div>
+
+                @if (SeriesDetails.Seasons.Count == 0)
+                {
+                    <div class="soft-block p-5 text-sm text-muted">
+                        No seasons yet. Add one to start tracking episode progress.
+                    </div>
+                }
+                else
+                {
+                    @foreach (var season in SeriesDetails.Seasons.OrderBy(season => season.SeasonNumber))
+                    {
+                        <section @key="season.Id" class="shell-card space-y-4 p-5">
+                            <div class="flex flex-wrap items-start justify-between gap-3">
+                                <div class="grid flex-1 gap-4 sm:grid-cols-[140px,1fr]">
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-semibold text-text">Season Number</label>
+                                        <InputNumber class="input-shell" @bind-Value="season.SeasonNumber" />
+                                    </div>
+
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-semibold text-text">Season Title</label>
+                                        <InputText class="input-shell" @bind-Value="season.Title" />
+                                    </div>
+                                </div>
+
+                                <button class="nav-chip" type="button" @onclick="() => RemoveSeason(season)">Remove</button>
+                            </div>
+
+                            <div class="space-y-3">
+                                @if (season.Episodes.Count == 0)
+                                {
+                                    <div class="soft-block p-4 text-sm text-muted">No episodes in this season yet.</div>
+                                }
+                                else
+                                {
+                                    @foreach (var episode in season.Episodes.OrderBy(episode => episode.EpisodeNumber))
+                                    {
+                                        <article @key="episode.Id" class="soft-block space-y-4 p-4">
+                                            <div class="grid gap-4 lg:grid-cols-[120px,1fr,160px]">
+                                                <div class="space-y-2">
+                                                    <label class="text-sm font-semibold text-text">Episode #</label>
+                                                    <InputNumber class="input-shell" @bind-Value="episode.EpisodeNumber" />
+                                                </div>
+
+                                                <div class="space-y-2">
+                                                    <label class="text-sm font-semibold text-text">Title</label>
+                                                    <InputText class="input-shell" @bind-Value="episode.Title" />
+                                                </div>
+
+                                                <div class="space-y-2">
+                                                    <label class="text-sm font-semibold text-text">Duration</label>
+                                                    <InputNumber class="input-shell" @bind-Value="episode.DurationMinutes" />
+                                                </div>
+                                            </div>
+
+                                            <div class="grid gap-4 sm:grid-cols-[auto,1fr,auto] sm:items-center">
+                                                <div class="flex items-center gap-3 rounded-2xl border border-border bg-surface-soft/70 px-4 py-3">
+                                                    <InputCheckbox @bind-Value="episode.IsWatched" />
+                                                    <label class="text-sm font-semibold text-text">Watched</label>
+                                                </div>
+
+                                                <div class="space-y-2">
+                                                    <label class="text-sm font-semibold text-text">Watched Date</label>
+                                                    <InputDate TValue="DateTime?" class="input-shell" @bind-Value="episode.WatchedDate" />
+                                                </div>
+
+                                                <button class="nav-chip" type="button" @onclick="() => RemoveEpisode(season, episode)">Remove</button>
+                                            </div>
+                                        </article>
+                                    }
+                                }
+                            </div>
+
+                            <button class="secondary-button" type="button" @onclick="() => AddEpisode(season)">Add Episode</button>
+                        </section>
+                    }
+                }
+            </div>
+        }
+
+        <div class="flex flex-wrap gap-3">
+            <button class="primary-button" type="submit" disabled="@IsBusy">@SubmitLabel</button>
+
+            @if (AllowDelete)
+            {
+                <button class="secondary-button" type="button" @onclick="HandleDeleteAsync" disabled="@IsBusy">@DeleteLabel</button>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(CancelHref))
+            {
+                <a class="secondary-button" href="@CancelHref">Cancel</a>
+            }
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private string GenresText { get; set; } = string.Empty;
+    private string? ValidationMessage { get; set; }
+    private Guid BoundMediaId { get; set; }
+    private bool IsInitialized { get; set; }
+
+    [Parameter, EditorRequired]
+    public MediaItem Media { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public MovieDetails MovieDetails { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public SeriesDetails SeriesDetails { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback OnSubmitRequested { get; set; }
+
+    [Parameter]
+    public EventCallback OnDeleteRequested { get; set; }
+
+    [Parameter]
+    public string SubmitLabel { get; set; } = "Save";
+
+    [Parameter]
+    public string DeleteLabel { get; set; } = "Delete";
+
+    [Parameter]
+    public string CancelHref { get; set; } = "/library";
+
+    [Parameter]
+    public string? ExternalErrorMessage { get; set; }
+
+    [Parameter]
+    public string FieldPrefix { get; set; } = "media-editor";
+
+    [Parameter]
+    public bool AllowDelete { get; set; }
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    private string? DisplayedErrorMessage => ExternalErrorMessage ?? ValidationMessage;
+
+    protected override void OnParametersSet()
+    {
+        if (!IsInitialized || BoundMediaId != Media.Id)
+        {
+            GenresText = string.Join(", ", Media.Genres);
+            BoundMediaId = Media.Id;
+            IsInitialized = true;
+        }
+    }
+
+    private async Task HandleSubmitAsync(EditContext _)
+    {
+        ValidationMessage = Validate();
+        if (!string.IsNullOrWhiteSpace(ValidationMessage))
+        {
+            return;
+        }
+
+        ApplyViewState();
+        await OnSubmitRequested.InvokeAsync();
+    }
+
+    private async Task HandleDeleteAsync()
+    {
+        ValidationMessage = null;
+        await OnDeleteRequested.InvokeAsync();
+    }
+
+    private void AddSeason()
+    {
+        SeriesDetails.Seasons.Add(new Season
+        {
+            SeriesId = Media.Id,
+            SeasonNumber = SeriesDetails.Seasons.Count == 0 ? 1 : SeriesDetails.Seasons.Max(season => season.SeasonNumber) + 1
+        });
+    }
+
+    private void RemoveSeason(Season season)
+        => SeriesDetails.Seasons.Remove(season);
+
+    private static void AddEpisode(Season season)
+    {
+        season.Episodes.Add(new Episode
+        {
+            SeasonId = season.Id,
+            EpisodeNumber = season.Episodes.Count == 0 ? 1 : season.Episodes.Max(episode => episode.EpisodeNumber) + 1
+        });
+    }
+
+    private static void RemoveEpisode(Season season, Episode episode)
+        => season.Episodes.Remove(episode);
+
+    private string? Validate()
+    {
+        if (string.IsNullOrWhiteSpace(Media.Title))
+        {
+            return "Title is required.";
+        }
+
+        if (Media.PersonalRating is < 1 or > 10)
+        {
+            return "Rating should be between 1 and 10.";
+        }
+
+        if (MovieDetails.DurationMinutes < 0)
+        {
+            return "Movie duration cannot be negative.";
+        }
+
+        foreach (var season in SeriesDetails.Seasons)
+        {
+            if (season.SeasonNumber <= 0)
+            {
+                return "Season numbers should be greater than zero.";
+            }
+
+            if (season.Episodes.Any(episode => episode.EpisodeNumber <= 0))
+            {
+                return "Episode numbers should be greater than zero.";
+            }
+
+            if (season.Episodes.Any(episode => episode.DurationMinutes < 0))
+            {
+                return "Episode duration cannot be negative.";
+            }
+        }
+
+        return null;
+    }
+
+    private void ApplyViewState()
+    {
+        Media.Title = Media.Title.Trim();
+        Media.Genres = GenresText
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        MovieDetails.MediaItemId = Media.Id;
+        SeriesDetails.MediaItemId = Media.Id;
+
+        if (!MovieDetails.IsWatched)
+        {
+            MovieDetails.WatchedDate = null;
+        }
+
+        SeriesDetails.Seasons = SeriesDetails.Seasons
+            .OrderBy(season => season.SeasonNumber)
+            .Select(season =>
+            {
+                season.SeriesId = Media.Id;
+                season.Episodes = season.Episodes
+                    .OrderBy(episode => episode.EpisodeNumber)
+                    .ToList();
+
+                foreach (var episode in season.Episodes)
+                {
+                    episode.SeasonId = season.Id;
+
+                    if (!episode.IsWatched)
+                    {
+                        episode.WatchedDate = null;
+                    }
+                }
+
+                return season;
+            })
+            .ToList();
+    }
+}

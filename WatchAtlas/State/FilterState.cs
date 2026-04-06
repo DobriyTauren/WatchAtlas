@@ -41,6 +41,17 @@ public class FilterState : StateStoreBase
         NotifyStateChanged();
     }
 
+    public void SetSeriesId(Guid? value)
+    {
+        if (Options.SeriesId == value)
+        {
+            return;
+        }
+
+        Options.SeriesId = value;
+        NotifyStateChanged();
+    }
+
     public void SetSortBy(LibrarySortBy value)
     {
         if (Options.SortBy == value)
@@ -52,9 +63,21 @@ public class FilterState : StateStoreBase
         NotifyStateChanged();
     }
 
-    public IEnumerable<LibraryEntry> Apply(IEnumerable<LibraryEntry> entries)
+    public void Reset()
     {
-        var query = entries;
+        Options.SearchTerm = string.Empty;
+        Options.MediaType = null;
+        Options.Status = null;
+        Options.SeriesId = null;
+        Options.SortBy = LibrarySortBy.RecentlyUpdated;
+        Options.Descending = true;
+        NotifyStateChanged();
+    }
+
+    public LibraryQueryResult Apply(IEnumerable<LibraryEntry> entries)
+    {
+        var sourceEntries = entries.ToList();
+        IEnumerable<LibraryEntry> query = sourceEntries;
 
         if (!string.IsNullOrWhiteSpace(Options.SearchTerm))
         {
@@ -69,6 +92,11 @@ public class FilterState : StateStoreBase
         if (Options.Status is not null)
         {
             query = query.Where(entry => WatchStatusHelper.GetStatus(entry) == Options.Status);
+        }
+
+        if (Options.SeriesId is not null)
+        {
+            query = query.Where(entry => entry.Media.Id == Options.SeriesId.Value);
         }
 
         query = Options.SortBy switch
@@ -87,6 +115,22 @@ public class FilterState : StateStoreBase
                 : query.OrderBy(entry => entry.Media.UpdatedAt)
         };
 
-        return query.ToList();
+        var items = query.ToList();
+
+        return new LibraryQueryResult
+        {
+            Items = items,
+            Filters = new LibraryFilterOptions
+            {
+                SearchTerm = Options.SearchTerm,
+                MediaType = Options.MediaType,
+                Status = Options.Status,
+                SeriesId = Options.SeriesId,
+                SortBy = Options.SortBy,
+                Descending = Options.Descending
+            },
+            TotalCount = sourceEntries.Count,
+            FilteredCount = items.Count
+        };
     }
 }

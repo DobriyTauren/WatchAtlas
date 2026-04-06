@@ -1,12 +1,17 @@
-using WatchAtlas.Models.Library;
+using WatchAtlas.Models;
 
 namespace WatchAtlas.Repositories;
 
 public interface IMediaRepository
 {
-    Task<IReadOnlyList<LibraryEntry>> GetAllAsync(CancellationToken cancellationToken = default);
-    Task<LibraryEntry?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-    Task SaveAsync(LibraryEntry entry, CancellationToken cancellationToken = default);
-    Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
-    Task ResetAsync(CancellationToken cancellationToken = default);
+    Task<List<MediaItem>> GetAllAsync();
+    Task<MediaItem?> GetByIdAsync(Guid id);
+    Task AddAsync(MediaItem item);
+    Task UpdateAsync(MediaItem item);
+    Task DeleteAsync(Guid id);
+    Task<MovieDetails?> GetMovieDetailsAsync(Guid mediaItemId);
+    Task SaveMovieDetailsAsync(MovieDetails details);
+    Task<SeriesDetails?> GetSeriesDetailsAsync(Guid mediaItemId);
+    Task SaveSeriesDetailsAsync(SeriesDetails details);
+    Task ResetAsync();
 }

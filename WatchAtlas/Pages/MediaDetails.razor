@@ -1,20 +1,21 @@
 @page "/media/{Id}"
 @inject LibraryState LibraryState
 @inject IStatisticsService StatisticsService
+@inject NavigationManager NavigationManager
 @using WatchAtlas.Extensions
 
 <PageTitle>Media Details</PageTitle>
 
 <section class="space-y-8">
-    @if (Entry is null)
+    @if (Media is null)
     {
         <PageHeader Eyebrow="Media Details"
                     Title="This entry is not in the library yet."
-                    Subtitle="The route is already in place for detail pages, but your repository is currently empty. Once CRUD lands, this page can read straight from the shared library state." />
+                    Subtitle="The route is ready for editing, but the requested item was not found in local storage." />
 
         <EmptyStateCard Badge="Details"
                         Title="No media entry found."
-                        Description="Try creating a new item first, then this route can become the home for cover art, notes, seasons, and episode progress."
+                        Description="Create a new item first, then return here to edit metadata, seasons, episodes, and watch progress."
                         PrimaryLabel="Create New Item"
                         PrimaryHref="/media/new"
                         SecondaryLabel="Return to Library"
@@ -23,42 +24,64 @@
     else
     {
         <PageHeader Eyebrow="Media Details"
-                    Title="@Entry.Media.Title"
-                    Subtitle="@Entry.Media.Description" />
+                    Title="@Media.Title"
+                    Subtitle="Edit the stored item, adjust progress, and keep the browser-backed library in sync." />
 
         <section class="grid gap-4 xl:grid-cols-[1.2fr,0.9fr]">
             <article class="shell-card p-6 sm:p-8">
-                <div class="space-y-5">
-                    <div class="flex flex-wrap gap-2">
-                        <span class="tag-pill">@(Entry.Media.Type == MediaType.Movie ? "Movie" : "Series")</span>
-                        <span class="rating-pill">
-                            Rating: @(Entry.Media.PersonalRating?.ToString() ?? "Not set")
-                        </span>
-                    </div>
-
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div class="soft-block-strong p-5">
-                            <p class="text-sm font-semibold text-text">Last Updated</p>
-                            <p class="mt-2 text-lg">@Entry.Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
-                        </div>
-
-                        <div class="soft-block-strong p-5">
-                            <p class="text-sm font-semibold text-text">Tracked Time</p>
-                            <p class="mt-2 text-lg">@GetRuntimeSummary()</p>
-                        </div>
-                    </div>
-                </div>
+                <MediaEditorForm Media="Media"
+                                 MovieDetails="Movie"
+                                 SeriesDetails="Series"
+                                 SubmitLabel="Save Changes"
+                                 DeleteLabel="Delete Entry"
+                                 CancelHref="/library"
+                                 FieldPrefix="media-details"
+                                 AllowDelete="true"
+                                 ExternalErrorMessage="ErrorMessage"
+                                 IsBusy="IsSaving"
+                                 OnSubmitRequested="SaveAsync"
+                                 OnDeleteRequested="DeleteAsync" />
             </article>
 
             <article class="shell-card p-6 sm:p-8">
-                <div class="space-y-4">
-                    <h2 class="text-2xl">Detail View Next Steps</h2>
-                    <div class="space-y-4 text-sm leading-7 text-muted">
-                        <p>Display cover art, genre tags, notes, and edit actions.</p>
-                        <p>Show season breakdown, episode list, and watch progress for series.</p>
-                        <p>Connect edit and delete flows through the repository abstraction.</p>
+                @if (PreviewEntry is not null)
+                {
+                    <div class="space-y-5">
+                        <div class="flex flex-wrap gap-2">
+                            <span class="tag-pill">@(PreviewEntry.Media.Type == MediaType.Movie ? "Movie" : "Series")</span>
+                            <span class="rating-pill">
+                                Rating: @(PreviewEntry.Media.PersonalRating?.ToString() ?? "Not set")
+                            </span>
+                        </div>
+
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="soft-block-strong p-5">
+                                <p class="text-sm font-semibold text-text">Last Updated</p>
+                                <p class="mt-2 text-lg">@Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
+                            </div>
+
+                            <div class="soft-block-strong p-5">
+                                <p class="text-sm font-semibold text-text">Tracked Time</p>
+                                <p class="mt-2 text-lg">@GetRuntimeSummary()</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 text-sm leading-7 text-muted">
+                            @if (PreviewEntry.Media.Type == MediaType.Series)
+                            {
+                                var seriesStats = StatisticsService.CalculateSeriesStatistics(PreviewEntry);
+
+                                <p>@seriesStats.SeasonCount season(s), @seriesStats.TotalEpisodes tracked episode(s), @seriesStats.WatchedEpisodes watched.</p>
+                                <p>@seriesStats.CompletionPercent.ToString("0")% complete with @seriesStats.WatchedMinutes.ToReadableDuration() of watched runtime.</p>
+                            }
+                            else
+                            {
+                                <p>@(PreviewEntry.Movie?.IsWatched == true ? "This movie is marked as watched." : "This movie is still marked as not watched.")</p>
+                                <p>Stored runtime: @((PreviewEntry.Movie?.DurationMinutes ?? 0).ToReadableDuration()).</p>
+                            }
+                        </div>
                     </div>
-                </div>
+                }
             </article>
         </section>
     }
@@ -68,26 +91,109 @@
     [Parameter]
     public string Id { get; set; } = string.Empty;
 
-    private LibraryEntry? Entry { get; set; }
+    private MediaItem? Media { get; set; }
+    private MovieDetails Movie { get; set; } = new();
+    private SeriesDetails Series { get; set; } = new();
+    private bool IsSaving { get; set; }
+    private string? ErrorMessage { get; set; }
+    private LibraryEntry? PreviewEntry => Media is null ? null : LibraryEntryFactory.Create(Media, Movie, Series);
 
     protected override async Task OnParametersSetAsync()
     {
         await LibraryState.EnsureLoadedAsync();
-        Entry = Guid.TryParse(Id, out var parsedId) ? LibraryState.GetById(parsedId) : null;
+
+        if (Guid.TryParse(Id, out var parsedId))
+        {
+            LoadEditorState(LibraryState.GetById(parsedId));
+            return;
+        }
+
+        Media = null;
     }
 
     private string GetRuntimeSummary()
     {
-        if (Entry is null)
+        if (PreviewEntry is null)
         {
             return "Not available";
         }
 
-        if (Entry.Media.Type == MediaType.Movie)
+        if (PreviewEntry.Media.Type == MediaType.Movie)
         {
-            return (Entry.Movie?.DurationMinutes ?? 0).ToReadableDuration();
+            return (PreviewEntry.Movie?.DurationMinutes ?? 0).ToReadableDuration();
         }
 
-        return StatisticsService.CalculateSeriesProgress(Entry).WatchedMinutes.ToReadableDuration();
+        return StatisticsService.CalculateSeriesProgress(PreviewEntry).WatchedMinutes.ToReadableDuration();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (Media is null)
+        {
+            return;
+        }
+
+        try
+        {
+            IsSaving = true;
+            ErrorMessage = null;
+
+            await LibraryState.UpdateAsync(Media, Movie, Series);
+            LoadEditorState(LibraryState.GetById(Media.Id));
+        }
+        catch (Exception exception)
+        {
+            ErrorMessage = exception.Message;
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (Media is null)
+        {
+            return;
+        }
+
+        try
+        {
+            IsSaving = true;
+            ErrorMessage = null;
+
+            await LibraryState.DeleteAsync(Media.Id);
+            NavigationManager.NavigateTo("/library");
+        }
+        catch (Exception exception)
+        {
+            ErrorMessage = exception.Message;
+            IsSaving = false;
+        }
+    }
+
+    private void LoadEditorState(LibraryEntry? entry)
+    {
+        ErrorMessage = null;
+        IsSaving = false;
+
+        if (entry is null)
+        {
+            Media = null;
+            Movie = new MovieDetails();
+            Series = new SeriesDetails();
+            return;
+        }
+
+        Media = LibraryCloneHelper.Clone(entry.Media);
+        Movie = LibraryCloneHelper.Clone(entry.Movie) ?? new MovieDetails
+        {
+            MediaItemId = entry.Media.Id
+        };
+        Series = LibraryCloneHelper.Clone(entry.Series) ?? new SeriesDetails
+        {
+            MediaItemId = entry.Media.Id
+        };
     }
 }

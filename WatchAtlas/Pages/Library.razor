@@ -8,7 +8,7 @@
 <section class="space-y-8">
     <PageHeader Eyebrow="Library"
                 Title="Browse your full watch collection."
-                Subtitle="Search, filter, and sort across movies and series. CRUD arrives in the next phase, but the browsing shell is already wired to shared state.">
+                Subtitle="Search, filter, and sort across movies and series. The library view now reads from browser-backed state, so new items persist across refreshes.">
         <Actions>
             <a class="primary-button" href="/media/new">Add New Item</a>
         </Actions>
@@ -37,7 +37,7 @@
 
             <div class="soft-block-strong p-4">
                 <p class="text-sm font-semibold text-text">Visible Items</p>
-                <p class="mt-2 text-3xl">@FilteredEntries.Count</p>
+                <p class="mt-2 text-3xl">@QueryResult.FilteredCount</p>
                 <p class="mt-2 text-sm text-muted">The library view is already prepared for richer filters and saved preferences.</p>
             </div>
         </div>
@@ -57,7 +57,7 @@
     {
         <EmptyStateCard Badge="Library"
                         Title="Your library is still empty."
-                        Description="The repository and library state are in place, so the next phase can connect creation forms straight into browser persistence."
+                        Description="Your browser-backed library is ready. Add the first movie or series and it will stay here after a refresh."
                         PrimaryLabel="Add First Entry"
                         PrimaryHref="/media/new"
                         SecondaryLabel="Open Settings"
@@ -75,7 +75,8 @@
 </section>
 
 @code {
-    private List<LibraryEntry> FilteredEntries => FilterState.Apply(LibraryState.Entries).ToList();
+    private LibraryQueryResult QueryResult => FilterState.Apply(LibraryState.Entries);
+    private IReadOnlyList<LibraryEntry> FilteredEntries => QueryResult.Items;
 
     protected override async Task OnInitializedAsync()
     {
@@ -95,13 +96,7 @@
         }
     }
 
-    private void ClearFilters()
-    {
-        FilterState.SetSearchTerm(string.Empty);
-        FilterState.SetMediaType(null);
-        FilterState.SetStatus(null);
-        FilterState.SetSortBy(LibrarySortBy.RecentlyUpdated);
-    }
+    private void ClearFilters() => FilterState.Reset();
 
     private string GetFilterButtonClass(bool isActive)
         => isActive ? "nav-chip nav-chip-active" : "nav-chip";

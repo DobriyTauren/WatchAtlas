@@ -11,20 +11,14 @@ public class StatisticsService : IStatisticsService
     {
         var libraryEntries = entries.ToList();
         var seriesEntries = libraryEntries.Where(entry => entry.Media.Type == MediaType.Series).ToList();
+        var seriesStatistics = seriesEntries.Select(CalculateSeriesStatistics).ToList();
         var watchedMovieMinutes = libraryEntries
             .Where(entry => entry.Media.Type == MediaType.Movie && entry.Movie?.IsWatched == true)
             .Sum(entry => entry.Movie?.DurationMinutes ?? 0);
-
-        var allEpisodes = seriesEntries
-            .SelectMany(entry => entry.Series?.Seasons ?? Enumerable.Empty<Season>())
-            .SelectMany(season => season.Episodes)
-            .ToList();
-
-        var watchedEpisodes = allEpisodes.Where(episode => episode.IsWatched).ToList();
         var completedSeries = seriesEntries.Count(entry => WatchStatusHelper.GetStatus(entry) == WatchStatus.Completed);
-        var averageCompletion = seriesEntries.Count == 0
+        var averageCompletion = seriesStatistics.Count == 0
             ? 0
-            : seriesEntries.Average(entry => CalculateSeriesProgress(entry).CompletionPercent);
+            : seriesStatistics.Average(stats => stats.CompletionPercent);
 
         return new GlobalStatistics
         {
@@ -32,25 +26,68 @@ public class StatisticsService : IStatisticsService
             WatchedMovies = libraryEntries.Count(entry => entry.Media.Type == MediaType.Movie && entry.Movie?.IsWatched == true),
             TotalSeries = seriesEntries.Count,
             CompletedSeries = completedSeries,
-            WatchedEpisodes = watchedEpisodes.Count,
-            TotalEpisodes = allEpisodes.Count,
-            TotalWatchTimeMinutes = watchedMovieMinutes + watchedEpisodes.Sum(episode => episode.DurationMinutes ?? 0),
+            WatchedEpisodes = seriesStatistics.Sum(stats => stats.WatchedEpisodes),
+            TotalEpisodes = seriesStatistics.Sum(stats => stats.TotalEpisodes),
+            TotalWatchTimeMinutes = watchedMovieMinutes + seriesStatistics.Sum(stats => stats.WatchedMinutes),
             AverageSeriesCompletionPercent = averageCompletion
         };
     }
 
     public SeriesProgressSummary CalculateSeriesProgress(LibraryEntry entry)
     {
-        var episodes = entry.Series?.Seasons.SelectMany(season => season.Episodes).ToList() ?? new List<Episode>();
-        var watchedEpisodes = episodes.Where(episode => episode.IsWatched).ToList();
-        var totalEpisodes = episodes.Count;
+        var statistics = CalculateSeriesStatistics(entry);
 
         return new SeriesProgressSummary
         {
-            WatchedEpisodes = watchedEpisodes.Count,
+            WatchedEpisodes = statistics.WatchedEpisodes,
+            TotalEpisodes = statistics.TotalEpisodes,
+            WatchedMinutes = statistics.WatchedMinutes,
+            CompletionPercent = statistics.CompletionPercent
+        };
+    }
+
+    public SeriesStatistics CalculateSeriesStatistics(LibraryEntry entry)
+    {
+        var seasonStatistics = (entry.Series?.Seasons ?? Enumerable.Empty<Season>())
+            .OrderBy(season => season.SeasonNumber)
+            .Select(CalculateSeasonStatistics)
+            .ToList();
+
+        var totalEpisodes = seasonStatistics.Sum(stats => stats.TotalEpisodes);
+        var watchedEpisodes = seasonStatistics.Sum(stats => stats.WatchedEpisodes);
+
+        return new SeriesStatistics
+        {
+            SeriesId = entry.Media.Id,
+            Title = entry.Media.Title,
+            SeasonCount = seasonStatistics.Count,
             TotalEpisodes = totalEpisodes,
+            WatchedEpisodes = watchedEpisodes,
+            TotalMinutes = seasonStatistics.Sum(stats => stats.TotalMinutes),
+            WatchedMinutes = seasonStatistics.Sum(stats => stats.WatchedMinutes),
+            CompletionPercent = totalEpisodes == 0 ? 0 : watchedEpisodes * 100d / totalEpisodes,
+            Seasons = seasonStatistics
+        };
+    }
+
+    public SeasonStatistics CalculateSeasonStatistics(Season season)
+    {
+        var episodes = season.Episodes
+            .OrderBy(episode => episode.EpisodeNumber)
+            .ToList();
+
+        var watchedEpisodes = episodes.Where(episode => episode.IsWatched).ToList();
+
+        return new SeasonStatistics
+        {
+            SeasonId = season.Id,
+            SeasonNumber = season.SeasonNumber,
+            Title = season.Title,
+            TotalEpisodes = episodes.Count,
+            WatchedEpisodes = watchedEpisodes.Count,
+            TotalMinutes = episodes.Sum(episode => episode.DurationMinutes ?? 0),
             WatchedMinutes = watchedEpisodes.Sum(episode => episode.DurationMinutes ?? 0),
-            CompletionPercent = totalEpisodes == 0 ? 0 : watchedEpisodes.Count * 100d / totalEpisodes
+            CompletionPercent = episodes.Count == 0 ? 0 : watchedEpisodes.Count * 100d / episodes.Count
         };
     }
 }
