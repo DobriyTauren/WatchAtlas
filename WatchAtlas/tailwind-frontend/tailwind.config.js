@@ -15,6 +15,8 @@
             colors: {
                 surface: 'rgb(var(--surface) / <alpha-value>)',
                 'surface-strong': 'rgb(var(--surface-strong) / <alpha-value>)',
+                'surface-soft': 'rgb(var(--surface-soft) / <alpha-value>)',
+                'surface-soft-strong': 'rgb(var(--surface-soft-strong) / <alpha-value>)',
                 text: 'rgb(var(--text-color) / <alpha-value>)',
                 muted: 'rgb(var(--muted-text) / <alpha-value>)',
                 accent: 'rgb(var(--accent) / <alpha-value>)',

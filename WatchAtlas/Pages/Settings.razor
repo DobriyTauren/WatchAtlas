@@ -51,6 +51,6 @@
 
     private string GetThemeCardClass(ThemeSettings theme)
         => theme.Mode == ThemeState.CurrentTheme.Mode
-            ? "rounded-[1.75rem] border border-accent/30 bg-accent-soft p-5 text-left shadow-float transition"
-            : "rounded-[1.75rem] border border-border bg-white/45 p-5 text-left transition hover:border-accent/30 hover:bg-white/60";
+            ? "soft-block-strong border-accent/30 bg-accent-soft p-5 text-left shadow-float transition"
+            : "soft-block-strong p-5 text-left transition hover:border-accent/30 hover:text-text";
 }

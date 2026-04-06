@@ -33,7 +33,7 @@
             </div>
         </div>
 
-        <span class="rounded-3xl bg-white/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted">
+        <span class="rating-pill">
             @(Entry.Media.PersonalRating is { } rating ? $"{rating}/10" : "Draft")
         </span>
     </div>
@@ -49,12 +49,12 @@
     }
 
     <div class="grid gap-3 text-sm text-muted sm:grid-cols-2">
-        <div class="rounded-2xl bg-white/40 p-4">
+        <div class="soft-block p-4">
             <p class="font-semibold text-text">Watch Time</p>
             <p class="mt-1">@(runtimeMinutes > 0 ? runtimeMinutes.ToReadableDuration() : "Not tracked yet")</p>
         </div>
 
-        <div class="rounded-2xl bg-white/40 p-4">
+        <div class="soft-block p-4">
             <p class="font-semibold text-text">Progress</p>
             <p class="mt-1">
                 @if (seriesProgress is not null)
@@ -88,8 +88,8 @@
 
     private static string GetStatusClass(WatchStatus status) => status switch
     {
-        WatchStatus.Completed => "bg-emerald-100 text-emerald-700",
-        WatchStatus.InProgress => "bg-sky-100 text-sky-700",
-        _ => "bg-white/60 text-muted"
+        WatchStatus.Completed => "status-pill status-pill-success",
+        WatchStatus.InProgress => "status-pill status-pill-progress",
+        _ => "status-pill status-pill-neutral"
     };
 }

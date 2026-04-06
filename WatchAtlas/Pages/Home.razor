@@ -20,7 +20,7 @@
     <section class="grid gap-4 xl:grid-cols-[1.4fr,1fr]">
         <article class="shell-card overflow-hidden p-6 sm:p-8">
             <div class="space-y-4">
-                <span class="inline-flex rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-text">Project Vision</span>
+                <span class="section-chip">Project Vision</span>
                 <h2 class="max-w-2xl text-3xl">Soft, modern, and fully client-side watch tracking.</h2>
                 <p class="max-w-3xl text-sm leading-7 text-muted sm:text-base">
                     WatchAtlas is now structured around reusable services, theme state, library state, and GitHub Pages-friendly routing so the next phases can focus on real data flows instead of rebuilding the shell.
@@ -28,13 +28,13 @@
             </div>
 
             <div class="mt-8 grid gap-4 sm:grid-cols-2">
-                <div class="rounded-[1.75rem] bg-white/45 p-5">
+                <div class="soft-block-strong p-5">
                     <p class="text-sm font-semibold text-text">Current Theme</p>
                     <p class="mt-2 text-2xl">@ThemeState.CurrentTheme.DisplayName</p>
                     <p class="mt-2 text-sm text-muted">@ThemeState.CurrentTheme.Description</p>
                 </div>
 
-                <div class="rounded-[1.75rem] bg-white/45 p-5">
+                <div class="soft-block-strong p-5">
                     <p class="text-sm font-semibold text-text">Deployment Ready</p>
                     <p class="mt-2 text-2xl">GitHub Pages</p>
                     <p class="mt-2 text-sm text-muted">Static asset base path and SPA fallback are prepared for project-site hosting.</p>
@@ -44,7 +44,7 @@
 
         <article class="shell-card p-6 sm:p-8">
             <div class="space-y-4">
-                <span class="inline-flex rounded-full bg-white/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-muted">Foundation Checklist</span>
+                <span class="section-chip-muted">Foundation Checklist</span>
                 <div class="space-y-3 text-sm leading-7 text-muted">
                     <p>Blazor WebAssembly solution organized for modular growth</p>
                     <p>Tailwind rebuilt to scan Razor and C# files in this project</p>

@@ -7,10 +7,20 @@
     <title>WatchAtlas</title>
     <meta name="theme-color" content="#d17187" />
     <meta name="description" content="A soft personal library for tracking watched movies and TV series." />
-    <base href="/WatchAtlas/" />
+    <base id="app-base" href="/" />
+    <script>
+        (function () {
+            var pathSegments = window.location.pathname.split('/').filter(Boolean);
+            var isGitHubPages = window.location.hostname.endsWith('github.io');
+            var basePath = isGitHubPages && pathSegments.length > 0
+                ? '/' + pathSegments[0] + '/'
+                : '/';
+
+            document.getElementById('app-base').setAttribute('href', basePath);
+        })();
+    </script>
     <link rel="preload" id="webassembly" />
     <link rel="stylesheet" href="css/app.css" />
-    <script src="theme.js"></script>
     <script type="importmap"></script>
 </head>
 

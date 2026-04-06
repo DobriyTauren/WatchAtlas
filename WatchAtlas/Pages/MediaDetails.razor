@@ -31,18 +31,18 @@
                 <div class="space-y-5">
                     <div class="flex flex-wrap gap-2">
                         <span class="tag-pill">@(Entry.Media.Type == MediaType.Movie ? "Movie" : "Series")</span>
-                        <span class="rounded-full bg-white/60 px-3 py-1 text-xs font-semibold text-muted">
+                        <span class="rating-pill">
                             Rating: @(Entry.Media.PersonalRating?.ToString() ?? "Not set")
                         </span>
                     </div>
 
                     <div class="grid gap-4 sm:grid-cols-2">
-                        <div class="rounded-[1.75rem] bg-white/45 p-5">
+                        <div class="soft-block-strong p-5">
                             <p class="text-sm font-semibold text-text">Last Updated</p>
                             <p class="mt-2 text-lg">@Entry.Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
                         </div>
 
-                        <div class="rounded-[1.75rem] bg-white/45 p-5">
+                        <div class="soft-block-strong p-5">
                             <p class="text-sm font-semibold text-text">Tracked Time</p>
                             <p class="mt-2 text-lg">@GetRuntimeSummary()</p>
                         </div>

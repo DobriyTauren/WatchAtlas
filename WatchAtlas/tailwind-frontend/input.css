@@ -12,49 +12,88 @@
 @layer base {
     :root {
         color-scheme: light;
-        --app-bg: 248 245 242;
-        --surface: 255 252 249;
+        --app-bg: 247 242 239;
+        --surface: 255 250 247;
         --surface-strong: 255 255 255;
-        --text-color: 43 33 45;
-        --muted-text: 106 94 116;
+        --surface-soft: 249 238 242;
+        --surface-soft-strong: 255 247 250;
+        --text-color: 49 39 50;
+        --muted-text: 114 101 119;
         --accent: 209 113 135;
-        --accent-soft: 246 220 227;
-        --border-color: 229 216 222;
+        --accent-strong: 188 92 123;
+        --accent-soft: 246 223 230;
+        --accent-contrast: 255 255 255;
+        --border-color: 232 218 225;
+        --panel-shadow: 15 23 42;
+        --orb-primary: 232 193 206;
+        --orb-secondary: 202 222 248;
+        --status-success-bg: 223 241 230;
+        --status-success-text: 45 109 74;
+        --status-progress-bg: 219 233 255;
+        --status-progress-text: 56 94 164;
+        --status-neutral-bg: 244 237 241;
+        --status-neutral-text: 108 94 112;
         --success: 92 155 122;
-        --shell-start: 255 246 240;
-        --shell-end: 239 244 255;
+        --shell-start: 255 245 239;
+        --shell-end: 238 244 255;
     }
 
     body[data-theme='dark-soft'],
     [data-theme='dark-soft'] {
         color-scheme: dark;
-        --app-bg: 24 28 39;
-        --surface: 37 43 59;
-        --surface-strong: 52 60 81;
-        --text-color: 236 240 247;
-        --muted-text: 163 176 197;
-        --accent: 135 173 255;
-        --accent-soft: 55 68 99;
-        --border-color: 73 86 113;
+        --app-bg: 17 23 35;
+        --surface: 29 36 52;
+        --surface-strong: 39 47 67;
+        --surface-soft: 49 58 82;
+        --surface-soft-strong: 63 74 103;
+        --text-color: 235 240 250;
+        --muted-text: 164 175 197;
+        --accent: 132 171 255;
+        --accent-strong: 96 135 226;
+        --accent-soft: 61 76 112;
+        --accent-contrast: 245 248 255;
+        --border-color: 70 84 116;
+        --panel-shadow: 2 6 23;
+        --orb-primary: 83 114 198;
+        --orb-secondary: 64 149 198;
+        --status-success-bg: 45 86 73;
+        --status-success-text: 190 239 214;
+        --status-progress-bg: 49 69 116;
+        --status-progress-text: 194 215 255;
+        --status-neutral-bg: 57 67 95;
+        --status-neutral-text: 204 213 232;
         --success: 119 196 156;
-        --shell-start: 31 36 50;
-        --shell-end: 19 24 36;
+        --shell-start: 26 33 48;
+        --shell-end: 14 18 28;
     }
 
     body[data-theme='pastel'],
     [data-theme='pastel'] {
         color-scheme: light;
-        --app-bg: 249 245 255;
-        --surface: 255 251 255;
+        --app-bg: 247 241 255;
+        --surface: 253 247 255;
         --surface-strong: 255 255 255;
-        --text-color: 61 47 83;
-        --muted-text: 122 108 148;
+        --surface-soft: 238 230 255;
+        --surface-soft-strong: 246 239 255;
+        --text-color: 72 55 101;
+        --muted-text: 128 111 161;
         --accent: 153 125 224;
-        --accent-soft: 234 226 255;
-        --border-color: 226 215 247;
+        --accent-strong: 131 100 214;
+        --accent-soft: 229 220 255;
+        --accent-contrast: 255 255 255;
+        --border-color: 223 210 249;
+        --panel-shadow: 35 28 68;
+        --orb-primary: 222 203 255;
+        --orb-secondary: 255 215 233;
+        --status-success-bg: 222 243 235;
+        --status-success-text: 58 120 103;
+        --status-progress-bg: 226 219 255;
+        --status-progress-text: 103 82 171;
+        --status-neutral-bg: 241 235 255;
+        --status-neutral-text: 119 102 154;
         --success: 101 171 156;
-        --shell-start: 255 244 249;
-        --shell-end: 239 247 255;
+        --shell-start: 255 242 248;
+        --shell-end: 235 244 255;
     }
 
     html {
@@ -63,7 +102,10 @@
 
     body {
         @apply min-h-screen bg-[rgb(var(--app-bg))] font-body text-text antialiased;
-        background-image: linear-gradient(180deg, rgb(var(--shell-start)), rgb(var(--shell-end)));
+        background-image:
+            radial-gradient(circle at top left, rgb(var(--orb-primary) / 0.24), transparent 24rem),
+            radial-gradient(circle at top right, rgb(var(--orb-secondary) / 0.20), transparent 20rem),
+            linear-gradient(180deg, rgb(var(--shell-start)), rgb(var(--shell-end)));
     }
 
     h1,
@@ -80,11 +122,13 @@
 
 @layer components {
     .shell-card {
-        @apply rounded-3xl border border-border/70 bg-surface/90 shadow-soft backdrop-blur;
+        @apply rounded-3xl border border-border/80 bg-surface/90 backdrop-blur;
+        box-shadow: 0 20px 60px rgb(var(--panel-shadow) / 0.10);
     }
 
     .shell-panel {
-        @apply rounded-[2rem] border border-white/30 bg-white/40 shadow-soft backdrop-blur;
+        @apply rounded-[2rem] border border-border/70 bg-surface-strong/90 backdrop-blur;
+        box-shadow: 0 28px 80px rgb(var(--panel-shadow) / 0.12);
     }
 
     .nav-chip {
@@ -96,24 +140,96 @@
     }
 
     .primary-button {
-        @apply inline-flex items-center justify-center rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-float transition-transform duration-200 hover:-translate-y-0.5;
+        @apply inline-flex items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold shadow-float transition-transform duration-200 hover:-translate-y-0.5;
+        background-image: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-strong)));
+        color: rgb(var(--accent-contrast));
     }
 
     .secondary-button {
-        @apply inline-flex items-center justify-center rounded-full border border-border bg-surface-strong px-4 py-2.5 text-sm font-semibold text-text transition-colors duration-200 hover:border-accent/30 hover:text-accent;
+        @apply inline-flex items-center justify-center rounded-full border border-border px-4 py-2.5 text-sm font-semibold text-text transition-colors duration-200 hover:border-accent/30 hover:text-accent;
+        background-color: rgb(var(--surface-soft) / 0.90);
     }
 
     .tag-pill {
-        @apply inline-flex items-center rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-text;
+        @apply inline-flex items-center rounded-full border border-accent/10 bg-accent-soft px-3 py-1 text-xs font-medium text-text;
     }
 
     .input-shell {
-        @apply w-full rounded-2xl border border-border bg-surface-strong px-4 py-3 text-sm text-text outline-none transition focus:border-accent/40 focus:ring-4 focus:ring-accent-soft/70;
+        @apply w-full rounded-2xl border border-border px-4 py-3 text-sm text-text outline-none transition focus:border-accent/40 focus:ring-4 focus:ring-accent-soft/70;
+        background-color: rgb(var(--surface-soft) / 0.90);
     }
 
     .app-shell-theme {
         @apply min-h-screen bg-[rgb(var(--app-bg))] text-text;
-        background-image: linear-gradient(180deg, rgb(var(--shell-start)), rgb(var(--shell-end)));
+        background-image:
+            radial-gradient(circle at top left, rgb(var(--orb-primary) / 0.24), transparent 24rem),
+            radial-gradient(circle at 86% 12%, rgb(var(--orb-secondary) / 0.20), transparent 22rem),
+            linear-gradient(180deg, rgb(var(--shell-start)), rgb(var(--shell-end)));
+    }
+
+    .soft-block {
+        @apply rounded-[1.75rem] border border-border/60;
+        background-color: rgb(var(--surface-soft) / 0.85);
+    }
+
+    .soft-block-strong {
+        @apply rounded-[1.75rem] border border-border/60;
+        background-color: rgb(var(--surface-soft-strong) / 0.92);
+    }
+
+    .brand-pill {
+        @apply inline-flex items-center gap-3 rounded-full border border-border/50 px-4 py-2 text-sm font-semibold text-text;
+        background-color: rgb(var(--surface-soft-strong) / 0.95);
+    }
+
+    .section-chip {
+        @apply inline-flex rounded-full border border-accent/10 bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-text;
+    }
+
+    .section-chip-muted {
+        @apply inline-flex rounded-full border border-border/50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-muted;
+        background-color: rgb(var(--surface-soft));
+    }
+
+    .theme-choice {
+        @apply rounded-full border border-border px-3 py-2 text-xs font-semibold text-muted transition hover:border-accent/30 hover:text-text;
+        background-color: rgb(var(--surface-soft));
+    }
+
+    .theme-choice-active {
+        @apply border-accent/30 bg-accent-soft text-text shadow-float;
+    }
+
+    .rating-pill {
+        @apply rounded-3xl border border-border/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted;
+        background-color: rgb(var(--surface-soft));
+    }
+
+    .status-pill {
+        @apply rounded-full px-3 py-1 text-xs font-semibold;
+    }
+
+    .status-pill-success {
+        background-color: rgb(var(--status-success-bg));
+        color: rgb(var(--status-success-text));
+    }
+
+    .status-pill-progress {
+        background-color: rgb(var(--status-progress-bg));
+        color: rgb(var(--status-progress-text));
+    }
+
+    .status-pill-neutral {
+        background-color: rgb(var(--status-neutral-bg));
+        color: rgb(var(--status-neutral-text));
+    }
+
+    .theme-orb-primary {
+        background-color: rgb(var(--orb-primary) / 0.45);
+    }
+
+    .theme-orb-secondary {
+        background-color: rgb(var(--orb-secondary) / 0.35);
     }
 }
 
@@ -151,15 +267,18 @@
     inset: 0;
     display: grid;
     place-items: center;
-    background: linear-gradient(180deg, rgb(var(--shell-start)), rgb(var(--shell-end)));
+    background:
+        radial-gradient(circle at top left, rgb(var(--orb-primary) / 0.24), transparent 24rem),
+        radial-gradient(circle at top right, rgb(var(--orb-secondary) / 0.20), transparent 20rem),
+        linear-gradient(180deg, rgb(var(--shell-start)), rgb(var(--shell-end)));
 }
 
 .watchatlas-loading__panel {
     width: min(92vw, 28rem);
     border: 1px solid rgb(var(--border-color));
     border-radius: 2rem;
-    background: rgba(255, 255, 255, 0.72);
-    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+    background: rgb(var(--surface-soft-strong) / 0.92);
+    box-shadow: 0 20px 60px rgb(var(--panel-shadow) / 0.12);
     padding: 2rem;
     text-align: center;
     backdrop-filter: blur(18px);
