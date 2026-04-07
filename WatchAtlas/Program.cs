@@ -15,6 +15,7 @@ builder.Services.AddScoped<ISettingsRepository, LocalStorageSettingsRepository>(
 builder.Services.AddScoped<IThemeService, ThemeService>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IMarkdownImportService, MarkdownImportService>();
 builder.Services.AddScoped<IImportExportService, ImportExportService>();
 builder.Services.AddScoped<LibraryState>();
 builder.Services.AddScoped<ThemeState>();

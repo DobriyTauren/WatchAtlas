@@ -61,6 +61,19 @@ public class MovieFormModel : IValidatableObject
         };
     }
 
+    public void CopyFrom(MovieFormModel source)
+    {
+        Title = source.Title;
+        CoverImageUrl = source.CoverImageUrl;
+        Description = source.Description;
+        GenresText = source.GenresText;
+        PersonalRating = source.PersonalRating;
+        Notes = source.Notes;
+        DurationMinutes = source.DurationMinutes;
+        IsWatched = source.IsWatched;
+        WatchedDate = source.IsWatched ? source.WatchedDate : null;
+    }
+
     public void ApplyTo(MediaItem media, MovieDetails movieDetails)
     {
         media.Type = MediaType.Movie;

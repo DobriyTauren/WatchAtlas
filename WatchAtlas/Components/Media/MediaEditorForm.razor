@@ -1,4 +1,5 @@
 @inject ToastState ToastState
+@inject IMarkdownImportService MarkdownImportService
 
 <EditForm Model="Media" OnSubmit="HandleSubmitAsync">
     <div class="space-y-6">
@@ -18,6 +19,35 @@
             <option value="@MediaType.Movie">Movie</option>
             <option value="@MediaType.Series">Series</option>
         </AppSelect>
+
+        <div class="flex flex-wrap gap-3">
+            @if (Media.Type == MediaType.Movie)
+            {
+                <MarkdownImportLauncher ButtonLabel="Fill Movie From Markdown"
+                                        ModalTitle="Fill this movie from markdown"
+                                        ModalDescription="Paste prepared markdown or upload a markdown file to fill this movie draft."
+                                        ExampleMarkdown="@MarkdownImportExamples.Movie"
+                                        FieldPrefix="@($"{FieldPrefix}-movie-markdown")"
+                                        OnConfirmAsync="@(HandleMovieMarkdownImportAsync)" />
+            }
+            else
+            {
+                <MarkdownImportLauncher ButtonLabel="Fill Series From Markdown"
+                                        ModalTitle="Fill this series from markdown"
+                                        ModalDescription="Paste a prepared series breakdown to fill the series draft in one step."
+                                        ExampleMarkdown="@MarkdownImportExamples.Series"
+                                        FieldPrefix="@($"{FieldPrefix}-series-markdown")"
+                                        OnConfirmAsync="@(HandleSeriesMarkdownImportAsync)" />
+
+                <MarkdownImportLauncher ButtonLabel="Add Seasons From Markdown"
+                                        ModalTitle="Add seasons from markdown"
+                                        ModalDescription="Paste one or more season blocks to append them to the current series draft."
+                                        ExampleMarkdown="@MarkdownImportExamples.Season"
+                                        ConfirmLabel="Add Seasons"
+                                        FieldPrefix="@($"{FieldPrefix}-season-markdown")"
+                                        OnConfirmAsync="@(HandleSeasonMarkdownImportAsync)" />
+            }
+        </div>
 
         @if (Media.Type == MediaType.Movie)
         {
@@ -128,6 +158,70 @@
         => Media.Type == MediaType.Movie
             ? MovieForm.GetValidationMessages().FirstOrDefault()
             : SeriesForm.GetValidationMessages().FirstOrDefault();
+
+    private Task<MarkdownImportApplyResult> HandleMovieMarkdownImportAsync(string markdown)
+    {
+        var result = MarkdownImportService.ParseMovie(markdown);
+        if (!result.IsSuccessful || result.Value is null)
+        {
+            return Task.FromResult(MarkdownImportApplyResult.Failure(result.ErrorMessage ?? "The markdown could not be applied."));
+        }
+
+        MovieForm.CopyFrom(result.Value);
+        MovieForm.ApplyTo(Media, MovieDetails);
+        StateHasChanged();
+        ToastState.ShowSuccess("Movie details added.", "The draft was filled from your markdown.");
+
+        if (result.Warnings.Count > 0)
+        {
+            ToastState.ShowInfo("A few details need a quick check.", result.Warnings[0]);
+        }
+
+        return Task.FromResult(MarkdownImportApplyResult.Success());
+    }
+
+    private Task<MarkdownImportApplyResult> HandleSeriesMarkdownImportAsync(string markdown)
+    {
+        var result = MarkdownImportService.ParseSeries(markdown);
+        if (!result.IsSuccessful || result.Value is null)
+        {
+            return Task.FromResult(MarkdownImportApplyResult.Failure(result.ErrorMessage ?? "The markdown could not be applied."));
+        }
+
+        SeriesForm.CopyFrom(result.Value);
+        SeriesForm.ApplyTo(Media, SeriesDetails);
+        StateHasChanged();
+        ToastState.ShowSuccess("Series details added.", "The draft was filled from your markdown.");
+
+        if (result.Warnings.Count > 0)
+        {
+            ToastState.ShowInfo("A few details need a quick check.", result.Warnings[0]);
+        }
+
+        return Task.FromResult(MarkdownImportApplyResult.Success());
+    }
+
+    private Task<MarkdownImportApplyResult> HandleSeasonMarkdownImportAsync(string markdown)
+    {
+        var result = MarkdownImportService.ParseSeasons(markdown);
+        if (!result.IsSuccessful || result.Value is null)
+        {
+            return Task.FromResult(MarkdownImportApplyResult.Failure(result.ErrorMessage ?? "The markdown could not be applied."));
+        }
+
+        var notices = SeriesForm.AppendImportedSeasons(result.Value).ToList();
+        SeriesForm.ApplyTo(Media, SeriesDetails);
+        StateHasChanged();
+        ToastState.ShowSuccess("Seasons added.", "New seasons and episodes were appended to the current series draft.");
+
+        var firstNotice = notices.Concat(result.Warnings).FirstOrDefault();
+        if (!string.IsNullOrWhiteSpace(firstNotice))
+        {
+            ToastState.ShowInfo("Imported with a few notes.", firstNotice);
+        }
+
+        return Task.FromResult(MarkdownImportApplyResult.Success());
+    }
 
     private void ApplyViewState()
     {

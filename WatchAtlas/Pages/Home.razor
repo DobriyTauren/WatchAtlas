@@ -2,7 +2,6 @@
 
 @implements IDisposable
 @inject LibraryState LibraryState
-@inject ThemeState ThemeState
 @inject IStatisticsService StatisticsService
 @using WatchAtlas.Extensions
 
@@ -13,7 +12,7 @@
     {
         <PageHeader Eyebrow="Overview"
                     Title="Loading your watch library."
-                    Subtitle="Preparing the dashboard, saved totals, and library overview from browser storage." />
+                    Subtitle="Getting your movies, series, and watch progress ready." />
 
         <section class="grid gap-4 xl:grid-cols-[1.4fr,1fr]">
             <AppCard Class="space-y-6">
@@ -39,60 +38,31 @@
     }
     else
     {
-    <PageHeader Eyebrow="Phase 3"
-                Title="Your personal watch library starts here."
-                Subtitle="The foundation now combines browser-backed persistence, reusable Blazor structure, and a shared theme-aware design system across the app shell.">
-        <Actions>
-            <a class="primary-button" href="/media/new">Add First Entry</a>
-            <a class="secondary-button" href="/library">Open Library</a>
-        </Actions>
-    </PageHeader>
+        <PageHeader Eyebrow="Overview"
+                    Title="Your personal watch library starts here."
+                    Subtitle="Track what you've watched, see your progress, and jump back into your library anytime.">
+            <Actions>
+                <a class="primary-button" href="/media/new">Add First Entry</a>
+                <a class="secondary-button" href="/library">Open Library</a>
+            </Actions>
+        </PageHeader>
 
-    <section class="grid gap-4 xl:grid-cols-[1.4fr,1fr]">
-        <article class="shell-card overflow-hidden p-6 sm:p-8">
+        <section class="shell-card overflow-hidden p-6 sm:p-8">
             <div class="space-y-4">
-                <span class="section-chip">Project Vision</span>
-                <h2 class="max-w-2xl text-3xl">Soft, modern, and fully client-side watch tracking.</h2>
+                <span class="section-chip">Welcome</span>
+                <h2 class="max-w-2xl text-3xl">A soft, simple place to keep up with what you've watched.</h2>
                 <p class="max-w-3xl text-sm leading-7 text-muted sm:text-base">
-                    WatchAtlas is now structured around reusable services, theme state, browser-backed library state, and GitHub Pages-friendly routing so the next phases can focus on richer viewing workflows instead of rebuilding the shell.
+                    Add films and series, follow episode progress, and keep an eye on your total watch time without losing the calm feel of a personal collection.
                 </p>
             </div>
+        </section>
 
-            <div class="mt-8 grid gap-4 sm:grid-cols-2">
-                <div class="soft-block-strong p-5">
-                    <p class="text-sm font-semibold text-text">Current Theme</p>
-                    <p class="mt-2 text-2xl">@ThemeState.CurrentTheme.DisplayName</p>
-                    <p class="mt-2 text-sm text-muted">@ThemeState.CurrentTheme.Description</p>
-                </div>
-
-                <div class="soft-block-strong p-5">
-                    <p class="text-sm font-semibold text-text">Deployment Ready</p>
-                    <p class="mt-2 text-2xl">GitHub Pages</p>
-                    <p class="mt-2 text-sm text-muted">Static asset base path and SPA fallback are prepared for project-site hosting.</p>
-                </div>
-            </div>
-        </article>
-
-        <article class="shell-card p-6 sm:p-8">
-            <div class="space-y-4">
-                <span class="section-chip-muted">Foundation Checklist</span>
-                <div class="space-y-3 text-sm leading-7 text-muted">
-                    <p>Blazor WebAssembly solution organized for modular growth</p>
-                    <p>Tailwind rebuilt to scan Razor and C# files in this project</p>
-                    <p>Reusable navigation for desktop and mobile breakpoints</p>
-                    <p>State and repository abstractions ready for browser persistence</p>
-                    <p>Starter pages mapped for library, statistics, settings, and media routes</p>
-                </div>
-            </div>
-        </article>
-    </section>
-
-    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatTile Title="Watched Movies" Value="@Stats.WatchedMovies.ToString()" Caption="Movie tracking now reads from the shared browser-backed repository." ChipLabel="Movies" />
-        <StatTile Title="Series Added" Value="@Stats.TotalSeries.ToString()" Caption="Series progress cards are already scaffolded." ChipLabel="Series" />
-        <StatTile Title="Watched Episodes" Value="@Stats.WatchedEpisodes.ToString()" Caption="Episode totals update from saved series data and watched states." ChipLabel="Episodes" />
-        <StatTile Title="Watch Time" Value="@Stats.TotalWatchTimeMinutes.ToReadableDuration()" Caption="Calculated through the statistics service." ChipLabel="Runtime" />
-    </section>
+        <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <StatTile Title="Watched Movies" Value="@Stats.WatchedMovies.ToString()" Caption="Movies you've already marked as watched." ChipLabel="Movies" />
+            <StatTile Title="Series Added" Value="@Stats.TotalSeries.ToString()" Caption="Series currently in your library." ChipLabel="Series" />
+            <StatTile Title="Watched Episodes" Value="@Stats.WatchedEpisodes.ToString()" Caption="Episodes you've checked off so far." ChipLabel="Episodes" />
+            <StatTile Title="Watch Time" Value="@Stats.TotalWatchTimeMinutes.ToReadableDuration()" Caption="Time you've spent watching across the library." ChipLabel="Runtime" />
+        </section>
     }
 </section>
 

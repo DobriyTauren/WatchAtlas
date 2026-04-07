@@ -1,0 +1,200 @@
+@using System.IO
+
+<AppButton Variant="@ButtonVariant"
+           Size="@ButtonSize"
+           Class="@ButtonClass"
+           OnClick="OpenAsync">
+    @ButtonLabel
+</AppButton>
+
+<AppModal IsOpen="@IsOpen"
+          Title="@ModalTitle"
+          Description="@ModalDescription"
+          OnClose="CloseAsync">
+    <ChildContent>
+        <div class="space-y-5">
+            @if (!string.IsNullOrWhiteSpace(InlineErrorMessage))
+            {
+                <div class="soft-block border border-red-200/70 p-4 text-sm text-red-700">
+                    @InlineErrorMessage
+                </div>
+            }
+
+            <div class="flex flex-wrap items-center gap-3">
+                <label class="app-button app-button-secondary app-button-md cursor-pointer">
+                    <InputFile OnChange="HandleFileSelectedAsync"
+                               accept="@AcceptedFileTypes"
+                               class="sr-only" />
+                    Choose Markdown File
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(SelectedFileName))
+                {
+                    <span class="text-sm text-muted">@SelectedFileName</span>
+                }
+            </div>
+
+            <AppTextarea Id="@($"{FieldPrefix}-markdown")"
+                         Label="@TextareaLabel"
+                         Value="@MarkdownText"
+                         ValueChanged="HandleMarkdownChanged"
+                         Placeholder="@Placeholder"
+                         HelpText="@HelpText"
+                         TextareaClassName="min-h-[18rem] font-mono text-xs leading-6" />
+
+            @if (!string.IsNullOrWhiteSpace(ExampleMarkdown))
+            {
+                <details class="soft-block p-4">
+                    <summary class="cursor-pointer text-sm font-semibold text-text">See an example</summary>
+                    <pre class="mt-4 overflow-x-auto whitespace-pre-wrap rounded-3xl border border-border/70 bg-surface-soft/70 p-4 font-mono text-xs leading-6 text-text">@ExampleMarkdown</pre>
+                </details>
+            }
+        </div>
+    </ChildContent>
+    <Footer>
+        <AppButton Variant="secondary" Disabled="@IsBusy" OnClick="CloseButtonAsync">Cancel</AppButton>
+        <AppButton IsLoading="@IsBusy" OnClick="HandleConfirmAsync">@ConfirmLabel</AppButton>
+    </Footer>
+</AppModal>
+
+@code {
+    private const long DefaultMaxFileSizeBytes = 512 * 1024;
+
+    private bool IsOpen { get; set; }
+    private bool IsBusy { get; set; }
+    private string MarkdownText { get; set; } = string.Empty;
+    private string? InlineErrorMessage { get; set; }
+    private string? SelectedFileName { get; set; }
+
+    [Parameter, EditorRequired]
+    public string ButtonLabel { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string ModalTitle { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string ModalDescription { get; set; } = default!;
+
+    [Parameter]
+    public string TextareaLabel { get; set; } = "Markdown";
+
+    [Parameter]
+    public string HelpText { get; set; } = "Paste prepared markdown here or upload a `.md` file from your device.";
+
+    [Parameter]
+    public string Placeholder { get; set; } = string.Empty;
+
+    [Parameter]
+    public string ExampleMarkdown { get; set; } = string.Empty;
+
+    [Parameter]
+    public string ConfirmLabel { get; set; } = "Fill Form";
+
+    [Parameter]
+    public string ButtonVariant { get; set; } = "secondary";
+
+    [Parameter]
+    public string ButtonSize { get; set; } = "md";
+
+    [Parameter]
+    public string? ButtonClass { get; set; }
+
+    [Parameter]
+    public string FieldPrefix { get; set; } = "markdown-import";
+
+    [Parameter]
+    public string AcceptedFileTypes { get; set; } = ".md,.markdown,.txt,text/markdown,text/plain";
+
+    [Parameter]
+    public long MaxFileSizeBytes { get; set; } = DefaultMaxFileSizeBytes;
+
+    [Parameter, EditorRequired]
+    public Func<string, Task<MarkdownImportApplyResult>> OnConfirmAsync { get; set; } = default!;
+
+    private Task OpenAsync(MouseEventArgs _)
+    {
+        InlineErrorMessage = null;
+        IsOpen = true;
+        return Task.CompletedTask;
+    }
+
+    private Task CloseButtonAsync(MouseEventArgs _)
+        => CloseAsync();
+
+    private Task CloseAsync()
+    {
+        if (IsBusy)
+        {
+            return Task.CompletedTask;
+        }
+
+        IsOpen = false;
+        InlineErrorMessage = null;
+        return Task.CompletedTask;
+    }
+
+    private Task HandleMarkdownChanged(string? value)
+    {
+        MarkdownText = value ?? string.Empty;
+        InlineErrorMessage = null;
+        return Task.CompletedTask;
+    }
+
+    private async Task HandleFileSelectedAsync(InputFileChangeEventArgs args)
+    {
+        InlineErrorMessage = null;
+        var file = args.File;
+
+        if (file is null)
+        {
+            return;
+        }
+
+        SelectedFileName = file.Name;
+
+        try
+        {
+            await using var stream = file.OpenReadStream(MaxFileSizeBytes);
+            using var reader = new StreamReader(stream);
+            MarkdownText = await reader.ReadToEndAsync();
+        }
+        catch (IOException)
+        {
+            InlineErrorMessage = $"The selected file is too large. Please keep it under {MaxFileSizeBytes / 1024} KB.";
+        }
+        catch (Exception exception)
+        {
+            InlineErrorMessage = $"The markdown file could not be read: {exception.Message}";
+        }
+    }
+
+    private async Task HandleConfirmAsync(MouseEventArgs _)
+    {
+        if (string.IsNullOrWhiteSpace(MarkdownText))
+        {
+            InlineErrorMessage = "Paste markdown or choose a markdown file first.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            InlineErrorMessage = null;
+
+            var result = await OnConfirmAsync.Invoke(MarkdownText);
+            if (result.IsSuccess)
+            {
+                MarkdownText = string.Empty;
+                SelectedFileName = null;
+                IsOpen = false;
+                return;
+            }
+
+            InlineErrorMessage = result.ErrorMessage ?? "The markdown could not be applied.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+}

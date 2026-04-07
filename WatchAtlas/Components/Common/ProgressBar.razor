@@ -1,3 +1,5 @@
+@using System.Globalization
+
 <div class="space-y-2">
     <div class="flex items-center justify-between gap-3">
         @if (!string.IsNullOrWhiteSpace(Label))
@@ -9,7 +11,7 @@
     </div>
 
     <div class="progress-shell">
-        <div class="progress-fill" style="width: @($"{ProgressPercent:0.##}%")"></div>
+        <div class="progress-fill" style="@ProgressStyle"></div>
     </div>
 </div>
 
@@ -24,4 +26,5 @@
     public double Max { get; set; } = 100;
 
     private double ProgressPercent => Max <= 0 ? 0 : Math.Clamp(Value / Max * 100d, 0, 100);
+    private string ProgressStyle => $"width: {ProgressPercent.ToString("0.##", CultureInfo.InvariantCulture)}%";
 }

@@ -101,6 +101,20 @@ public class SeriesFormModel : IValidatableObject
         };
     }
 
+    public void CopyFrom(SeriesFormModel source)
+    {
+        Title = source.Title;
+        CoverImageUrl = source.CoverImageUrl;
+        Description = source.Description;
+        GenresText = source.GenresText;
+        PersonalRating = source.PersonalRating;
+        Notes = source.Notes;
+        Seasons = source.Seasons
+            .OrderBy(season => season.SeasonNumber)
+            .Select(season => season.Clone())
+            .ToList();
+    }
+
     public void ApplyTo(MediaItem media, SeriesDetails details)
     {
         media.Type = MediaType.Series;
@@ -142,6 +156,29 @@ public class SeriesFormModel : IValidatableObject
 
     public void RemoveEpisode(SeasonFormModel season, EpisodeFormModel episode)
         => season.Episodes.Remove(episode);
+
+    public IReadOnlyList<string> AppendImportedSeasons(IEnumerable<SeasonFormModel> seasons)
+    {
+        var notices = new List<string>();
+
+        foreach (var importedSeason in seasons.OrderBy(season => season.SeasonNumber))
+        {
+            var clone = importedSeason.Clone();
+            var originalSeasonNumber = clone.SeasonNumber;
+
+            if (clone.SeasonNumber <= 0 || Seasons.Any(existing => existing.SeasonNumber == clone.SeasonNumber))
+            {
+                clone.SeasonNumber = Seasons.Count == 0 ? 1 : Seasons.Max(existing => existing.SeasonNumber) + 1;
+                notices.Add(originalSeasonNumber > 0
+                    ? $"Imported season {originalSeasonNumber} was added as season {clone.SeasonNumber} because that number is already in use."
+                    : $"An imported season was added as season {clone.SeasonNumber}.");
+            }
+
+            Seasons.Add(clone);
+        }
+
+        return notices;
+    }
 
     public void GenerateEpisodes(SeasonFormModel season)
     {
@@ -229,6 +266,22 @@ public class SeasonFormModel
         };
     }
 
+    public SeasonFormModel Clone()
+    {
+        return new SeasonFormModel
+        {
+            Id = Id,
+            SeasonNumber = SeasonNumber,
+            Title = Title,
+            GenerateEpisodeCount = GenerateEpisodeCount,
+            SharedDurationMinutes = SharedDurationMinutes,
+            Episodes = Episodes
+                .OrderBy(episode => episode.EpisodeNumber)
+                .Select(episode => episode.Clone())
+                .ToList()
+        };
+    }
+
     public Season ToDomain(Guid seriesId)
     {
         var seasonId = Id == Guid.Empty ? Guid.NewGuid() : Id;
@@ -266,6 +319,19 @@ public class EpisodeFormModel
             DurationMinutes = episode.DurationMinutes,
             IsWatched = episode.IsWatched,
             WatchedDate = episode.WatchedDate
+        };
+    }
+
+    public EpisodeFormModel Clone()
+    {
+        return new EpisodeFormModel
+        {
+            Id = Id,
+            EpisodeNumber = EpisodeNumber,
+            Title = Title,
+            DurationMinutes = DurationMinutes,
+            IsWatched = IsWatched,
+            WatchedDate = WatchedDate
         };
     }
 

@@ -8,9 +8,9 @@
 <section class="space-y-8">
     <PageHeader Eyebrow="New Movie"
                 Title="Add a movie to your library."
-                Subtitle="This flow is dedicated to movie metadata, watch status, and validation so film entries feel focused instead of generic." />
+                Subtitle="Add the title, cover, and any details you want to remember." />
 
-    <section class="grid gap-4 xl:grid-cols-[1.25fr,0.9fr]">
+    <section>
         <AppCard>
             <MovieForm Model="Form"
                        SubmitLabel="Create Movie"
@@ -19,17 +19,6 @@
                        ExternalErrorMessage="@ErrorMessage"
                        IsBusy="IsSaving"
                        OnSubmitRequested="SaveAsync" />
-        </AppCard>
-
-        <AppCard>
-            <div class="space-y-4">
-                <h2 class="text-2xl">Movie Notes</h2>
-                <div class="space-y-4 text-sm leading-7 text-muted">
-                    <p>Movie creation now uses a dedicated form model, so title, runtime, rating, and watched-date rules are validated before anything reaches browser storage.</p>
-                    <p>Genres are stored as a normalized list, and watched date is persisted only when the movie is marked as watched.</p>
-                    <p>After saving, the app redirects to the movie details page so edit and delete actions stay in one focused place.</p>
-                </div>
-            </div>
         </AppCard>
     </section>
 </section>

@@ -10,13 +10,13 @@
     {
         <PageHeader Eyebrow="Series Editor"
                     Title="Loading series editor."
-                    Subtitle="Fetching the series from browser storage so its seasons and episodes can be edited." />
+                    Subtitle="Getting this series ready to edit." />
     }
     else if (Entry is null)
     {
         <PageHeader Eyebrow="Series Editor"
                     Title="This series could not be found."
-                    Subtitle="The edit route is ready, but the selected series is not in your local library." />
+                    Subtitle="It may have been removed, or the link may be out of date." />
 
         <EmptyStateCard Badge="Series Editor"
                         Title="Series not found."
@@ -30,7 +30,7 @@
     {
         <PageHeader Eyebrow="Edit Series"
                     Title="@Entry.Media.Title"
-                    Subtitle="Adjust metadata, season structure, episode details, and bulk watch-state updates in the dedicated series workflow." />
+                    Subtitle="Update the series details, seasons, and episodes." />
 
         <section class="grid gap-4 xl:grid-cols-[1.15fr,0.85fr]">
             <AppCard>
@@ -64,11 +64,6 @@
                             <p class="text-sm font-semibold text-text">Updated</p>
                             <p class="mt-2 text-lg">@Entry.Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
                         </div>
-                    </div>
-
-                    <div class="soft-block space-y-3 p-5 text-sm leading-7 text-muted">
-                        <p>This editor reuses the same series model as the generic media flow, so metadata and episode changes stay in one shared implementation.</p>
-                        <p>Bulk season actions here update completion status automatically because the existing watch-status and statistics helpers already read from episode state.</p>
                     </div>
 
                     <div class="flex flex-wrap gap-3">

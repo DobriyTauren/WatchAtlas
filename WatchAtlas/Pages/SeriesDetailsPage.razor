@@ -42,21 +42,23 @@
         }
 
         <section class="grid gap-4 xl:grid-cols-[0.95fr,1.15fr]">
-            <AppCard Class="overflow-hidden">
-                @if (!string.IsNullOrWhiteSpace(Entry.Media.CoverImageUrl))
-                {
-                    <img src="@Entry.Media.CoverImageUrl"
-                         alt="@($"{Entry.Media.Title} cover")"
-                         class="h-80 w-full rounded-3xl object-cover" />
-                }
-                else
-                {
-                    <div class="movie-cover-fallback">
-                        <span class="movie-cover-fallback__badge">Series</span>
-                        <h2 class="movie-cover-fallback__title">@Entry.Media.Title</h2>
-                        <p class="movie-cover-fallback__copy">Add a cover image from the edit page to give the series page a stronger visual identity.</p>
-                    </div>
-                }
+            <AppCard Class="self-start">
+                <div class="mx-auto aspect-[2/3] w-full max-w-[22rem] overflow-hidden rounded-[1.75rem] border border-border/70 bg-surface-soft/60">
+                    @if (!string.IsNullOrWhiteSpace(Entry.Media.CoverImageUrl))
+                    {
+                        <img src="@Entry.Media.CoverImageUrl"
+                             alt="@($"{Entry.Media.Title} cover")"
+                             class="h-full w-full object-cover" />
+                    }
+                    else
+                    {
+                        <div class="movie-cover-fallback h-full">
+                            <span class="movie-cover-fallback__badge">Series</span>
+                            <h2 class="movie-cover-fallback__title">@Entry.Media.Title</h2>
+                            <p class="movie-cover-fallback__copy">Add a cover image from the edit page to give the series page a stronger visual identity.</p>
+                        </div>
+                    }
+                </div>
             </AppCard>
 
             <div class="space-y-4">

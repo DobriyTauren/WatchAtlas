@@ -7,9 +7,9 @@
 <section class="space-y-8">
     <PageHeader Eyebrow="New Media"
                 Title="Add a movie or series to your library."
-                Subtitle="The editor now saves into browser storage and uses the shared design system so creation flows feel consistent with the rest of the app." />
+                Subtitle="Fill in the details below and save it to your collection." />
 
-    <section class="grid gap-4 xl:grid-cols-[1.25fr,0.9fr]">
+    <section>
         <article class="shell-card p-6 sm:p-8">
             <MediaEditorForm Media="Media"
                              MovieDetails="Movie"
@@ -20,17 +20,6 @@
                              ExternalErrorMessage="@ErrorMessage"
                              IsBusy="IsSaving"
                              OnSubmitRequested="SaveAsync" />
-        </article>
-
-        <article class="shell-card p-6 sm:p-8">
-            <div class="space-y-4">
-                <h2 class="text-2xl">Storage Notes</h2>
-                <div class="space-y-4 text-sm leading-7 text-muted">
-                    <p>Saving here creates a real `MediaItem` and matching movie or series details in browser storage.</p>
-                    <p>Refreshing the page keeps your entries because the repository now reads from `localStorage` through JS interop.</p>
-                    <p>The same state and statistics services powering the home and library pages update after each save.</p>
-                </div>
-            </div>
         </article>
     </section>
 </section>

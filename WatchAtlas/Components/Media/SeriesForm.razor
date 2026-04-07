@@ -1,4 +1,5 @@
 @inject ToastState ToastState
+@inject IMarkdownImportService MarkdownImportService
 
 <EditForm EditContext="EditContext" OnValidSubmit="HandleValidSubmitAsync" OnInvalidSubmit="HandleInvalidSubmit">
     <DataAnnotationsValidator />
@@ -22,6 +23,23 @@
         {
             <ValidationSummary class="space-y-1 rounded-3xl border border-red-200/70 bg-red-50/80 px-4 py-3 text-sm text-red-700" />
         }
+
+        <div class="flex flex-wrap gap-3">
+            <MarkdownImportLauncher ButtonLabel="Fill Series From Markdown"
+                                    ModalTitle="Fill this series from markdown"
+                                    ModalDescription="Paste a prepared series breakdown to fill the title, notes, seasons, and episodes in one step."
+                                    ExampleMarkdown="@MarkdownImportExamples.Series"
+                                    FieldPrefix="@($"{FieldPrefix}-series-markdown")"
+                                    OnConfirmAsync="@(HandleSeriesMarkdownImportAsync)" />
+
+            <MarkdownImportLauncher ButtonLabel="Add Seasons From Markdown"
+                                    ModalTitle="Add seasons from markdown"
+                                    ModalDescription="Paste one or more season blocks to append them to the current series draft."
+                                    ExampleMarkdown="@MarkdownImportExamples.Season"
+                                    ConfirmLabel="Add Seasons"
+                                    FieldPrefix="@($"{FieldPrefix}-season-markdown")"
+                                    OnConfirmAsync="@(HandleSeasonMarkdownImportAsync)" />
+        </div>
 
         <SeriesFormFields Model="Model" FieldPrefix="@FieldPrefix" />
 
@@ -76,9 +94,57 @@
     private Task HandleValidSubmitAsync()
         => OnSubmitRequested.InvokeAsync();
 
+    private Task<MarkdownImportApplyResult> HandleSeriesMarkdownImportAsync(string markdown)
+    {
+        var result = MarkdownImportService.ParseSeries(markdown);
+        if (!result.IsSuccessful || result.Value is null)
+        {
+            return Task.FromResult(MarkdownImportApplyResult.Failure(result.ErrorMessage ?? "The markdown could not be applied."));
+        }
+
+        Model.CopyFrom(result.Value);
+        RefreshEditContext();
+        ToastState.ShowSuccess("Series details added.", "The series form was filled from your markdown.");
+
+        if (result.Warnings.Count > 0)
+        {
+            ToastState.ShowInfo("A few details need a quick check.", result.Warnings[0]);
+        }
+
+        return Task.FromResult(MarkdownImportApplyResult.Success());
+    }
+
+    private Task<MarkdownImportApplyResult> HandleSeasonMarkdownImportAsync(string markdown)
+    {
+        var result = MarkdownImportService.ParseSeasons(markdown);
+        if (!result.IsSuccessful || result.Value is null)
+        {
+            return Task.FromResult(MarkdownImportApplyResult.Failure(result.ErrorMessage ?? "The markdown could not be applied."));
+        }
+
+        var notices = Model.AppendImportedSeasons(result.Value).ToList();
+        RefreshEditContext();
+        ToastState.ShowSuccess("Seasons added.", "New seasons and episodes were appended to the current series draft.");
+
+        var firstNotice = notices.Concat(result.Warnings).FirstOrDefault();
+        if (!string.IsNullOrWhiteSpace(firstNotice))
+        {
+            ToastState.ShowInfo("Imported with a few notes.", firstNotice);
+        }
+
+        return Task.FromResult(MarkdownImportApplyResult.Success());
+    }
+
     private void HandleInvalidSubmit(EditContext editContext)
     {
         var firstMessage = editContext.GetValidationMessages().FirstOrDefault();
         ToastState.ShowWarning("Please review the series form.", firstMessage ?? "Some series details still need attention before save.");
+    }
+
+    private void RefreshEditContext()
+    {
+        EditContext = new EditContext(Model);
+        BoundModel = Model;
+        StateHasChanged();
     }
 }

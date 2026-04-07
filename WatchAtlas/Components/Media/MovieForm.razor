@@ -1,4 +1,5 @@
 @inject ToastState ToastState
+@inject IMarkdownImportService MarkdownImportService
 
 <EditForm EditContext="EditContext" OnValidSubmit="HandleValidSubmitAsync" OnInvalidSubmit="HandleInvalidSubmit">
     <DataAnnotationsValidator />
@@ -22,6 +23,15 @@
         {
             <ValidationSummary class="space-y-1 rounded-3xl border border-red-200/70 bg-red-50/80 px-4 py-3 text-sm text-red-700" />
         }
+
+        <div class="flex flex-wrap gap-3">
+            <MarkdownImportLauncher ButtonLabel="Fill From Markdown"
+                                    ModalTitle="Fill this movie from markdown"
+                                    ModalDescription="Paste prepared markdown or upload a markdown file, and WatchAtlas will fill the movie form for you."
+                                    ExampleMarkdown="@MarkdownImportExamples.Movie"
+                                    FieldPrefix="@($"{FieldPrefix}-markdown")"
+                                    OnConfirmAsync="@(HandleMarkdownImportAsync)" />
+        </div>
 
         <MovieFormFields Model="Model" FieldPrefix="@FieldPrefix" />
 
@@ -76,9 +86,36 @@
     private Task HandleValidSubmitAsync()
         => OnSubmitRequested.InvokeAsync();
 
+    private Task<MarkdownImportApplyResult> HandleMarkdownImportAsync(string markdown)
+    {
+        var result = MarkdownImportService.ParseMovie(markdown);
+        if (!result.IsSuccessful || result.Value is null)
+        {
+            return Task.FromResult(MarkdownImportApplyResult.Failure(result.ErrorMessage ?? "The markdown could not be applied."));
+        }
+
+        Model.CopyFrom(result.Value);
+        RefreshEditContext();
+        ToastState.ShowSuccess("Movie details added.", "The movie form was filled from your markdown.");
+
+        if (result.Warnings.Count > 0)
+        {
+            ToastState.ShowInfo("A few details need a quick check.", result.Warnings[0]);
+        }
+
+        return Task.FromResult(MarkdownImportApplyResult.Success());
+    }
+
     private void HandleInvalidSubmit(EditContext editContext)
     {
         var firstMessage = editContext.GetValidationMessages().FirstOrDefault();
         ToastState.ShowWarning("Please review the form fields.", firstMessage ?? "Some movie details still need attention before save.");
+    }
+
+    private void RefreshEditContext()
+    {
+        EditContext = new EditContext(Model);
+        BoundModel = Model;
+        StateHasChanged();
     }
 }

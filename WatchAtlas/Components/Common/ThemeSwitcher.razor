@@ -1,3 +1,4 @@
+@implements IDisposable
 @inject ThemeState ThemeState
 
 <div class="@WrapperClass">
@@ -52,6 +53,11 @@
     [Parameter]
     public bool ShowCurrentButton { get; set; } = true;
 
+    protected override void OnInitialized()
+    {
+        ThemeState.Changed += HandleThemeChanged;
+    }
+
     private string WrapperClass => ShowPalette && !Compact ? "space-y-4" : "space-y-3";
 
     private Task CycleThemeAsync()
@@ -71,4 +77,12 @@
         => theme.Mode == ThemeState.CurrentTheme.Mode
             ? "theme-card theme-card-active"
             : "theme-card";
+
+    private void HandleThemeChanged()
+        => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        ThemeState.Changed -= HandleThemeChanged;
+    }
 }
