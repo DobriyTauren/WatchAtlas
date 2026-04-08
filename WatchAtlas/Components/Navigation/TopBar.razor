@@ -1,4 +1,6 @@
+@implements IDisposable
 @inject FilterState FilterState
+@inject NavigationManager NavigationManager
 
 <header class="shell-card sticky top-4 z-20 flex flex-col gap-4 p-4 sm:p-5" role="search" aria-label="Library search and quick actions">
     <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
@@ -17,6 +19,11 @@
 </header>
 
 @code {
+    protected override void OnInitialized()
+    {
+        FilterState.Changed += HandleFilterChanged;
+    }
+
     private string SearchTerm
     {
         get => FilterState.Options.SearchTerm;
@@ -26,6 +33,25 @@
     private Task HandleSearchChanged(string? value)
     {
         SearchTerm = value ?? string.Empty;
+
+        if (!IsLibraryRoute())
+        {
+            NavigationManager.NavigateTo("/library");
+        }
+
         return Task.CompletedTask;
+    }
+
+    private bool IsLibraryRoute()
+    {
+        var relativePath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        return relativePath.Equals("library", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void HandleFilterChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        FilterState.Changed -= HandleFilterChanged;
     }
 }

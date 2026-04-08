@@ -10,21 +10,26 @@
     <PageHeader Eyebrow="Library"
                 Title="Browse your full watch collection."
                 Subtitle="Search, filter, sort, and switch layouts across your full movie and series collection. The browsing view updates instantly from shared browser-backed state.">
-        <Actions>
-            <AppButton Href="/media/new">Add New Item</AppButton>
-        </Actions>
     </PageHeader>
 
     @if (LibraryState.IsLoading && !LibraryState.IsLoaded)
     {
         <section class="space-y-4">
             <AppCard Class="space-y-5">
-                <div class="grid gap-4 xl:grid-cols-[1.8fr,1fr,1fr]">
-                    <SkeletonBlock HeightClass="h-14" RadiusClass="rounded-full" />
+                <div class="grid gap-4 xl:grid-cols-[minmax(0,1.05fr),minmax(0,1fr),minmax(0,1fr),auto]">
                     <SkeletonBlock HeightClass="h-14" RadiusClass="rounded-[1.4rem]" />
-                    <SkeletonCard ShowChip="false" Class="min-h-[5.5rem]" />
+                    <SkeletonBlock HeightClass="h-14" RadiusClass="rounded-[1.4rem]" />
+                    <SkeletonBlock HeightClass="h-14" RadiusClass="rounded-[1.4rem]" />
+                    <SkeletonBlock HeightClass="h-14" Class="w-28" RadiusClass="rounded-[1.4rem]" />
                 </div>
-                <SkeletonBlock HeightClass="h-40" RadiusClass="rounded-[1.75rem]" />
+                <SkeletonBlock HeightClass="h-20" RadiusClass="rounded-[1.75rem]" />
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex gap-3">
+                        <SkeletonBlock HeightClass="h-12" Class="w-28" RadiusClass="rounded-full" />
+                        <SkeletonBlock HeightClass="h-12" Class="w-32" RadiusClass="rounded-full" />
+                    </div>
+                    <SkeletonBlock HeightClass="h-12" Class="w-36" RadiusClass="rounded-full" />
+                </div>
             </AppCard>
 
             <section class="grid gap-4 lg:grid-cols-2">
@@ -38,64 +43,54 @@
     else
     {
     <AppCard Class="space-y-5">
-        <div class="grid gap-4 xl:grid-cols-[1.8fr,1fr,1fr]">
-            <SearchBox Id="library-search"
-                       Label="Search"
-                       Prefix="Search"
-                       Value="@FilterState.Options.SearchTerm"
-                       ValueChanged="HandleSearchChanged"
-                       Placeholder="Search by title, description, or genre" />
-
+        <div class="grid gap-4 xl:grid-cols-[minmax(0,1.05fr),minmax(0,1fr),minmax(0,1fr),auto] xl:items-end">
             <SortDropdown Id="library-sort"
                           Label="Sort"
                           Value="@SelectedSortKey"
                           ValueChanged="HandleSortChanged"
                           Options="@SortOptions" />
 
-            <div class="soft-block-strong p-4">
-                <p class="text-sm font-semibold text-text">Visible Items</p>
-                <p class="mt-2 text-3xl">@QueryResult.FilteredCount</p>
-                <p class="mt-2 text-sm text-muted">@SummaryCopy</p>
+            <AppSelect TValue="string"
+                       Id="library-genre-top"
+                       Label="Genre"
+                       Value="@SelectedGenreValue"
+                       ValueChanged="HandleGenreChanged">
+                <option value="">All genres</option>
+                @foreach (var genre in AvailableGenres)
+                {
+                    <option value="@genre">@genre</option>
+                }
+            </AppSelect>
+
+            <AppSelect TValue="string"
+                       Id="library-series-top"
+                       Label="Selected Series"
+                       Value="@SelectedSeriesValue"
+                       ValueChanged="HandleSeriesChanged">
+                <option value="">All series</option>
+                @foreach (var series in AvailableSeries)
+                {
+                    <option value="@series.Media.Id">@series.Media.Title</option>
+                }
+            </AppSelect>
+
+            <div class="min-w-[8.5rem] pb-1 text-left xl:text-right">
+                <p class="text-sm font-semibold text-text">@QueryResult.FilteredCount @VisibleItemsLabel</p>
+                <p class="mt-1 text-sm text-muted">@VisibleItemsSummary</p>
             </div>
         </div>
 
         <FilterBar>
-            <div class="grid gap-4 xl:grid-cols-[1.4fr,1fr,1fr]">
-                <div class="space-y-3">
-                    <p class="text-sm font-semibold text-text">Quick Filters</p>
-                    <div class="flex flex-wrap gap-2">
-                        <button class="@GetFilterButtonClass(FilterState.Options.MediaType is null && FilterState.Options.Status is null)" type="button" @onclick="() => SelectQuickFilter(null, null)">All Items</button>
-                        <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Movie)" type="button" @onclick="() => SelectQuickFilter(MediaType.Movie, null)">Movies</button>
-                        <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Series)" type="button" @onclick="() => SelectQuickFilter(MediaType.Series, null)">Series</button>
-                        <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.Completed)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.Completed)">Completed</button>
-                        <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.InProgress)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.InProgress)">In Progress</button>
-                        <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.NotStarted)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.NotStarted)">Not Started</button>
-                    </div>
+            <div class="space-y-3">
+                <p class="text-sm font-semibold text-text">Quick Filters</p>
+                <div class="flex flex-wrap gap-2">
+                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType is null && FilterState.Options.Status is null)" type="button" @onclick="() => SelectQuickFilter(null, null)">All Items</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Movie)" type="button" @onclick="() => SelectQuickFilter(MediaType.Movie, null)">Movies</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Series)" type="button" @onclick="() => SelectQuickFilter(MediaType.Series, null)">Series</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.Completed)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.Completed)">Completed</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.InProgress)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.InProgress)">In Progress</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.NotStarted)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.NotStarted)">Not Started</button>
                 </div>
-
-                <AppSelect TValue="string"
-                           Id="library-genre"
-                           Label="Genre"
-                           Value="@SelectedGenreValue"
-                           ValueChanged="HandleGenreChanged">
-                    <option value="">All genres</option>
-                    @foreach (var genre in AvailableGenres)
-                    {
-                        <option value="@genre">@genre</option>
-                    }
-                </AppSelect>
-
-                <AppSelect TValue="string"
-                           Id="library-series"
-                           Label="Selected Series"
-                           Value="@SelectedSeriesValue"
-                           ValueChanged="HandleSeriesChanged">
-                    <option value="">All series</option>
-                    @foreach (var series in AvailableSeries)
-                    {
-                        <option value="@series.Media.Id">@series.Media.Title</option>
-                    }
-                </AppSelect>
             </div>
 
             <div class="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-4">
@@ -179,9 +174,10 @@
     private string SelectedGenreValue => FilterState.Options.Genre ?? string.Empty;
     private string SelectedSeriesValue => FilterState.Options.SeriesId?.ToString() ?? string.Empty;
     private string SelectedSortKey => LibrarySortOptionHelper.ToKey(FilterState.Options.SortBy, FilterState.Options.Descending);
-    private string SummaryCopy => QueryResult.TotalCount == QueryResult.FilteredCount
-        ? "Everything currently in your watch library is visible."
-        : $"{QueryResult.FilteredCount} of {QueryResult.TotalCount} items match the current filters.";
+    private string VisibleItemsLabel => QueryResult.FilteredCount == 1 ? "item" : "items";
+    private string VisibleItemsSummary => QueryResult.TotalCount == QueryResult.FilteredCount
+        ? "Everything is visible."
+        : $"{QueryResult.FilteredCount} of {QueryResult.TotalCount} match.";
 
     protected override async Task OnInitializedAsync()
     {
@@ -191,12 +187,6 @@
         await LibraryState.EnsureLoadedAsync();
         await SettingsState.EnsureLoadedAsync();
         ApplyStoredSortDefaultsIfNeeded();
-    }
-
-    private Task HandleSearchChanged(string? value)
-    {
-        FilterState.SetSearchTerm(value ?? string.Empty);
-        return Task.CompletedTask;
     }
 
     private Task HandleSortChanged(string value)

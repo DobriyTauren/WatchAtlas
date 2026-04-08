@@ -11,76 +11,75 @@
         : (seriesProgress?.WatchedMinutes ?? 0);
 }
 
-<article class="shell-card flex h-full flex-col gap-5 p-5 sm:p-6">
-    <div class="flex items-start justify-between gap-4">
-        <div class="space-y-2">
-            <div class="flex flex-wrap items-center gap-2">
-                <MediaTypeBadge Type="@Entry.Media.Type" />
-                <MediaStatusBadge Status="@status" />
+<a href="@MediaRouteHelper.GetDetailsHref(Entry)"
+   class="group block rounded-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+   aria-label="@($"Open details for {Entry.Media.Title}")">
+    <article class="shell-card flex h-full flex-col gap-5 p-5 transition duration-200 group-hover:-translate-y-0.5 group-hover:border-accent/60 group-hover:shadow-[0_24px_70px_-42px_rgba(120,101,214,0.42)] sm:p-6">
+        <div class="flex items-start justify-between gap-4">
+            <div class="space-y-2">
+                <div class="flex flex-wrap items-center gap-2">
+                    <MediaTypeBadge Type="@Entry.Media.Type" />
+                    <MediaStatusBadge Status="@status" />
+                </div>
+
+                <div>
+                    <h3 class="text-xl transition-colors duration-200 group-hover:text-accent">@Entry.Media.Title</h3>
+
+                    @if (!string.IsNullOrWhiteSpace(Entry.Media.Description))
+                    {
+                        <p class="mt-2 line-clamp-3 text-sm leading-6 text-muted">@Entry.Media.Description</p>
+                    }
+                    else
+                    {
+                        <p class="mt-2 text-sm leading-6 text-muted">No description yet. Open details to add notes, cover art, and richer tracking info.</p>
+                    }
+                </div>
             </div>
 
-            <div>
-                <h3 class="text-xl">@Entry.Media.Title</h3>
+            <span class="rating-pill">
+                @(Entry.Media.PersonalRating is { } rating ? $"{rating}/10" : "Draft")
+            </span>
+        </div>
 
-                @if (!string.IsNullOrWhiteSpace(Entry.Media.Description))
+        @if (Entry.Media.Genres.Count > 0)
+        {
+            <div class="flex flex-wrap gap-2">
+                @foreach (var genre in Entry.Media.Genres.Take(3))
                 {
-                    <p class="mt-2 line-clamp-3 text-sm leading-6 text-muted">@Entry.Media.Description</p>
+                    <AppBadge Variant="outline">@genre</AppBadge>
                 }
-                else
-                {
-                    <p class="mt-2 text-sm leading-6 text-muted">No description yet. Open details to add notes, cover art, and richer tracking info.</p>
-                }
+            </div>
+        }
+
+        <div class="grid gap-3 text-sm text-muted sm:grid-cols-2">
+            <div class="soft-block p-4">
+                <p class="font-semibold text-text">Watch Time</p>
+                <p class="mt-1">@(runtimeMinutes > 0 ? runtimeMinutes.ToReadableDuration() : "Not tracked yet")</p>
+            </div>
+
+            <div class="soft-block p-4">
+                <p class="font-semibold text-text">Progress</p>
+                <p class="mt-1">
+                    @if (seriesProgress is not null)
+                    {
+                        @($"{seriesProgress.WatchedEpisodes}/{seriesProgress.TotalEpisodes} episodes")
+                    }
+                    else
+                    {
+                        @(Entry.Movie?.IsWatched == true ? "Watched" : "Unwatched")
+                    }
+                </p>
             </div>
         </div>
 
-        <span class="rating-pill">
-            @(Entry.Media.PersonalRating is { } rating ? $"{rating}/10" : "Draft")
-        </span>
-    </div>
-
-    @if (Entry.Media.Genres.Count > 0)
-    {
-        <div class="flex flex-wrap gap-2">
-            @foreach (var genre in Entry.Media.Genres.Take(3))
-            {
-                <AppBadge Variant="outline">@genre</AppBadge>
-            }
-        </div>
-    }
-
-    <div class="grid gap-3 text-sm text-muted sm:grid-cols-2">
-        <div class="soft-block p-4">
-            <p class="font-semibold text-text">Watch Time</p>
-            <p class="mt-1">@(runtimeMinutes > 0 ? runtimeMinutes.ToReadableDuration() : "Not tracked yet")</p>
-        </div>
-
-        <div class="soft-block p-4">
-            <p class="font-semibold text-text">Progress</p>
-            <p class="mt-1">
-                @if (seriesProgress is not null)
-                {
-                    @($"{seriesProgress.WatchedEpisodes}/{seriesProgress.TotalEpisodes} episodes")
-                }
-                else
-                {
-                    @(Entry.Movie?.IsWatched == true ? "Watched" : "Unwatched")
-                }
-            </p>
-        </div>
-    </div>
-
-    @if (seriesProgress is not null)
-    {
-        <ProgressBar Label="Series Completion"
-                     Value="@seriesProgress.WatchedEpisodes"
-                     Max="@Math.Max(seriesProgress.TotalEpisodes, 1)" />
-    }
-
-    <div class="mt-auto flex flex-wrap gap-3 pt-1">
-        <AppButton Href="@MediaRouteHelper.GetDetailsHref(Entry)" Variant="secondary">Open Details</AppButton>
-        <AppButton Href="@MediaRouteHelper.GetCreateHref(Entry.Media.Type)">Add Another</AppButton>
-    </div>
-</article>
+        @if (seriesProgress is not null)
+        {
+            <ProgressBar Label="Series Completion"
+                         Value="@seriesProgress.WatchedEpisodes"
+                         Max="@Math.Max(seriesProgress.TotalEpisodes, 1)" />
+        }
+    </article>
+</a>
 
 @code {
     [Parameter, EditorRequired]
