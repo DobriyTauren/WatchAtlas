@@ -79,22 +79,66 @@
         </section>
 
         <section class="space-y-4">
-        <SectionHeader Eyebrow="Completion"
-                       Title="Most completed series."
-                       Description="Entries ranked by completion percentage, then by watched episode count." />
+        <SectionHeader Eyebrow="Episodes"
+                       Title="Most episodes watched."
+                       Description="Series ranked by watched episode count, then by logged watch time." />
 
-        @if (MostCompletedSeries.Count == 0)
+        @if (MostEpisodesWatchedSeries.Count == 0)
         {
             <AppCard>
-                <p class="text-sm leading-7 text-muted">No series progress to compare yet. Once episodes are tracked, completion standings will appear here.</p>
+                <p class="text-sm leading-7 text-muted">No watched episodes yet. Start tracking episode progress to populate this ranking.</p>
             </AppCard>
         }
         else
         {
             <section class="grid gap-4 xl:grid-cols-3">
-                @foreach (var series in MostCompletedSeries)
+                @foreach (var series in MostEpisodesWatchedSeries)
                 {
                     <SeriesStatsCard Statistics="series" />
+                }
+            </section>
+        }
+        </section>
+
+        <section class="space-y-4">
+        <SectionHeader Eyebrow="In Progress"
+                       Title="Currently watching."
+                       Description="Series that are in progress right now, ranked by watched episodes and active watch time." />
+
+        @if (CurrentlyWatchingSeries.Count == 0)
+        {
+            <AppCard>
+                <p class="text-sm leading-7 text-muted">No in-progress series yet. Once a series is partly watched, it will show up here.</p>
+            </AppCard>
+        }
+        else
+        {
+            <section class="grid gap-4 xl:grid-cols-3">
+                @foreach (var series in CurrentlyWatchingSeries)
+                {
+                    <SeriesStatsCard Statistics="series" />
+                }
+            </section>
+        }
+        </section>
+
+        <section class="space-y-4">
+        <SectionHeader Eyebrow="Genres"
+                       Title="Watch time by genre."
+                       Description="Watched movie runtime and watched episode runtime grouped by library genres." />
+
+        @if (TopGenresByWatchTime.Count == 0)
+        {
+            <AppCard>
+                <p class="text-sm leading-7 text-muted">No watched runtime has been matched to genres yet. Add genres and watched entries to see the breakdown.</p>
+            </AppCard>
+        }
+        else
+        {
+            <section class="grid gap-4 xl:grid-cols-3">
+                @foreach (var genre in TopGenresByWatchTime)
+                {
+                    <GenreWatchTimeCard Statistics="genre" />
                 }
             </section>
         }
@@ -128,7 +172,9 @@
     private GlobalStatistics Stats => StatisticsService.CalculateGlobalStatistics(LibraryState.Entries);
     private WatchTimeSummary WatchTime => StatisticsService.CalculateWatchTimeSummary(LibraryState.Entries);
     private IReadOnlyList<SeriesStatistics> TopSeriesByDuration => StatisticsService.GetTopSeriesByWatchTime(LibraryState.Entries, 3);
-    private IReadOnlyList<SeriesStatistics> MostCompletedSeries => StatisticsService.GetMostCompletedSeries(LibraryState.Entries, 3);
+    private IReadOnlyList<SeriesStatistics> MostEpisodesWatchedSeries => StatisticsService.GetMostEpisodesWatchedSeries(LibraryState.Entries, 3);
+    private IReadOnlyList<SeriesStatistics> CurrentlyWatchingSeries => StatisticsService.GetCurrentlyWatchingSeries(LibraryState.Entries, 3);
+    private IReadOnlyList<GenreWatchTimeStatistics> TopGenresByWatchTime => StatisticsService.GetTopGenresByWatchTime(LibraryState.Entries, 3);
     private IReadOnlyList<SeasonStatistics> TopSeasonsByDuration => StatisticsService.GetTopSeasonsByWatchTime(LibraryState.Entries, 3);
 
     protected override async Task OnInitializedAsync()

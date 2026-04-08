@@ -134,12 +134,82 @@ public class StatisticsService : IStatisticsService
             .ToList();
     }
 
-    public IReadOnlyList<SeriesStatistics> GetMostCompletedSeries(IEnumerable<LibraryEntry> entries, int count)
+    public IReadOnlyList<SeriesStatistics> GetMostEpisodesWatchedSeries(IEnumerable<LibraryEntry> entries, int count)
     {
         return CalculateSeriesStatistics(entries)
-            .OrderByDescending(stats => stats.CompletionPercent)
-            .ThenByDescending(stats => stats.WatchedEpisodes)
+            .OrderByDescending(stats => stats.WatchedEpisodes)
+            .ThenByDescending(stats => stats.WatchedMinutes)
             .ThenBy(stats => stats.Title)
+            .Take(Math.Max(count, 0))
+            .ToList();
+    }
+
+    public IReadOnlyList<SeriesStatistics> GetCurrentlyWatchingSeries(IEnumerable<LibraryEntry> entries, int count)
+    {
+        return CalculateSeriesStatistics(entries)
+            .Where(stats => stats.Status == WatchStatus.InProgress)
+            .OrderByDescending(stats => stats.WatchedEpisodes)
+            .ThenByDescending(stats => stats.WatchedMinutes)
+            .ThenBy(stats => stats.Title)
+            .Take(Math.Max(count, 0))
+            .ToList();
+    }
+
+    public IReadOnlyList<GenreWatchTimeStatistics> GetTopGenresByWatchTime(IEnumerable<LibraryEntry> entries, int count)
+    {
+        var genreTotals = new Dictionary<string, GenreWatchTimeAggregate>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var entry in entries)
+        {
+            var genres = entry.Media.Genres
+                .Where(genre => !string.IsNullOrWhiteSpace(genre))
+                .Select(genre => genre.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (genres.Count == 0)
+            {
+                continue;
+            }
+
+            var watchedMovieMinutes = entry.Media.Type == MediaType.Movie && entry.Movie?.IsWatched == true
+                ? entry.Movie.DurationMinutes ?? 0
+                : 0;
+            var watchedEpisodeMinutes = entry.Media.Type == MediaType.Series
+                ? CalculateSeriesStatistics(entry).WatchedMinutes
+                : 0;
+
+            if (watchedMovieMinutes <= 0 && watchedEpisodeMinutes <= 0)
+            {
+                continue;
+            }
+
+            foreach (var genre in genres)
+            {
+                if (!genreTotals.TryGetValue(genre, out var aggregate))
+                {
+                    aggregate = new GenreWatchTimeAggregate(genre);
+                    genreTotals.Add(genre, aggregate);
+                }
+
+                aggregate.WatchedMovieMinutes += watchedMovieMinutes;
+                aggregate.WatchedEpisodeMinutes += watchedEpisodeMinutes;
+                aggregate.TitleIds.Add(entry.Media.Id);
+            }
+        }
+
+        return genreTotals.Values
+            .Select(aggregate => new GenreWatchTimeStatistics
+            {
+                Genre = aggregate.Genre,
+                WatchedMovieMinutes = aggregate.WatchedMovieMinutes,
+                WatchedEpisodeMinutes = aggregate.WatchedEpisodeMinutes,
+                TotalWatchedMinutes = aggregate.WatchedMovieMinutes + aggregate.WatchedEpisodeMinutes,
+                TitleCount = aggregate.TitleIds.Count
+            })
+            .OrderByDescending(stats => stats.TotalWatchedMinutes)
+            .ThenByDescending(stats => stats.TitleCount)
+            .ThenBy(stats => stats.Genre)
             .Take(Math.Max(count, 0))
             .ToList();
     }
@@ -189,5 +259,13 @@ public class StatisticsService : IStatisticsService
                 _ => WatchStatus.InProgress
             }
         };
+    }
+
+    private sealed class GenreWatchTimeAggregate(string genre)
+    {
+        public string Genre { get; } = genre;
+        public int WatchedMovieMinutes { get; set; }
+        public int WatchedEpisodeMinutes { get; set; }
+        public HashSet<Guid> TitleIds { get; } = new();
     }
 }

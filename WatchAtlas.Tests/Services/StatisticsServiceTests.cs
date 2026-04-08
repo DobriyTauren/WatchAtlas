@@ -63,7 +63,7 @@ public class StatisticsServiceTests
     }
 
     [Fact]
-    public void GetMostCompletedSeries_OrdersByCompletionThenWatchedEpisodes()
+    public void GetMostEpisodesWatchedSeries_OrdersByWatchedEpisodesThenWatchTime()
     {
         var entries = new[]
         {
@@ -94,8 +94,62 @@ public class StatisticsServiceTests
                 ])
         };
 
-        var ordered = _service.GetMostCompletedSeries(entries, 3).Select(item => item.Title).ToList();
+        var ordered = _service.GetMostEpisodesWatchedSeries(entries, 3).Select(item => item.Title).ToList();
 
-        Assert.Equal(["Gamma", "Beta", "Alpha"], ordered);
+        Assert.Equal(["Beta", "Gamma", "Alpha"], ordered);
+    }
+
+    [Fact]
+    public void GetCurrentlyWatchingSeries_ReturnsOnlyInProgressSeries()
+    {
+        var entries = new[]
+        {
+            TestDataFactory.CreateSeriesEntry(
+                "Completed",
+                seasons:
+                [
+                    TestDataFactory.CreateSeason(1,
+                        TestDataFactory.CreateEpisode(1, watched: true, durationMinutes: 42))
+                ]),
+            TestDataFactory.CreateSeriesEntry(
+                "Currently Watching",
+                seasons:
+                [
+                    TestDataFactory.CreateSeason(1,
+                        TestDataFactory.CreateEpisode(1, watched: true, durationMinutes: 44),
+                        TestDataFactory.CreateEpisode(2, watched: false, durationMinutes: 44))
+                ]),
+            TestDataFactory.CreateSeriesEntry("Not Started")
+        };
+
+        var ordered = _service.GetCurrentlyWatchingSeries(entries, 3).Select(item => item.Title).ToList();
+
+        Assert.Equal(["Currently Watching"], ordered);
+    }
+
+    [Fact]
+    public void GetTopGenresByWatchTime_AggregatesMoviesAndEpisodesByGenre()
+    {
+        var entries = new[]
+        {
+            TestDataFactory.CreateMovieEntry("Arrival", watched: true, durationMinutes: 116, genres: ["Sci-Fi", "Drama"]),
+            TestDataFactory.CreateSeriesEntry(
+                "Dark",
+                genres: ["Sci-Fi", "Mystery"],
+                seasons:
+                [
+                    TestDataFactory.CreateSeason(1,
+                        TestDataFactory.CreateEpisode(1, watched: true, durationMinutes: 50),
+                        TestDataFactory.CreateEpisode(2, watched: true, durationMinutes: 55))
+                ])
+        };
+
+        var genres = _service.GetTopGenresByWatchTime(entries, 3);
+        var sciFi = Assert.Single(genres.Where(item => item.Genre == "Sci-Fi"));
+
+        Assert.Equal(221, sciFi.TotalWatchedMinutes);
+        Assert.Equal(116, sciFi.WatchedMovieMinutes);
+        Assert.Equal(105, sciFi.WatchedEpisodeMinutes);
+        Assert.Equal(2, sciFi.TitleCount);
     }
 }

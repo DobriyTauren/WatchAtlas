@@ -12,6 +12,8 @@ public interface IStatisticsService
     SeasonStatistics CalculateSeasonStatistics(Season season);
     WatchTimeSummary CalculateWatchTimeSummary(IEnumerable<LibraryEntry> entries);
     IReadOnlyList<SeriesStatistics> GetTopSeriesByWatchTime(IEnumerable<LibraryEntry> entries, int count);
-    IReadOnlyList<SeriesStatistics> GetMostCompletedSeries(IEnumerable<LibraryEntry> entries, int count);
+    IReadOnlyList<SeriesStatistics> GetMostEpisodesWatchedSeries(IEnumerable<LibraryEntry> entries, int count);
+    IReadOnlyList<SeriesStatistics> GetCurrentlyWatchingSeries(IEnumerable<LibraryEntry> entries, int count);
+    IReadOnlyList<GenreWatchTimeStatistics> GetTopGenresByWatchTime(IEnumerable<LibraryEntry> entries, int count);
     IReadOnlyList<SeasonStatistics> GetTopSeasonsByWatchTime(IEnumerable<LibraryEntry> entries, int count);
 }

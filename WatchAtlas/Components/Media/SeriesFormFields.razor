@@ -42,7 +42,14 @@
             <p class="mt-1 text-sm text-muted">Build seasons and episodes with quick generation, watch-state bulk actions, and reusable runtime tools.</p>
         </div>
 
-        <AppButton Variant="secondary" OnClick="AddSeasonAsync">Add Season</AppButton>
+        <div class="flex flex-wrap gap-3">
+            <AppButton Variant="secondary"
+                       Disabled="@(Model.Seasons.Count == 0)"
+                       OnClick="MarkSeriesWatchedAsync">
+                Mark Entire Series Watched
+            </AppButton>
+            <AppButton Variant="secondary" OnClick="AddSeasonAsync">Add Season</AppButton>
+        </div>
     </div>
 
     @if (Model.Seasons.Count == 0)
@@ -225,6 +232,12 @@
     private Task MarkSeasonUnwatchedAsync(SeasonFormModel season, MouseEventArgs _)
     {
         Model.MarkSeasonUnwatched(season);
+        return Task.CompletedTask;
+    }
+
+    private Task MarkSeriesWatchedAsync(MouseEventArgs _)
+    {
+        Model.MarkSeriesWatched();
         return Task.CompletedTask;
     }
 

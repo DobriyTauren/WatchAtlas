@@ -1,0 +1,30 @@
+<AppCard Class="h-full">
+    <div class="space-y-5">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="space-y-2">
+                <div class="flex flex-wrap items-center gap-2">
+                    <AppBadge>@Statistics.Genre</AppBadge>
+                    <AppBadge Variant="outline">@Statistics.TitleCount.ToCountLabel("title")</AppBadge>
+                </div>
+                <h3 class="text-xl">@Statistics.TotalWatchedMinutes.ToReadableDuration()</h3>
+            </div>
+        </div>
+
+        <div class="grid gap-3 text-sm text-muted sm:grid-cols-2">
+            <div class="soft-block p-4">
+                <p class="font-semibold text-text">Movies</p>
+                <p class="mt-1">@Statistics.WatchedMovieMinutes.ToReadableDuration()</p>
+            </div>
+
+            <div class="soft-block p-4">
+                <p class="font-semibold text-text">Episodes</p>
+                <p class="mt-1">@Statistics.WatchedEpisodeMinutes.ToReadableDuration()</p>
+            </div>
+        </div>
+    </div>
+</AppCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public GenreWatchTimeStatistics Statistics { get; set; } = default!;
+}

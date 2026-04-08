@@ -226,6 +226,17 @@ public class SeriesFormModel : IValidatableObject
         }
     }
 
+    public void MarkSeriesWatched()
+    {
+        var watchedDate = DateTime.Today;
+
+        foreach (var episode in Seasons.SelectMany(season => season.Episodes))
+        {
+            episode.IsWatched = true;
+            episode.WatchedDate ??= watchedDate;
+        }
+    }
+
     public IReadOnlyList<string> GetValidationMessages()
     {
         var results = new List<ValidationResult>();
