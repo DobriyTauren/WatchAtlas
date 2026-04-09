@@ -12,13 +12,6 @@
             </div>
         }
 
-        @if (!string.IsNullOrWhiteSpace(SuccessMessage))
-        {
-            <div class="soft-block-strong border border-emerald-200/70 p-4 text-sm text-emerald-700">
-                @SuccessMessage
-            </div>
-        }
-
         @if (EditContext.GetValidationMessages().Any())
         {
             <ValidationSummary class="space-y-1 rounded-3xl border border-red-200/70 bg-red-50/80 px-4 py-3 text-sm text-red-700" />
@@ -75,9 +68,6 @@
 
     [Parameter]
     public string? ExternalErrorMessage { get; set; }
-
-    [Parameter]
-    public string? SuccessMessage { get; set; }
 
     [Parameter]
     public string FieldPrefix { get; set; } = "series-form";

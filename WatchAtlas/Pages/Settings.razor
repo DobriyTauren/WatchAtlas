@@ -16,13 +16,6 @@
                 Title="Control your app preferences and local data safety."
                 Subtitle="Choose how the app looks, save a backup, or clear everything and start fresh." />
 
-    @if (!string.IsNullOrWhiteSpace(FeedbackMessage))
-    {
-        <div class="soft-block border border-emerald-200/70 p-4 text-sm text-emerald-700">
-            @FeedbackMessage
-        </div>
-    }
-
     @if (!string.IsNullOrWhiteSpace(ErrorMessage))
     {
         <div class="soft-block border border-red-200/70 p-4 text-sm text-red-700">
@@ -184,7 +177,6 @@
         })
         .ToList();
 
-    private string? FeedbackMessage { get; set; }
     private string? ErrorMessage { get; set; }
     private string? SelectedImportFileName { get; set; }
     private LibraryBackupModel? PendingImportBackup { get; set; }
@@ -238,7 +230,6 @@
             var fileName = $"watchatlas-backup-{DateTime.Now:yyyyMMdd-HHmmss}.json";
             var json = ImportExportService.Export(backup);
             await JsRuntime.InvokeVoidAsync("watchAtlasStorage.downloadTextFile", fileName, json, "application/json;charset=utf-8");
-            FeedbackMessage = "Backup exported successfully.";
             ToastState.ShowSuccess("Backup exported.", "A full JSON snapshot of your library and settings has been downloaded.");
         }
         catch (Exception exception)
@@ -333,7 +324,6 @@
             await ThemeState.ApplyThemeAsync(PendingImportBackup.Settings.ThemeMode);
             FilterState.Reset(SettingsState.Current.DefaultLibrarySortBy, SettingsState.Current.DefaultLibrarySortDescending);
 
-            FeedbackMessage = "Backup restored successfully.";
             ToastState.ShowSuccess("Backup restored.", "The selected backup replaced the current local data.");
             IsImportModalOpen = false;
             SelectedImportFileName = null;
@@ -362,7 +352,6 @@
             await ThemeState.ApplyThemeAsync(SettingsState.Current.ThemeMode);
             FilterState.Reset(SettingsState.Current.DefaultLibrarySortBy, SettingsState.Current.DefaultLibrarySortDescending);
 
-            FeedbackMessage = "All local WatchAtlas data has been cleared.";
             ToastState.ShowSuccess("Local data reset.", "The library and saved preferences were cleared from browser storage.");
             IsResetModalOpen = false;
             SelectedImportFileName = null;
@@ -381,7 +370,6 @@
 
     private void ClearMessages()
     {
-        FeedbackMessage = null;
         ErrorMessage = null;
     }
 

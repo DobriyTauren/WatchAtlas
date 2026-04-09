@@ -39,7 +39,6 @@
                            CancelHref="@($"/movies/{Id}")"
                            FieldPrefix="movie-edit"
                            ExternalErrorMessage="@ErrorMessage"
-                           SuccessMessage="@SuccessMessage"
                            IsBusy="IsSaving"
                            OnSubmitRequested="SaveAsync" />
             </AppCard>
@@ -85,13 +84,10 @@
     private bool IsReady { get; set; }
     private bool IsSaving { get; set; }
     private string? ErrorMessage { get; set; }
-    private string? SuccessMessage { get; set; }
-
     protected override async Task OnParametersSetAsync()
     {
         IsReady = false;
         ErrorMessage = null;
-        SuccessMessage = null;
 
         await LibraryState.EnsureLoadedAsync();
         var entry = LibraryState.GetById(Id);
@@ -124,7 +120,6 @@
         {
             IsSaving = true;
             ErrorMessage = null;
-            SuccessMessage = null;
 
             await LibraryState.UpdateAsync(media, movie, null);
             var refreshedEntry = LibraryState.GetById(Id);
@@ -133,7 +128,6 @@
             if (Entry is not null)
             {
                 Form = MovieFormModel.From(Entry.Media, Entry.Movie);
-                SuccessMessage = "Movie changes were saved.";
                 ToastState.ShowSuccess("Movie saved.", "Your movie details were updated successfully.");
             }
         }
