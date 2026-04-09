@@ -22,9 +22,9 @@
                         Title="No movie found."
                         Description="Create a movie first, then return here to review metadata, watch status, and notes."
                         PrimaryLabel="Create Movie"
-                        PrimaryHref="/movies/new"
+                        PrimaryHref="movies/new"
                         SecondaryLabel="Return to Library"
-                        SecondaryHref="/library" />
+                        SecondaryHref="library" />
     }
     else
     {
@@ -155,7 +155,7 @@
     private string? ErrorMessage { get; set; }
 
     private RenderFragment ActionButtons => @<div class="flex flex-wrap gap-3">
-        <AppButton Href="@($"/movies/{Id}/edit")" Variant="secondary">Edit Movie</AppButton>
+        <AppButton Href="@($"movies/{Id}/edit")" Variant="secondary">Edit Movie</AppButton>
         <AppButton OnClick="OpenDeleteModalAsync">Delete Movie</AppButton>
     </div>;
 

@@ -1,5 +1,6 @@
 ﻿@page "/not-found"
 @layout MainLayout
+@inject NavigationManager NavigationManager
 
 <PageTitle>Not Found</PageTitle>
 
@@ -12,7 +13,7 @@
                     Title="Nothing is mapped here yet."
                     Description="Try returning to the dashboard or jump into the library shell while the rest of the watch-tracking features are built out."
                     PrimaryLabel="Go Home"
-                    PrimaryHref="/"
+                    PrimaryHref="@NavigationManager.BaseUri"
                     SecondaryLabel="Open Library"
-                    SecondaryHref="/library" />
+                    SecondaryHref="library" />
 </section>

@@ -22,9 +22,9 @@
                         Title="Series not found."
                         Description="Create a series first or return to the library to pick an existing entry."
                         PrimaryLabel="Create Series"
-                        PrimaryHref="/series/new"
+                        PrimaryHref="series/new"
                         SecondaryLabel="Open Library"
-                        SecondaryHref="/library" />
+                        SecondaryHref="library" />
     }
     else
     {
@@ -36,7 +36,7 @@
             <AppCard>
                 <SeriesForm Model="Form"
                             SubmitLabel="Save Changes"
-                            CancelHref="@($"/series/{Id}")"
+                            CancelHref="@($"series/{Id}")"
                             FieldPrefix="series-edit"
                             ExternalErrorMessage="@ErrorMessage"
                             IsBusy="IsSaving"
@@ -66,8 +66,8 @@
                     </div>
 
                     <div class="flex flex-wrap gap-3">
-                        <AppButton Href="@($"/series/{Id}")" Variant="secondary">Back to Details</AppButton>
-                        <AppButton Href="/library" Variant="secondary">Open Library</AppButton>
+                        <AppButton Href="@($"series/{Id}")" Variant="secondary">Back to Details</AppButton>
+                        <AppButton Href="library" Variant="secondary">Open Library</AppButton>
                     </div>
                 </div>
             </AppCard>

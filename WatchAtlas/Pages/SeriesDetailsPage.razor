@@ -23,9 +23,9 @@
                         Title="No series found."
                         Description="Create a series first, then return here to review seasons, episodes, and progress."
                         PrimaryLabel="Create Series"
-                        PrimaryHref="/series/new"
+                        PrimaryHref="series/new"
                         SecondaryLabel="Return to Library"
-                        SecondaryHref="/library" />
+                        SecondaryHref="library" />
     }
     else
     {
@@ -127,8 +127,8 @@
                     </div>
 
                     <div class="flex flex-wrap gap-3">
-                        <AppButton Href="@($"/series/{Id}/edit")" Variant="secondary">Quick Edit</AppButton>
-                        <AppButton Href="/library" Variant="secondary">Open Library</AppButton>
+                        <AppButton Href="@($"series/{Id}/edit")" Variant="secondary">Quick Edit</AppButton>
+                        <AppButton Href="library" Variant="secondary">Open Library</AppButton>
                     </div>
                 </div>
 
@@ -144,7 +144,7 @@
                     {
                         var season = Entry.Series?.Seasons.FirstOrDefault(item => item.Id == seasonStats.SeasonId);
 
-                        <details class="series-accordion" open>
+                        <details class="series-accordion">
                             <summary class="series-accordion__summary">
                                 <div class="space-y-2">
                                     <div class="flex flex-wrap items-center gap-2">
@@ -234,7 +234,7 @@
     private string? ErrorMessage { get; set; }
 
     private RenderFragment ActionButtons => @<div class="flex flex-wrap gap-3">
-        <AppButton Href="@($"/series/{Id}/edit")" Variant="secondary">Edit Series</AppButton>
+        <AppButton Href="@($"series/{Id}/edit")" Variant="secondary">Edit Series</AppButton>
         <AppButton OnClick="OpenDeleteModalAsync">Delete Series</AppButton>
     </div>;
 

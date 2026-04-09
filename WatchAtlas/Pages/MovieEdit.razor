@@ -22,9 +22,9 @@
                         Title="Movie not found."
                         Description="Create a movie first or return to the library to pick an existing item."
                         PrimaryLabel="Create Movie"
-                        PrimaryHref="/movies/new"
+                        PrimaryHref="movies/new"
                         SecondaryLabel="Open Library"
-                        SecondaryHref="/library" />
+                        SecondaryHref="library" />
     }
     else
     {
@@ -36,7 +36,7 @@
             <AppCard>
                 <MovieForm Model="Form"
                            SubmitLabel="Save Changes"
-                           CancelHref="@($"/movies/{Id}")"
+                           CancelHref="@($"movies/{Id}")"
                            FieldPrefix="movie-edit"
                            ExternalErrorMessage="@ErrorMessage"
                            IsBusy="IsSaving"
@@ -66,8 +66,8 @@
                     </div>
 
                     <div class="flex flex-wrap gap-3">
-                        <AppButton Href="@($"/movies/{Id}")" Variant="secondary">Back to Details</AppButton>
-                        <AppButton Href="/library" Variant="secondary">Open Library</AppButton>
+                        <AppButton Href="@($"movies/{Id}")" Variant="secondary">Back to Details</AppButton>
+                        <AppButton Href="library" Variant="secondary">Open Library</AppButton>
                     </div>
                 </div>
             </AppCard>

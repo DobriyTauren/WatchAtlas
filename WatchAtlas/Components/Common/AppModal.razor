@@ -2,6 +2,7 @@
 {
     <div class="app-modal-backdrop" @onclick="HandleBackdropClick">
         <div class="app-modal-panel"
+             @ref="PanelRef"
              role="dialog"
              aria-modal="true"
              aria-labelledby="@TitleId"
@@ -39,6 +40,9 @@
 }
 
 @code {
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = default!;
+
     [Parameter]
     public bool IsOpen { get; set; }
 
@@ -63,6 +67,18 @@
     private string TitleId { get; } = $"modal-title-{Guid.NewGuid():N}";
     private string DescriptionId { get; } = $"modal-description-{Guid.NewGuid():N}";
     private string? AriaDescriptionId => !string.IsNullOrWhiteSpace(Description) ? DescriptionId : null;
+    private ElementReference PanelRef { get; set; }
+    private bool WasOpen { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (IsOpen && !WasOpen)
+        {
+            await JsRuntime.InvokeVoidAsync("watchAtlasStorage.focusModal", PanelRef);
+        }
+
+        WasOpen = IsOpen;
+    }
 
     private Task HandleBackdropClick()
         => CloseOnBackdropClick ? OnClose.InvokeAsync() : Task.CompletedTask;

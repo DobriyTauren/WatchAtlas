@@ -112,9 +112,9 @@
                         Title="Your library is still empty."
                         Description="Start by adding your first movie or series. Once it is saved, this page becomes your main browsing hub for search, filters, and progress tracking."
                         PrimaryLabel="Add First Entry"
-                        PrimaryHref="/media/new"
+                        PrimaryHref="media/new"
                         SecondaryLabel="Open Settings"
-                        SecondaryHref="/settings" />
+                        SecondaryHref="settings" />
     }
     else if (FilteredEntries.Count == 0)
     {
@@ -126,7 +126,7 @@
 
                 <div class="flex flex-wrap justify-center gap-3 pt-2">
                     <AppButton Variant="secondary" OnClick="ClearFiltersAsync">Reset Filters</AppButton>
-                    <AppButton Href="/media/new">Add New Item</AppButton>
+                    <AppButton Href="media/new">Add New Item</AppButton>
                 </div>
             </div>
         </AppCard>

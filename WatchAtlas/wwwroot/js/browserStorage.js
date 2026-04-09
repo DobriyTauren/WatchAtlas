@@ -31,5 +31,25 @@ window.watchAtlasStorage = {
             URL.revokeObjectURL(url);
         } catch {
         }
+    },
+    focusModal: function (element) {
+        try {
+            if (!element) {
+                return;
+            }
+
+            element.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+                inline: "nearest"
+            });
+
+            if (typeof element.focus === "function") {
+                window.setTimeout(function () {
+                    element.focus({ preventScroll: true });
+                }, 120);
+            }
+        } catch {
+        }
     }
 };
