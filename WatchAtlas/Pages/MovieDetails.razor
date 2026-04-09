@@ -224,7 +224,7 @@
             ErrorMessage = null;
             await LibraryState.DeleteAsync(Entry.Media.Id);
             ToastState.ShowSuccess("Movie deleted.", $"\"{deletedTitle}\" was removed from your library.");
-            NavigationManager.NavigateTo("/library");
+            NavigationManager.NavigateTo("library");
         }
         catch (Exception exception)
         {

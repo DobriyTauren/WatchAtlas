@@ -42,7 +42,7 @@
 
             await LibraryState.AddAsync(media, null, series);
             ToastState.ShowSuccess("Series created.", "The new series has been saved in your library.");
-            NavigationManager.NavigateTo($"/series/{media.Id}");
+            NavigationManager.NavigateTo(MediaRouteHelper.GetDetailsHref(media));
         }
         catch (Exception exception)
         {

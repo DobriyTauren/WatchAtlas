@@ -299,7 +299,7 @@
             ErrorMessage = null;
             await LibraryState.DeleteAsync(Entry.Media.Id);
             ToastState.ShowSuccess("Series deleted.", $"\"{deletedTitle}\" and its tracked progress were removed.");
-            NavigationManager.NavigateTo("/library");
+            NavigationManager.NavigateTo("library");
         }
         catch (Exception exception)
         {

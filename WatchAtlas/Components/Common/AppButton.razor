@@ -1,6 +1,6 @@
 @if (!string.IsNullOrWhiteSpace(Href))
 {
-    <a href="@Href" class="@CssClass" @attributes="AdditionalAttributes">@ChildContent</a>
+    <a href="@ResolvedHref" class="@CssClass" @attributes="AdditionalAttributes">@ChildContent</a>
 }
 else
 {
@@ -19,6 +19,9 @@ else
 }
 
 @code {
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
     [Parameter]
     public string? Href { get; set; }
 
@@ -50,6 +53,30 @@ else
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
 
     private bool IsActuallyDisabled => Disabled || IsLoading;
+
+    private string? ResolvedHref
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Href))
+            {
+                return Href;
+            }
+
+            if (Uri.TryCreate(Href, UriKind.Absolute, out _)
+                || Href.StartsWith('#')
+                || Href.StartsWith('?')
+                || Href.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase)
+                || Href.StartsWith("tel:", StringComparison.OrdinalIgnoreCase))
+            {
+                return Href;
+            }
+
+            return Href.StartsWith('/')
+                ? new Uri(new Uri(NavigationManager.BaseUri), Href.TrimStart('/')).ToString()
+                : Href;
+        }
+    }
 
     private string CssClass => string.Join(" ", new[]
     {

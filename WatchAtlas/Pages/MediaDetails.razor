@@ -174,7 +174,7 @@
             ErrorMessage = null;
 
             await LibraryState.DeleteAsync(Media.Id);
-            NavigationManager.NavigateTo("/library");
+            NavigationManager.NavigateTo("library");
         }
         catch (Exception exception)
         {

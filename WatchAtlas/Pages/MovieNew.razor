@@ -42,7 +42,7 @@
 
             await LibraryState.AddAsync(media, movie, null);
             ToastState.ShowSuccess("Movie created.", "The new movie has been saved in your library.");
-            NavigationManager.NavigateTo($"/movies/{media.Id}");
+            NavigationManager.NavigateTo(MediaRouteHelper.GetDetailsHref(media));
         }
         catch (Exception exception)
         {
