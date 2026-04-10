@@ -24,35 +24,81 @@
             @if (UsageSteps.Count > 0 || !string.IsNullOrWhiteSpace(CopyablePrompt))
             {
                 <div class="soft-block space-y-3 p-4">
-                    <div class="flex flex-wrap items-start justify-between gap-3">
-                        <div class="space-y-1">
-                            @if (!string.IsNullOrWhiteSpace(CopyablePrompt))
-                            {
-                                <p class="text-sm font-semibold text-text">@CopyablePromptTitle</p>
-                                <p class="text-sm leading-7 text-muted">@CopyablePromptDescription</p>
-                            }
-                            else
-                            {
-                                <p class="text-sm font-semibold text-text">How to use it</p>
-                                <p class="text-sm leading-7 text-muted">Generate clean markdown first, then paste it here or upload a file.</p>
-                            }
-
-                            @if (!string.IsNullOrWhiteSpace(CopyablePrompt))
-                            {
-                                <p class="text-xs leading-6 text-muted">The full prompt will be copied to your clipboard.</p>
-                            }
-                        </div>
+                    <div class="space-y-1">
+                        @if (!string.IsNullOrWhiteSpace(CopyablePrompt))
+                        {
+                            <p class="text-sm font-semibold text-text">@CopyablePromptTitle</p>
+                            <p class="text-sm leading-7 text-muted">@CopyablePromptDescription</p>
+                        }
+                        else
+                        {
+                            <p class="text-sm font-semibold text-text">How to use it</p>
+                            <p class="text-sm leading-7 text-muted">Generate clean markdown first, then paste it here.</p>
+                        }
 
                         @if (!string.IsNullOrWhiteSpace(CopyablePrompt))
                         {
+                            <p class="text-xs leading-6 text-muted">The full prompt will be copied to your clipboard.</p>
+                        }
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(PromptPrimaryToken) || !string.IsNullOrWhiteSpace(PromptSecondaryToken))
+                    {
+                        <div class="space-y-3">
+                            @if (!string.IsNullOrWhiteSpace(PromptPrimaryToken))
+                            {
+                                <div class="app-field space-y-2">
+                                    <label class="app-field-label" for="@($"{FieldPrefix}-prompt-primary")">@PromptPrimaryLabel</label>
+
+                                    <div class="flex items-center gap-3">
+                                        <input id="@($"{FieldPrefix}-prompt-primary")"
+                                               type="text"
+                                               class="app-input flex-1"
+                                               value="@PrimaryPromptValue"
+                                               placeholder="@PromptPrimaryPlaceholder"
+                                               @oninput="HandlePrimaryPromptInput" />
+
+                                        @if (!string.IsNullOrWhiteSpace(CopyablePrompt))
+                                        {
+                                            <AppButton Variant="secondary"
+                                                       Size="sm"
+                                                       Disabled="@IsBusy"
+                                                       OnClick="CopyPromptAsync">
+                                                Copy Prompt
+                                            </AppButton>
+                                        }
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(PromptPrimaryHelpText))
+                                    {
+                                        <p class="app-field-help">@PromptPrimaryHelpText</p>
+                                    }
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(PromptSecondaryToken))
+                            {
+                                <AppInput Id="@($"{FieldPrefix}-prompt-secondary")"
+                                          Label="@PromptSecondaryLabel"
+                                          Value="@SecondaryPromptValue"
+                                          ValueChanged="HandleSecondaryPromptChanged"
+                                          Placeholder="@PromptSecondaryPlaceholder"
+                                          HelpText="@PromptSecondaryHelpText" />
+                            }
+                        </div>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(CopyablePrompt))
+                    {
+                        <div class="flex justify-start lg:justify-end">
                             <AppButton Variant="secondary"
                                        Size="sm"
+                                       style="border-radius: 1rem; white-space: nowrap;"
                                        Disabled="@IsBusy"
                                        OnClick="CopyPromptAsync">
                                 Copy Prompt
                             </AppButton>
-                        }
-                    </div>
+                        </div>
+                    }
 
                     @if (UsageSteps.Count > 0)
                     {
@@ -88,6 +134,8 @@
     private bool IsBusy { get; set; }
     private string MarkdownText { get; set; } = string.Empty;
     private string? InlineErrorMessage { get; set; }
+    private string PrimaryPromptValue { get; set; } = string.Empty;
+    private string SecondaryPromptValue { get; set; } = string.Empty;
 
     [Parameter, EditorRequired]
     public string ButtonLabel { get; set; } = default!;
@@ -126,6 +174,36 @@
     public string CopyablePromptDescription { get; set; } = "Copy this prompt into ChatGPT or another assistant, then paste the generated markdown back here.";
 
     [Parameter]
+    public string? PromptPrimaryToken { get; set; }
+
+    [Parameter]
+    public string PromptPrimaryLabel { get; set; } = "Title";
+
+    [Parameter]
+    public string PromptPrimaryPlaceholder { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? PromptPrimaryHelpText { get; set; }
+
+    [Parameter]
+    public string? PromptPrimaryValue { get; set; }
+
+    [Parameter]
+    public string? PromptSecondaryToken { get; set; }
+
+    [Parameter]
+    public string PromptSecondaryLabel { get; set; } = "Additional details";
+
+    [Parameter]
+    public string PromptSecondaryPlaceholder { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? PromptSecondaryHelpText { get; set; }
+
+    [Parameter]
+    public string? PromptSecondaryValue { get; set; }
+
+    [Parameter]
     public string ConfirmLabel { get; set; } = "Fill Form";
 
     [Parameter]
@@ -146,6 +224,8 @@
     private Task OpenAsync(MouseEventArgs _)
     {
         InlineErrorMessage = null;
+        PrimaryPromptValue = PromptPrimaryValue ?? string.Empty;
+        SecondaryPromptValue = PromptSecondaryValue ?? string.Empty;
         IsOpen = true;
         return Task.CompletedTask;
     }
@@ -172,6 +252,23 @@
         return Task.CompletedTask;
     }
 
+    private Task HandlePrimaryPromptChanged(string? value)
+    {
+        PrimaryPromptValue = value ?? string.Empty;
+        InlineErrorMessage = null;
+        return Task.CompletedTask;
+    }
+
+    private Task HandlePrimaryPromptInput(ChangeEventArgs args)
+        => HandlePrimaryPromptChanged(args.Value?.ToString());
+
+    private Task HandleSecondaryPromptChanged(string? value)
+    {
+        SecondaryPromptValue = value ?? string.Empty;
+        InlineErrorMessage = null;
+        return Task.CompletedTask;
+    }
+
     private async Task CopyPromptAsync(MouseEventArgs _)
     {
         if (string.IsNullOrWhiteSpace(CopyablePrompt))
@@ -181,8 +278,8 @@
 
         try
         {
-            await JsRuntime.InvokeVoidAsync("watchAtlasStorage.copyText", CopyablePrompt);
-            ToastState.ShowSuccess("Prompt copied.", "Paste it into your assistant and replace the placeholders before generating the markdown.");
+            await JsRuntime.InvokeVoidAsync("watchAtlasStorage.copyText", BuildPrompt());
+            ToastState.ShowSuccess("Prompt copied.", "Paste it into your assistant and generate the markdown from the prepared prompt.");
         }
         catch (Exception exception)
         {
@@ -194,7 +291,7 @@
     {
         if (string.IsNullOrWhiteSpace(MarkdownText))
         {
-            InlineErrorMessage = "Paste markdown or choose a markdown file first.";
+            InlineErrorMessage = "Paste markdown first.";
             return;
         }
 
@@ -217,5 +314,22 @@
         {
             IsBusy = false;
         }
+    }
+
+    private string BuildPrompt()
+    {
+        var prompt = CopyablePrompt;
+
+        if (!string.IsNullOrWhiteSpace(PromptPrimaryToken))
+        {
+            prompt = prompt.Replace(PromptPrimaryToken, string.IsNullOrWhiteSpace(PrimaryPromptValue) ? PromptPrimaryToken : PrimaryPromptValue, StringComparison.Ordinal);
+        }
+
+        if (!string.IsNullOrWhiteSpace(PromptSecondaryToken))
+        {
+            prompt = prompt.Replace(PromptSecondaryToken, string.IsNullOrWhiteSpace(SecondaryPromptValue) ? PromptSecondaryToken : SecondaryPromptValue, StringComparison.Ordinal);
+        }
+
+        return prompt;
     }
 }

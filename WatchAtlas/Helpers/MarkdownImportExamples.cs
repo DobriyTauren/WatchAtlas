@@ -4,21 +4,19 @@ public static class MarkdownImportExamples
 {
     public static IReadOnlyList<string> MovieImportSteps =>
     [
-        "Copy the AI prompt below and paste it into ChatGPT, Claude, or another assistant.",
-        "Replace the placeholder with the exact movie title you want to import.",
+        "Enter the exact movie title below and copy the AI prompt.",
         "Paste the returned markdown here without extra commentary and click Fill Form."
     ];
 
     public static IReadOnlyList<string> SeriesImportSteps =>
     [
-        "Copy the AI prompt below and paste it into ChatGPT, Claude, or another assistant.",
-        "Replace the placeholder with the exact series title you want to import.",
+        "Enter the exact series title below and copy the AI prompt.",
         "Paste the returned markdown here without extra commentary and click Fill Form."
     ];
 
     public static IReadOnlyList<string> SeasonImportSteps =>
     [
-        "Copy the season prompt below and ask your assistant for the missing seasons only.",
+        "Enter the series title and the seasons you want to add, then copy the AI prompt.",
         "Keep the answer as raw markdown with no code fences or extra text.",
         "Paste the result here to append the new seasons to the current series draft."
     ];
@@ -80,7 +78,7 @@ public static class MarkdownImportExamples
         Rating: 10
         Notes: Keep special episodes marked as watched.
 
-        ## Season 1: Book One
+        ## Season 1: 2021
         - Episode 1: Welcome to the Playground
           - Duration: 43
           - Watched: yes
@@ -89,10 +87,10 @@ public static class MarkdownImportExamples
           - Duration: 41
           - Watched: yes
 
-        ## Season 2
-        - Episode 1: Heavy Is the Crown
+        ## Season 2: 2024 (planned)
+        - Episode 9: Heavy Is the Crown
           - Duration: 44
-        - Episode 2: Watch It All Burn
+        - Episode 10: Watch It All Burn
           - Duration: 42
         """;
 
@@ -112,6 +110,14 @@ public static class MarkdownImportExamples
         - Use episode duration as minutes only, for example `Duration: 42`.
         - Use `Watched: yes` or `Watched: no` only if that status is clearly known.
         - Include `Watched Date:` only when an exact watch date is known.
+        - Always put the season year in the season title position after the colon, for example `## Season 1: 2021`.
+        - For officially announced but unreleased seasons, still include the planned year in that same title position, for example `## Season 3: 2026 (planned)`.
+        - Include not only released episodes, but also officially announced upcoming seasons or episodes that have not aired yet.
+        - If a future season is officially announced, include its episode list too whenever episode count, numbering, or titles are already known.
+        - If a future season is announced but episode titles are not published yet, still list the announced episode numbers as `Episode 1`, `Episode 2`, and so on whenever the episode count or numbering is known.
+        - Continue episode numbering from the previous seasons already listed in the same markdown instead of restarting from 1 in each new season.
+        - Do not invent unconfirmed future episodes or placeholder items that have not been officially announced.
+        - For announced but unreleased episodes, omit `Watched Date:` and omit `Duration:` if it is not confirmed yet.
 
         Use exactly this structure:
 
@@ -123,21 +129,22 @@ public static class MarkdownImportExamples
         Rating:
         Notes:
 
-        ## Season 1: Optional Season Title
+        ## Season 1: 2021
         - Episode 1: Episode Title
           - Duration: 42
           - Watched: no
 
-        ## Season 2
-        - Episode 1: Episode Title
+        ## Season 2: 2026 (planned)
+        - Episode 9: Episode Title
           - Duration: 44
+        - Episode 10
 
-        Include all released seasons and episodes for: [SERIES TITLE]
+        Include all released seasons and episodes, plus officially announced upcoming seasons or episodes, for: [SERIES TITLE]
         """;
 
     public static string Season =>
         """
-        ## Season 3: Final Chapter
+        ## Season 3: 2026
         - Episode 1: First Light
           - Duration: 46
         - Episode 2: The Last Signal
@@ -161,16 +168,25 @@ public static class MarkdownImportExamples
         - Use minutes only for duration, for example `Duration: 47`.
         - Use `Watched: yes` or `Watched: no` only if that status is clearly known.
         - Include `Watched Date:` only when an exact watch date is known.
+        - Always put the season year in the season title position after the colon, for example `## Season 3: 2026`.
+        - For officially announced but unreleased seasons, put the planned year in that same title position, for example `## Season 4: 2027 (planned)`.
+        - Include officially announced upcoming episodes even if they have not aired yet.
+        - If the target season is planned but already has announced episode count, numbering, or titles, include those episode entries too.
+        - If titles are not published yet, still list the announced episode numbers as `Episode 1`, `Episode 2`, and so on whenever the episode count or numbering is known.
+        - Continue episode numbering from the previous seasons already listed in the same markdown instead of restarting from 1 in each new season.
+        - Do not invent unconfirmed future episodes or placeholder items that have not been officially announced.
+        - For announced but unreleased episodes, omit `Watched Date:` and omit `Duration:` if it is not confirmed yet.
 
         Use exactly this structure:
 
-        ## Season 3: Optional Season Title
+        ## Season 3: 2026
         - Episode 1: Episode Title
           - Duration: 46
 
-        ## Season 4
-        - Episode 1: Episode Title
+        ## Season 4: 2027 (planned)
+        - Episode 9: Episode Title
           - Duration: 49
+        - Episode 10
 
         Create seasons for: [SERIES TITLE]
         Seasons to add: [SEASONS TO ADD]

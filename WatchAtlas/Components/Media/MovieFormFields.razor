@@ -77,7 +77,11 @@
     private Task HandleWatchedChanged(bool value)
     {
         Model.IsWatched = value;
-        if (!value)
+        if (value)
+        {
+            Model.WatchedDate ??= DateTime.Today;
+        }
+        else
         {
             Model.WatchedDate = null;
         }
