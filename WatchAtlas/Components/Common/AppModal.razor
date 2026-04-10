@@ -3,6 +3,7 @@
     <div class="app-modal-backdrop" @onclick="HandleBackdropClick">
         <div class="app-modal-panel"
              @ref="PanelRef"
+             style="max-height: calc(100vh - 2rem); overflow-y: auto;"
              role="dialog"
              aria-modal="true"
              aria-labelledby="@TitleId"

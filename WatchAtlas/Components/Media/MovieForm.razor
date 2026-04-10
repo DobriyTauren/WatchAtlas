@@ -17,25 +17,33 @@
             <ValidationSummary class="space-y-1 rounded-3xl border border-red-200/70 bg-red-50/80 px-4 py-3 text-sm text-red-700" />
         }
 
-        <div class="flex flex-wrap gap-3">
-            <MarkdownImportLauncher ButtonLabel="Fill From Markdown"
-                                    ModalTitle="Fill this movie from markdown"
-                                    ModalDescription="Paste prepared markdown or upload a markdown file, and WatchAtlas will fill the movie form for you."
-                                    ExampleMarkdown="@MarkdownImportExamples.Movie"
-                                    FieldPrefix="@($"{FieldPrefix}-markdown")"
-                                    OnConfirmAsync="@(HandleMarkdownImportAsync)" />
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div class="flex flex-wrap gap-3">
+                <MarkdownImportLauncher ButtonLabel="Fill From Markdown"
+                                        ModalTitle="Fill this movie from markdown"
+                                        ModalDescription="Paste one clean markdown document for a single movie, or copy the AI prompt below to generate it automatically in the right format."
+                                        ExampleMarkdown="@MarkdownImportExamples.Movie"
+                                        ExampleTitle="See a movie example"
+                                        UsageSteps="@MarkdownImportExamples.MovieImportSteps"
+                                        CopyablePrompt="@MarkdownImportExamples.MovieAiPrompt"
+                                        CopyablePromptTitle="Prompt for ChatGPT or Claude"
+                                        CopyablePromptDescription="Copy this, replace the placeholder with the exact movie title, and ask your assistant for import-ready markdown."
+                                        Placeholder="# Movie&#10;Title: ...&#10;Genres: ...&#10;Duration: 120"
+                                        FieldPrefix="@($"{FieldPrefix}-markdown")"
+                                        OnConfirmAsync="@(HandleMarkdownImportAsync)" />
+            </div>
+
+            <div class="flex flex-wrap gap-3 lg:justify-end">
+                <AppButton Type="submit" IsLoading="@IsBusy">@SubmitLabel</AppButton>
+
+                @if (!string.IsNullOrWhiteSpace(CancelHref))
+                {
+                    <AppButton Href="@CancelHref" Variant="secondary">Cancel</AppButton>
+                }
+            </div>
         </div>
 
         <MovieFormFields Model="Model" FieldPrefix="@FieldPrefix" />
-
-        <div class="flex flex-wrap gap-3">
-            <AppButton Type="submit" IsLoading="@IsBusy">@SubmitLabel</AppButton>
-
-            @if (!string.IsNullOrWhiteSpace(CancelHref))
-            {
-                <AppButton Href="@CancelHref" Variant="secondary">Cancel</AppButton>
-            }
-        </div>
     </div>
 </EditForm>
 
