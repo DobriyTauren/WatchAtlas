@@ -7,7 +7,7 @@ namespace WatchAtlas.Models.Forms;
 
 public class MovieFormModel : IValidatableObject
 {
-    [Required(ErrorMessage = "Title is required.")]
+    [Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.TitleRequired))]
     public string Title { get; set; } = string.Empty;
 
     public string? CoverImageUrl { get; set; }
@@ -16,12 +16,12 @@ public class MovieFormModel : IValidatableObject
 
     public string GenresText { get; set; } = string.Empty;
 
-    [Range(1, 10, ErrorMessage = "Rating should be between 1 and 10.")]
+    [Range(1, 10, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.RatingRange))]
     public int? PersonalRating { get; set; }
 
     public string? Notes { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "Duration must be greater than zero.")]
+    [Range(1, int.MaxValue, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.DurationPositive))]
     public int? DurationMinutes { get; set; }
 
     public bool IsWatched { get; set; }
@@ -33,14 +33,14 @@ public class MovieFormModel : IValidatableObject
         if (!CoverImageValueHelper.IsValidStoredValue(CoverImageUrl))
         {
             yield return new ValidationResult(
-                "Enter a valid http/https image URL or upload an image file.",
+                ValidationMessages.CoverImageInvalid,
                 new[] { nameof(CoverImageUrl) });
         }
 
         if (WatchedDate.HasValue && !IsWatched)
         {
             yield return new ValidationResult(
-                "Watched date can only be set when the movie is marked as watched.",
+                ValidationMessages.MovieWatchedDateRequiresStatus,
                 new[] { nameof(WatchedDate), nameof(IsWatched) });
         }
     }

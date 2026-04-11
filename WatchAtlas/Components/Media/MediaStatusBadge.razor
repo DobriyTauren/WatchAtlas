@@ -6,9 +6,9 @@
 
     private string Label => Status switch
     {
-        WatchStatus.Completed => "Completed",
-        WatchStatus.InProgress => "In Progress",
-        _ => "Not Started"
+        WatchStatus.Completed => L["Completed"],
+        WatchStatus.InProgress => L["In Progress"],
+        _ => L["Not Started"]
     };
 
     private string Variant => Status switch

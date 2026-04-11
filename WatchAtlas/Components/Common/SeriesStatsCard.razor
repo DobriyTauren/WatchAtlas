@@ -17,18 +17,18 @@
             }
         </div>
 
-        <ProgressBar Label="Completion"
+        <ProgressBar Label="@L["Completion"]"
                      Value="@Statistics.CompletionPercent"
                      Max="100" />
 
         <div class="grid gap-3 text-sm text-muted sm:grid-cols-2">
             <div class="soft-block p-4">
-                <p class="font-semibold text-text">Episodes</p>
-                <p class="mt-1">@Statistics.WatchedEpisodes / @Statistics.TotalEpisodes watched</p>
+                <p class="font-semibold text-text">@L["Episodes"]</p>
+                <p class="mt-1">@L.Format("{0} / {1} watched", Statistics.WatchedEpisodes, Statistics.TotalEpisodes)</p>
             </div>
 
             <div class="soft-block p-4">
-                <p class="font-semibold text-text">Watch Time</p>
+                <p class="font-semibold text-text">@L["Watch Time"]</p>
                 <p class="mt-1">@Statistics.WatchedMinutes.ToReadableDuration()</p>
             </div>
         </div>

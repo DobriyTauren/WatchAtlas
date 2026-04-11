@@ -41,7 +41,7 @@ public class ImageService : IImageService
         {
             return new CoverImageProcessingResult
             {
-                ErrorMessage = "Unsupported image type. Please use JPG, PNG, WEBP, or GIF."
+                ErrorMessage = LocalizedText.Translate("Unsupported image type. Please use JPG, PNG, WEBP, or GIF.")
             };
         }
 

@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
 @implements IDisposable
+@inject LocalizationState LocalizationState
 @inject ThemeState ThemeState
 
 <div class="app-shell-theme relative min-h-screen overflow-hidden" data-theme="@ThemeState.CurrentTheme.ThemeKey">
@@ -27,6 +28,7 @@
 @code {
     protected override void OnInitialized()
     {
+        LocalizationState.Changed += HandleLocalizationChanged;
         ThemeState.Changed += HandleThemeChanged;
     }
 
@@ -40,8 +42,11 @@
 
     private void HandleThemeChanged() => InvokeAsync(StateHasChanged);
 
+    private void HandleLocalizationChanged() => InvokeAsync(StateHasChanged);
+
     public void Dispose()
     {
+        LocalizationState.Changed -= HandleLocalizationChanged;
         ThemeState.Changed -= HandleThemeChanged;
     }
 }

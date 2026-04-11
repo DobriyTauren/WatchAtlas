@@ -27,18 +27,18 @@
                     <div class="space-y-1">
                         @if (!string.IsNullOrWhiteSpace(CopyablePrompt))
                         {
-                            <p class="text-sm font-semibold text-text">@CopyablePromptTitle</p>
-                            <p class="text-sm leading-7 text-muted">@CopyablePromptDescription</p>
+                            <p class="text-sm font-semibold text-text">@ResolvedCopyablePromptTitle</p>
+                            <p class="text-sm leading-7 text-muted">@ResolvedCopyablePromptDescription</p>
                         }
                         else
                         {
-                            <p class="text-sm font-semibold text-text">How to use it</p>
-                            <p class="text-sm leading-7 text-muted">Generate clean markdown first, then paste it here.</p>
+                            <p class="text-sm font-semibold text-text">@L["How to use it"]</p>
+                            <p class="text-sm leading-7 text-muted">@L["Generate clean markdown first, then paste it here."]</p>
                         }
 
                         @if (!string.IsNullOrWhiteSpace(CopyablePrompt))
                         {
-                            <p class="text-xs leading-6 text-muted">The full prompt will be copied to your clipboard.</p>
+                            <p class="text-xs leading-6 text-muted">@L["The full prompt will be copied to your clipboard."]</p>
                         }
                     </div>
 
@@ -48,7 +48,7 @@
                             @if (!string.IsNullOrWhiteSpace(PromptPrimaryToken))
                             {
                                 <div class="app-field space-y-2">
-                                    <label class="app-field-label" for="@($"{FieldPrefix}-prompt-primary")">@PromptPrimaryLabel</label>
+                                    <label class="app-field-label" for="@($"{FieldPrefix}-prompt-primary")">@ResolvedPromptPrimaryLabel</label>
 
                                     <div class="flex items-center gap-3">
                                         <input id="@($"{FieldPrefix}-prompt-primary")"
@@ -64,7 +64,7 @@
                                                        Size="sm"
                                                        Disabled="@IsBusy"
                                                        OnClick="CopyPromptAsync">
-                                                Copy Prompt
+                                                @L["Copy Prompt"]
                                             </AppButton>
                                         }
                                     </div>
@@ -79,7 +79,7 @@
                             @if (!string.IsNullOrWhiteSpace(PromptSecondaryToken))
                             {
                                 <AppInput Id="@($"{FieldPrefix}-prompt-secondary")"
-                                          Label="@PromptSecondaryLabel"
+                                          Label="@ResolvedPromptSecondaryLabel"
                                           Value="@SecondaryPromptValue"
                                           ValueChanged="HandleSecondaryPromptChanged"
                                           Placeholder="@PromptSecondaryPlaceholder"
@@ -95,7 +95,7 @@
                                        style="border-radius: 1rem; white-space: nowrap;"
                                        Disabled="@IsBusy"
                                        OnClick="CopyPromptAsync">
-                                Copy Prompt
+                                @L["Copy Prompt"]
                             </AppButton>
                         </div>
                     }
@@ -113,19 +113,19 @@
             }
 
             <AppTextarea Id="@($"{FieldPrefix}-markdown")"
-                         Label="@TextareaLabel"
+                         Label="@ResolvedTextareaLabel"
                          Value="@MarkdownText"
                          ValueChanged="HandleMarkdownChanged"
                          Placeholder="@Placeholder"
-                         HelpText="@HelpText"
+                         HelpText="@ResolvedHelpText"
                          TextareaClassName="font-mono text-xs leading-6"
                          style="min-height: 14rem;" />
 
         </div>
     </ChildContent>
     <Footer>
-        <AppButton Variant="secondary" Disabled="@IsBusy" OnClick="CloseButtonAsync">Cancel</AppButton>
-        <AppButton IsLoading="@IsBusy" OnClick="HandleConfirmAsync">@ConfirmLabel</AppButton>
+        <AppButton Variant="secondary" Disabled="@IsBusy" OnClick="CloseButtonAsync">@L["Cancel"]</AppButton>
+        <AppButton IsLoading="@IsBusy" OnClick="HandleConfirmAsync">@ResolvedConfirmLabel</AppButton>
     </Footer>
 </AppModal>
 
@@ -147,10 +147,10 @@
     public string ModalDescription { get; set; } = default!;
 
     [Parameter]
-    public string TextareaLabel { get; set; } = "Markdown";
+    public string TextareaLabel { get; set; } = string.Empty;
 
     [Parameter]
-    public string HelpText { get; set; } = "Paste prepared markdown here after generating it with your assistant.";
+    public string HelpText { get; set; } = string.Empty;
 
     [Parameter]
     public string Placeholder { get; set; } = string.Empty;
@@ -159,7 +159,7 @@
     public string ExampleMarkdown { get; set; } = string.Empty;
 
     [Parameter]
-    public string ExampleTitle { get; set; } = "See an example";
+    public string ExampleTitle { get; set; } = string.Empty;
 
     [Parameter]
     public IReadOnlyList<string> UsageSteps { get; set; } = [];
@@ -168,16 +168,16 @@
     public string CopyablePrompt { get; set; } = string.Empty;
 
     [Parameter]
-    public string CopyablePromptTitle { get; set; } = "Prompt for AI";
+    public string CopyablePromptTitle { get; set; } = string.Empty;
 
     [Parameter]
-    public string CopyablePromptDescription { get; set; } = "Copy this prompt into ChatGPT or another assistant, then paste the generated markdown back here.";
+    public string CopyablePromptDescription { get; set; } = string.Empty;
 
     [Parameter]
     public string? PromptPrimaryToken { get; set; }
 
     [Parameter]
-    public string PromptPrimaryLabel { get; set; } = "Title";
+    public string PromptPrimaryLabel { get; set; } = string.Empty;
 
     [Parameter]
     public string PromptPrimaryPlaceholder { get; set; } = string.Empty;
@@ -192,7 +192,7 @@
     public string? PromptSecondaryToken { get; set; }
 
     [Parameter]
-    public string PromptSecondaryLabel { get; set; } = "Additional details";
+    public string PromptSecondaryLabel { get; set; } = string.Empty;
 
     [Parameter]
     public string PromptSecondaryPlaceholder { get; set; } = string.Empty;
@@ -204,7 +204,7 @@
     public string? PromptSecondaryValue { get; set; }
 
     [Parameter]
-    public string ConfirmLabel { get; set; } = "Fill Form";
+    public string ConfirmLabel { get; set; } = string.Empty;
 
     [Parameter]
     public string ButtonVariant { get; set; } = "secondary";
@@ -220,6 +220,14 @@
 
     [Parameter, EditorRequired]
     public Func<string, Task<MarkdownImportApplyResult>> OnConfirmAsync { get; set; } = default!;
+
+    private string ResolvedTextareaLabel => string.IsNullOrWhiteSpace(TextareaLabel) ? L["Markdown"] : TextareaLabel;
+    private string ResolvedHelpText => string.IsNullOrWhiteSpace(HelpText) ? L["Paste prepared markdown here after generating it with your assistant."] : HelpText;
+    private string ResolvedCopyablePromptTitle => string.IsNullOrWhiteSpace(CopyablePromptTitle) ? L["Prompt for AI"] : CopyablePromptTitle;
+    private string ResolvedCopyablePromptDescription => string.IsNullOrWhiteSpace(CopyablePromptDescription) ? L["Copy this prompt into ChatGPT or another assistant, then paste the generated markdown back here."] : CopyablePromptDescription;
+    private string ResolvedPromptPrimaryLabel => string.IsNullOrWhiteSpace(PromptPrimaryLabel) ? L["Title"] : PromptPrimaryLabel;
+    private string ResolvedPromptSecondaryLabel => string.IsNullOrWhiteSpace(PromptSecondaryLabel) ? L["Additional details"] : PromptSecondaryLabel;
+    private string ResolvedConfirmLabel => string.IsNullOrWhiteSpace(ConfirmLabel) ? L["Fill Form"] : ConfirmLabel;
 
     private Task OpenAsync(MouseEventArgs _)
     {
@@ -279,11 +287,11 @@
         try
         {
             await JsRuntime.InvokeVoidAsync("watchAtlasStorage.copyText", BuildPrompt());
-            ToastState.ShowSuccess("Prompt copied.", "Paste it into your assistant and generate the markdown from the prepared prompt.");
+            ToastState.ShowSuccess(L["Prompt copied."], L["Paste it into your assistant and generate the markdown from the prepared prompt."]);
         }
         catch (Exception exception)
         {
-            InlineErrorMessage = $"The prompt could not be copied: {exception.Message}";
+            InlineErrorMessage = L.Format("The prompt could not be copied: {0}", exception.Message);
         }
     }
 
@@ -291,7 +299,7 @@
     {
         if (string.IsNullOrWhiteSpace(MarkdownText))
         {
-            InlineErrorMessage = "Paste markdown first.";
+            InlineErrorMessage = L["Paste markdown first."];
             return;
         }
 
@@ -308,7 +316,7 @@
                 return;
             }
 
-            InlineErrorMessage = result.ErrorMessage ?? "The markdown could not be applied.";
+            InlineErrorMessage = result.ErrorMessage ?? L["The markdown could not be applied."];
         }
         finally
         {

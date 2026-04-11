@@ -1,6 +1,39 @@
-﻿<Router AppAssembly="@typeof(App).Assembly" NotFoundPage="typeof(Pages.NotFound)">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-</Router>
+@implements IDisposable
+@inject LocalizationState LocalizationState
+
+@if (LocalizationState.IsInitialized)
+{
+    <Router AppAssembly="@typeof(App).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+    </Router>
+}
+else
+{
+    <div class="min-h-screen bg-surface"></div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        LocalizationState.Changed += HandleLocalizationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LocalizationState.InitializeAsync();
+        }
+    }
+
+    private void HandleLocalizationChanged()
+        => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        LocalizationState.Changed -= HandleLocalizationChanged;
+    }
+}

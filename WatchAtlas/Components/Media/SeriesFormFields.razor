@@ -1,6 +1,6 @@
 <div class="space-y-6">
     <div class="app-field">
-        <label class="app-field-label" for="@($"{FieldPrefix}-title")">Title</label>
+        <label class="app-field-label" for="@($"{FieldPrefix}-title")">@L["Title"]</label>
         <InputText id="@($"{FieldPrefix}-title")" class="app-input" @bind-Value="Model.Title" />
         <ValidationMessage For="@(() => Model.Title)" class="mt-2 block text-sm text-red-600" />
     </div>
@@ -8,54 +8,54 @@
     <CoverUploader Value="@Model.CoverImageUrl"
                    ValueChanged="HandleCoverChanged"
                    FieldPrefix="@FieldPrefix"
-                   PlaceholderBadge="Series"
+                   PlaceholderBadge="@L["Series"]"
                    PlaceholderTitle="@GetPlaceholderTitle()"
-                   PlaceholderCopy="Choose an external cover URL or upload a local series key art image." />
+                   PlaceholderCopy="@L["Choose an external cover URL or upload a local series key art image."]" />
     <ValidationMessage For="@(() => Model.CoverImageUrl)" class="mt-2 block text-sm text-red-600" />
 
     <div class="grid gap-4 sm:grid-cols-2">
         <AppInput Id="@($"{FieldPrefix}-genres")"
-                  Label="Genres"
+                  Label="@L["Genres"]"
                   @bind-Value="Model.GenresText"
                   Placeholder="Drama, Sci-Fi, Comedy" />
 
         <div class="app-field">
-            <label class="app-field-label" for="@($"{FieldPrefix}-rating")">Rating</label>
+            <label class="app-field-label" for="@($"{FieldPrefix}-rating")">@L["Rating"]</label>
             <InputNumber TValue="int?" id="@($"{FieldPrefix}-rating")" class="app-input" @bind-Value="Model.PersonalRating" />
             <ValidationMessage For="@(() => Model.PersonalRating)" class="mt-2 block text-sm text-red-600" />
         </div>
     </div>
 
     <AppTextarea Id="@($"{FieldPrefix}-description")"
-                 Label="Description"
+                 Label="@L["Description"]"
                  @bind-Value="Model.Description"
                  TextareaClassName="min-h-32" />
 
     <AppTextarea Id="@($"{FieldPrefix}-notes")"
-                 Label="Notes"
+                 Label="@L["Notes"]"
                  @bind-Value="Model.Notes"
                  TextareaClassName="min-h-28" />
 
     <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-            <h2 class="text-xl">Season Editor</h2>
-            <p class="mt-1 text-sm text-muted">Build seasons and episodes with quick generation, watch-state bulk actions, and reusable runtime tools.</p>
+            <h2 class="text-xl">@L["Season Editor"]</h2>
+            <p class="mt-1 text-sm text-muted">@L["Build seasons and episodes with quick generation, watch-state bulk actions, and reusable runtime tools."]</p>
         </div>
 
         <div class="flex flex-wrap gap-3">
             <AppButton Variant="secondary"
                        Disabled="@(Model.Seasons.Count == 0)"
                        OnClick="MarkSeriesWatchedAsync">
-                Mark Entire Series Watched
+                @L["Mark Entire Series Watched"]
             </AppButton>
-            <AppButton Variant="secondary" OnClick="AddSeasonAsync">Add Season</AppButton>
+            <AppButton Variant="secondary" OnClick="AddSeasonAsync">@L["Add Season"]</AppButton>
         </div>
     </div>
 
     @if (Model.Seasons.Count == 0)
     {
         <div class="soft-block p-5 text-sm text-muted">
-            No seasons yet. Add one to start structuring the series.
+            @L["No seasons yet. Add one to start structuring the series."]
         </div>
     }
     else
@@ -70,55 +70,55 @@
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div class="grid flex-1 gap-4 sm:grid-cols-[140px,1fr]">
                         <div class="app-field">
-                            <label class="app-field-label">Season Number</label>
+                            <label class="app-field-label">@L["Season Number"]</label>
                             <InputNumber TValue="int" class="app-input" @bind-Value="season.SeasonNumber" />
                         </div>
 
                         <div class="app-field">
-                            <label class="app-field-label">Season Title</label>
+                            <label class="app-field-label">@L["Season Title"]</label>
                             <InputText class="app-input" @bind-Value="season.Title" />
                         </div>
                     </div>
 
-                    <AppButton Variant="ghost" Size="sm" OnClick="@((MouseEventArgs args) => RemoveSeasonAsync(season, args))">Remove</AppButton>
+                    <AppButton Variant="ghost" Size="sm" OnClick="@((MouseEventArgs args) => RemoveSeasonAsync(season, args))">@L["Remove"]</AppButton>
                 </div>
 
                 <div class="grid gap-4 xl:grid-cols-[1.15fr,1fr]">
                     <div class="soft-block space-y-4 p-4">
                         <div class="flex flex-wrap items-center justify-between gap-3">
-                            <h3 class="text-lg">Season Progress</h3>
+                            <h3 class="text-lg">@L["Season Progress"]</h3>
                             <span class="section-chip-muted">@season.Episodes.Count episode(s)</span>
                         </div>
 
-                        <ProgressBar Label="Completion"
+                        <ProgressBar Label="@L["Completion"]"
                                      Value="@completionPercent"
                                      Max="100" />
 
                         <div class="flex flex-wrap gap-3">
-                            <AppButton Variant="secondary" Size="sm" OnClick="@((MouseEventArgs args) => MarkSeasonWatchedAsync(season, args))">Mark Watched</AppButton>
-                            <AppButton Variant="secondary" Size="sm" OnClick="@((MouseEventArgs args) => MarkSeasonUnwatchedAsync(season, args))">Mark Unwatched</AppButton>
+                            <AppButton Variant="secondary" Size="sm" OnClick="@((MouseEventArgs args) => MarkSeasonWatchedAsync(season, args))">@L["Mark Watched"]</AppButton>
+                            <AppButton Variant="secondary" Size="sm" OnClick="@((MouseEventArgs args) => MarkSeasonUnwatchedAsync(season, args))">@L["Mark Unwatched"]</AppButton>
                         </div>
                     </div>
 
                     <div class="soft-block space-y-4 p-4">
-                        <h3 class="text-lg">Bulk Actions</h3>
+                        <h3 class="text-lg">@L["Bulk Actions"]</h3>
 
                         <div class="grid gap-4 sm:grid-cols-[140px,auto] sm:items-end">
                             <div class="app-field">
-                                <label class="app-field-label">Generate Count</label>
+                                <label class="app-field-label">@L["Generate Count"]</label>
                                 <InputNumber TValue="int" class="app-input" @bind-Value="season.GenerateEpisodeCount" />
                             </div>
 
-                            <AppButton Variant="secondary" Size="sm" OnClick="@((MouseEventArgs args) => GenerateEpisodesAsync(season, args))">Generate Episodes</AppButton>
+                            <AppButton Variant="secondary" Size="sm" OnClick="@((MouseEventArgs args) => GenerateEpisodesAsync(season, args))">@L["Generate Episodes"]</AppButton>
                         </div>
 
                         <div class="grid gap-4 sm:grid-cols-[160px,auto] sm:items-end">
                             <div class="app-field">
-                                <label class="app-field-label">Shared Duration</label>
+                                <label class="app-field-label">@L["Shared Duration"]</label>
                                 <InputNumber TValue="int?" class="app-input" @bind-Value="season.SharedDurationMinutes" />
                             </div>
 
-                            <AppButton Variant="secondary" Size="sm" OnClick="@((MouseEventArgs args) => ApplySharedDurationAsync(season, args))">Apply To All Episodes</AppButton>
+                            <AppButton Variant="secondary" Size="sm" OnClick="@((MouseEventArgs args) => ApplySharedDurationAsync(season, args))">@L["Apply To All Episodes"]</AppButton>
                         </div>
                     </div>
                 </div>
@@ -126,7 +126,7 @@
                 <div class="space-y-3">
                     @if (season.Episodes.Count == 0)
                     {
-                        <div class="soft-block p-4 text-sm text-muted">No episodes in this season yet.</div>
+                        <div class="soft-block p-4 text-sm text-muted">@L["No episodes in this season yet."]</div>
                     }
                     else
                     {
@@ -135,40 +135,40 @@
                             <article @key="episode.Id" class="soft-block space-y-4 p-4">
                                 <div class="grid gap-4 lg:grid-cols-[120px,1fr,160px]">
                                     <div class="app-field">
-                                        <label class="app-field-label">Episode #</label>
+                                        <label class="app-field-label">@L["Episode #"]</label>
                                         <InputNumber TValue="int" class="app-input" @bind-Value="episode.EpisodeNumber" />
                                     </div>
 
                                     <div class="app-field">
-                                        <label class="app-field-label">Title</label>
+                                        <label class="app-field-label">@L["Title"]</label>
                                         <InputText class="app-input" @bind-Value="episode.Title" />
                                     </div>
 
                                     <div class="app-field">
-                                        <label class="app-field-label">Duration</label>
+                                        <label class="app-field-label">@L["Duration"]</label>
                                         <InputNumber TValue="int?" class="app-input" @bind-Value="episode.DurationMinutes" />
                                     </div>
                                 </div>
 
                                 <div class="grid gap-4 sm:grid-cols-[auto,1fr,auto] sm:items-center">
-                                    <AppCheckbox Label="Watched"
+                                    <AppCheckbox Label="@L["Watched"]"
                                                  Value="@episode.IsWatched"
                                                  ValueChanged="value => HandleEpisodeWatchedChanged(episode, value)"
                                                  Class="px-4 py-3" />
 
                                     <div class="app-field">
-                                        <label class="app-field-label">Watched Date</label>
+                                        <label class="app-field-label">@L["Watched Date"]</label>
                                         <InputDate TValue="DateTime?" class="app-input" @bind-Value="episode.WatchedDate" />
                                     </div>
 
-                                    <AppButton Variant="ghost" Size="sm" OnClick="@((MouseEventArgs args) => RemoveEpisodeAsync(season, episode, args))">Remove</AppButton>
+                                    <AppButton Variant="ghost" Size="sm" OnClick="@((MouseEventArgs args) => RemoveEpisodeAsync(season, episode, args))">@L["Remove"]</AppButton>
                                 </div>
                             </article>
                         }
                     }
                 </div>
 
-                <AppButton Variant="secondary" OnClick="@((MouseEventArgs args) => AddEpisodeAsync(season, args))">Add Episode</AppButton>
+                <AppButton Variant="secondary" OnClick="@((MouseEventArgs args) => AddEpisodeAsync(season, args))">@L["Add Episode"]</AppButton>
             </section>
         }
     }
@@ -257,5 +257,5 @@
     }
 
     private string GetPlaceholderTitle()
-        => string.IsNullOrWhiteSpace(Model.Title) ? "Series cover preview" : Model.Title;
+        => string.IsNullOrWhiteSpace(Model.Title) ? L["Series cover preview"] : Model.Title;
 }

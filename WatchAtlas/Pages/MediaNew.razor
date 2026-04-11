@@ -2,19 +2,19 @@
 @inject LibraryState LibraryState
 @inject NavigationManager NavigationManager
 
-<PageTitle>Add Media</PageTitle>
+<PageTitle>@L["Add Media"]</PageTitle>
 
 <section class="space-y-8">
-    <PageHeader Eyebrow="New Media"
-                Title="Add a movie or series to your library."
-                Subtitle="Fill in the details below and save it to your collection." />
+    <PageHeader Eyebrow="@L["New Media"]"
+                Title="@L["Add a movie or series to your library."]"
+                Subtitle="@L["Fill in the details below and save it to your collection."]" />
 
     <section>
         <article class="shell-card p-6 sm:p-8">
             <MediaEditorForm Media="Media"
                              MovieDetails="Movie"
                              SeriesDetails="Series"
-                             SubmitLabel="Save Entry"
+                             SubmitLabel="@L["Save Entry"]"
                              CancelHref="library"
                              FieldPrefix="media-new"
                              ExternalErrorMessage="@ErrorMessage"

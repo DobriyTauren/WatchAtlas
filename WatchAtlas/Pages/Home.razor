@@ -5,14 +5,14 @@
 @inject IStatisticsService StatisticsService
 @using WatchAtlas.Extensions
 
-<PageTitle>WatchAtlas</PageTitle>
+<PageTitle>@L["Overview"]</PageTitle>
 
 <section class="space-y-8">
     @if (LibraryState.IsLoading && !LibraryState.IsLoaded)
     {
-        <PageHeader Eyebrow="Overview"
-                    Title="Loading your watch library."
-                    Subtitle="Getting your movies, series, and watch progress ready." />
+        <PageHeader Eyebrow="@L["Overview"]"
+                    Title="@L["Loading your watch library."]"
+                    Subtitle="@L["Getting your movies, series, and watch progress ready."]" />
 
         <section class="grid gap-4 xl:grid-cols-[1.4fr,1fr]">
             <AppCard Class="space-y-6">
@@ -38,26 +38,26 @@
     }
     else
     {
-        <PageHeader Eyebrow="Overview"
-                    Title="Your personal watch library starts here."
-                    Subtitle="Track what you've watched, see your progress, and jump back into your library anytime.">
+        <PageHeader Eyebrow="@L["Overview"]"
+                    Title="@L["Your personal watch library starts here."]"
+                    Subtitle="@L["Track what you've watched, see your progress, and jump back into your library anytime."]">
         </PageHeader>
 
         <section class="shell-card overflow-hidden p-6 sm:p-8">
             <div class="space-y-4">
-                <span class="section-chip">Welcome</span>
-                <h2 class="max-w-2xl text-3xl">A soft, simple place to keep up with what you've watched.</h2>
+                <span class="section-chip">@L["Welcome"]</span>
+                <h2 class="max-w-2xl text-3xl">@L["A soft, simple place to keep up with what you've watched."]</h2>
                 <p class="max-w-3xl text-sm leading-7 text-muted sm:text-base">
-                    Add films and series, follow episode progress, and keep an eye on your total watch time without losing the calm feel of a personal collection.
+                    @L["Add films and series, follow episode progress, and keep an eye on your total watch time without losing the calm feel of a personal collection."]
                 </p>
             </div>
         </section>
 
         <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <StatTile Title="Watched Movies" Value="@Stats.WatchedMovies.ToString()" Caption="Movies you've already marked as watched." ChipLabel="Movies" />
-            <StatTile Title="Series Added" Value="@Stats.TotalSeries.ToString()" Caption="Series currently in your library." ChipLabel="Series" />
-            <StatTile Title="Watched Episodes" Value="@Stats.WatchedEpisodes.ToString()" Caption="Episodes you've checked off so far." ChipLabel="Episodes" />
-            <StatTile Title="Watch Time" Value="@Stats.TotalWatchTimeMinutes.ToReadableDuration()" Caption="Time you've spent watching across the library." ChipLabel="Runtime" />
+            <StatTile Title="@L["Watched Movies"]" Value="@Stats.WatchedMovies.ToString()" Caption="@L["Movies you've already marked as watched."]" ChipLabel="@L["Movies"]" />
+            <StatTile Title="@L["Series Added"]" Value="@Stats.TotalSeries.ToString()" Caption="@L["Series currently in your library."]" ChipLabel="@L["Series"]" />
+            <StatTile Title="@L["Watched Episodes"]" Value="@Stats.WatchedEpisodes.ToString()" Caption="@L["Episodes you've checked off so far."]" ChipLabel="@L["Episodes"]" />
+            <StatTile Title="@L["Watch Time"]" Value="@Stats.TotalWatchTimeMinutes.ToReadableDuration()" Caption="@L["Time you've spent watching across the library."]" ChipLabel="@L["Runtime"]" />
         </section>
     }
 </section>

@@ -1,3 +1,6 @@
+@implements IDisposable
+@inject LocalizationState LocalizationState
+
 <aside class="hidden w-80 shrink-0 lg:block">
     <div class="shell-panel sticky top-4 flex min-h-[calc(100vh-2rem)] flex-col gap-8 p-6">
         <div class="space-y-3">
@@ -7,18 +10,32 @@
             </div>
 
             <div class="space-y-2">
-                <h2 class="text-2xl">Soft tracking for movies and series.</h2>
-                <p class="text-sm leading-7 text-muted">Keep movies, series, seasons, and episodes in one calm, easy-to-browse library.</p>
+                <h2 class="text-2xl">@L["Soft tracking for movies and series."]</h2>
+                <p class="text-sm leading-7 text-muted">@L["Keep movies, series, seasons, and episodes in one calm, easy-to-browse library."]</p>
             </div>
         </div>
 
         <nav class="flex flex-col gap-2">
-            <NavLink href="" Match="NavLinkMatch.All" class="nav-chip justify-start" ActiveClass="nav-chip-active">Overview</NavLink>
-            <NavLink href="library" class="nav-chip justify-start" ActiveClass="nav-chip-active">Library</NavLink>
-            <NavLink href="statistics" class="nav-chip justify-start" ActiveClass="nav-chip-active">Statistics</NavLink>
-            <NavLink href="settings" class="nav-chip justify-start" ActiveClass="nav-chip-active">Settings</NavLink>
-            <NavLink href="media/new" class="nav-chip justify-start" ActiveClass="nav-chip-active">Add New Item</NavLink>
+            <NavLink href="" Match="NavLinkMatch.All" class="nav-chip justify-start" ActiveClass="nav-chip-active">@L["Overview"]</NavLink>
+            <NavLink href="library" class="nav-chip justify-start" ActiveClass="nav-chip-active">@L["Library"]</NavLink>
+            <NavLink href="statistics" class="nav-chip justify-start" ActiveClass="nav-chip-active">@L["Statistics"]</NavLink>
+            <NavLink href="settings" class="nav-chip justify-start" ActiveClass="nav-chip-active">@L["Settings"]</NavLink>
+            <NavLink href="media/new" class="nav-chip justify-start" ActiveClass="nav-chip-active">@L["Add New Item"]</NavLink>
         </nav>
 
     </div>
 </aside>
+
+@code {
+    protected override void OnInitialized()
+    {
+        LocalizationState.Changed += HandleLocalizationChanged;
+    }
+
+    private void HandleLocalizationChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        LocalizationState.Changed -= HandleLocalizationChanged;
+    }
+}

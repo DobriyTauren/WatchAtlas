@@ -4,5 +4,5 @@
     [Parameter, EditorRequired]
     public MediaType Type { get; set; }
 
-    private string Label => Type == MediaType.Movie ? "Movie" : "Series";
+    private string Label => Type == MediaType.Movie ? L["Movie"] : L["Series"];
 }

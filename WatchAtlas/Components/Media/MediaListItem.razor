@@ -8,7 +8,7 @@
 
 <a href="@MediaRouteHelper.GetDetailsHref(Entry)"
    class="group block rounded-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-   aria-label="@($"Open details for {Entry.Media.Title}")">
+   aria-label="@L.Format("Open details for {0}", Entry.Media.Title)">
     <article class="shell-card grid gap-5 p-5 transition duration-200 group-hover:-translate-y-0.5 group-hover:border-accent/60 group-hover:shadow-[0_24px_70px_-42px_rgba(120,101,214,0.42)] sm:p-6 lg:grid-cols-[9rem,1fr]">
         <div class="mx-auto hidden w-full max-w-[9rem] space-y-3 lg:block">
             <div class="aspect-[2/3] overflow-hidden rounded-[1.5rem] border border-border/70 bg-surface-soft/60">
@@ -48,7 +48,7 @@
 
                 <p class="text-sm leading-7 text-muted">
                     @(string.IsNullOrWhiteSpace(Entry.Media.Description)
-                        ? "No description yet. Open details to enrich this entry."
+                        ? L["No description yet. Open details to enrich this entry."]
                         : Entry.Media.Description)
                 </p>
             </div>
@@ -65,18 +65,18 @@
 
             <div class="grid gap-3 text-sm text-muted sm:grid-cols-3">
                 <div class="soft-block p-4">
-                    <p class="font-semibold text-text">Created</p>
+                    <p class="font-semibold text-text">@L["Created"]</p>
                     <p class="mt-1">@Entry.Media.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
                 </div>
 
                 <div class="soft-block p-4">
-                    <p class="font-semibold text-text">Updated</p>
+                    <p class="font-semibold text-text">@L["Updated"]</p>
                     <p class="mt-1">@Entry.Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
                 </div>
 
                 <div class="soft-block p-4">
-                    <p class="font-semibold text-text">Tracked Time</p>
-                    <p class="mt-1">@(runtimeMinutes > 0 ? runtimeMinutes.ToReadableDuration() : "Not tracked yet")</p>
+                    <p class="font-semibold text-text">@L["Tracked Time"]</p>
+                    <p class="mt-1">@(runtimeMinutes > 0 ? runtimeMinutes.ToReadableDuration() : L["Not tracked yet"])</p>
                 </div>
             </div>
         </div>
@@ -88,5 +88,5 @@
     public LibraryEntry Entry { get; set; } = default!;
 
     private string GetCoverBadge()
-        => Entry.Media.Type == MediaType.Movie ? "Movie" : "Series";
+        => Entry.Media.Type == MediaType.Movie ? L["Movie"] : L["Series"];
 }

@@ -4,14 +4,14 @@
 @inject IStatisticsService StatisticsService
 @using WatchAtlas.Extensions
 
-<PageTitle>Statistics</PageTitle>
+<PageTitle>@L["Statistics"]</PageTitle>
 
 <section class="space-y-8">
     @if (LibraryState.IsLoading && !LibraryState.IsLoaded)
     {
-        <PageHeader Eyebrow="Statistics"
-                    Title="Loading your watch progress."
-                    Subtitle="Crunching totals, watch-time summaries, and completion breakdowns from browser storage." />
+        <PageHeader Eyebrow="@L["Statistics"]"
+                    Title="@L["Loading your watch progress."]"
+                    Subtitle="@L["Crunching totals, watch-time summaries, and completion breakdowns from browser storage."]" />
 
         <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <SkeletonCard />
@@ -27,27 +27,27 @@
     }
     else
     {
-        <PageHeader Eyebrow="Statistics"
-                    Title="A clear overview of your watch progress."
-                    Subtitle="The statistics service now centralizes totals, watch-time summaries, completion breakdowns, and ranked series or season views so analytics stay consistent everywhere." />
+        <PageHeader Eyebrow="@L["Statistics"]"
+                    Title="@L["A clear overview of your watch progress."]"
+                    Subtitle="@L["The statistics service now centralizes totals, watch-time summaries, completion breakdowns, and ranked series or season views so analytics stay consistent everywhere."]" />
 
         <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <StatCard Title="Movies Watched"
+            <StatCard Title="@L["Movies Watched"]"
                       Value="@Stats.WatchedMovies.ToString()"
-                      Caption="@($"{Stats.WatchedMovies} of {Stats.TotalMovies} movies are marked watched.")"
-                      ChipLabel="Movies" />
-            <StatCard Title="Series Added"
+                      Caption="@L.Format("{0} of {1} movies are marked watched.", Stats.WatchedMovies, Stats.TotalMovies)"
+                      ChipLabel="@L["Movies"]" />
+            <StatCard Title="@L["Series Added"]"
                       Value="@Stats.TotalSeries.ToString()"
-                      Caption="@($"{Stats.CompletedSeries} completed, {Stats.InProgressSeries} in progress.")"
-                      ChipLabel="Series" />
-            <StatCard Title="Episodes Watched"
+                      Caption="@L.Format("{0} completed, {1} in progress.", Stats.CompletedSeries, Stats.InProgressSeries)"
+                      ChipLabel="@L["Series"]" />
+            <StatCard Title="@L["Episodes Watched"]"
                       Value="@Stats.WatchedEpisodes.ToString()"
-                      Caption="@($"{Stats.WatchedEpisodes}/{Stats.TotalEpisodes} tracked episodes watched.")"
-                      ChipLabel="Episodes" />
-            <StatCard Title="Total Watch Time"
+                      Caption="@L.Format("{0}/{1} tracked episodes watched.", Stats.WatchedEpisodes, Stats.TotalEpisodes)"
+                      ChipLabel="@L["Episodes"]" />
+            <StatCard Title="@L["Total Watch Time"]"
                       Value="@Stats.TotalWatchTimeMinutes.ToReadableDuration()"
-                      Caption="Sum of watched movie and episode runtime."
-                      ChipLabel="Runtime"
+                      Caption="@L["Sum of watched movie and episode runtime."]"
+                      ChipLabel="@L["Runtime"]"
                       ChipVariant="success" />
         </section>
 
@@ -57,14 +57,14 @@
         </section>
 
         <section class="space-y-4">
-        <SectionHeader Eyebrow="Rankings"
-                       Title="Top series by watched duration."
-                       Description="Series ordered by the amount of watched runtime already logged in the library." />
+        <SectionHeader Eyebrow="@L["Rankings"]"
+                       Title="@L["Top series by watched duration."]"
+                       Description="@L["Series ordered by the amount of watched runtime already logged in the library."]" />
 
         @if (TopSeriesByDuration.Count == 0)
         {
             <AppCard>
-                <p class="text-sm leading-7 text-muted">No tracked series runtime yet. Add a series with seasons and watched episodes to see rankings here.</p>
+                <p class="text-sm leading-7 text-muted">@L["No tracked series runtime yet. Add a series with seasons and watched episodes to see rankings here."]</p>
             </AppCard>
         }
         else
@@ -79,14 +79,14 @@
         </section>
 
         <section class="space-y-4">
-        <SectionHeader Eyebrow="Episodes"
-                       Title="Most episodes watched."
-                       Description="Series ranked by watched episode count, then by logged watch time." />
+        <SectionHeader Eyebrow="@L["Episodes"]"
+                       Title="@L["Most episodes watched."]"
+                       Description="@L["Series ranked by watched episode count, then by logged watch time."]" />
 
         @if (MostEpisodesWatchedSeries.Count == 0)
         {
             <AppCard>
-                <p class="text-sm leading-7 text-muted">No watched episodes yet. Start tracking episode progress to populate this ranking.</p>
+                <p class="text-sm leading-7 text-muted">@L["No watched episodes yet. Start tracking episode progress to populate this ranking."]</p>
             </AppCard>
         }
         else
@@ -101,14 +101,14 @@
         </section>
 
         <section class="space-y-4">
-        <SectionHeader Eyebrow="In Progress"
-                       Title="Currently watching."
-                       Description="Series that are in progress right now, ranked by watched episodes and active watch time." />
+        <SectionHeader Eyebrow="@L["In Progress"]"
+                       Title="@L["Currently watching."]"
+                       Description="@L["Series that are in progress right now, ranked by watched episodes and active watch time."]" />
 
         @if (CurrentlyWatchingSeries.Count == 0)
         {
             <AppCard>
-                <p class="text-sm leading-7 text-muted">No in-progress series yet. Once a series is partly watched, it will show up here.</p>
+                <p class="text-sm leading-7 text-muted">@L["No in-progress series yet. Once a series is partly watched, it will show up here."]</p>
             </AppCard>
         }
         else
@@ -123,14 +123,14 @@
         </section>
 
         <section class="space-y-4">
-        <SectionHeader Eyebrow="Genres"
-                       Title="Watch time by genre."
-                       Description="Watched movie runtime and watched episode runtime grouped by library genres." />
+        <SectionHeader Eyebrow="@L["Genres"]"
+                       Title="@L["Watch time by genre."]"
+                       Description="@L["Watched movie runtime and watched episode runtime grouped by library genres."]" />
 
         @if (TopGenresByWatchTime.Count == 0)
         {
             <AppCard>
-                <p class="text-sm leading-7 text-muted">No watched runtime has been matched to genres yet. Add genres and watched entries to see the breakdown.</p>
+                <p class="text-sm leading-7 text-muted">@L["No watched runtime has been matched to genres yet. Add genres and watched entries to see the breakdown."]</p>
             </AppCard>
         }
         else
@@ -145,14 +145,14 @@
         </section>
 
         <section class="space-y-4">
-        <SectionHeader Eyebrow="Seasons"
-                       Title="Top seasons by watched runtime."
-                       Description="Season totals are calculated from episode data and ranked across the whole library." />
+        <SectionHeader Eyebrow="@L["Seasons"]"
+                       Title="@L["Top seasons by watched runtime."]"
+                       Description="@L["Season totals are calculated from episode data and ranked across the whole library."]" />
 
         @if (TopSeasonsByDuration.Count == 0)
         {
             <AppCard>
-                <p class="text-sm leading-7 text-muted">No season runtime has been logged yet. Mark episodes as watched to populate these cards.</p>
+                <p class="text-sm leading-7 text-muted">@L["No season runtime has been logged yet. Mark episodes as watched to populate these cards."]</p>
             </AppCard>
         }
         else

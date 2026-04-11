@@ -3,32 +3,32 @@
 @inject NavigationManager NavigationManager
 @inject ToastState ToastState
 
-<PageTitle>Movie Details</PageTitle>
+<PageTitle>@L["Movie Details"]</PageTitle>
 
 <section class="space-y-8">
     @if (!IsReady)
     {
-        <PageHeader Eyebrow="Movie Details"
-                    Title="Loading movie details."
-                    Subtitle="Reading the selected movie from browser storage." />
+        <PageHeader Eyebrow="@L["Movie Details"]"
+                    Title="@L["Loading movie details."]"
+                    Subtitle="@L["Reading the selected movie from browser storage."]" />
     }
     else if (Entry is null)
     {
-        <PageHeader Eyebrow="Movie Details"
-                    Title="This movie is not in the library yet."
-                    Subtitle="The details route is ready, but the requested movie was not found in browser storage." />
+        <PageHeader Eyebrow="@L["Movie Details"]"
+                    Title="@L["This movie is not in the library yet."]"
+                    Subtitle="@L["The details route is ready, but the requested movie was not found in browser storage."]" />
 
-        <EmptyStateCard Badge="Movie Details"
-                        Title="No movie found."
-                        Description="Create a movie first, then return here to review metadata, watch status, and notes."
-                        PrimaryLabel="Create Movie"
+        <EmptyStateCard Badge="@L["Movie Details"]"
+                        Title="@L["No movie found."]"
+                        Description="@L["Create a movie first, then return here to review metadata, watch status, and notes."]"
+                        PrimaryLabel="@L["Create Movie"]"
                         PrimaryHref="movies/new"
-                        SecondaryLabel="Return to Library"
+                        SecondaryLabel="@L["Return to Library"]"
                         SecondaryHref="library" />
     }
     else
     {
-        <PageHeader Eyebrow="Movie Details"
+        <PageHeader Eyebrow="@L["Movie Details"]"
                     Title="@Entry.Media.Title"
                     Subtitle="@GetSubtitle()"
                     Actions="@ActionButtons" />
@@ -51,9 +51,9 @@
                 else
                 {
                     <div class="movie-cover-fallback h-full min-h-[24rem] xl:min-h-[32rem]">
-                        <span class="movie-cover-fallback__badge">Movie</span>
+                        <span class="movie-cover-fallback__badge">@L["Movie"]</span>
                         <h2 class="movie-cover-fallback__title">@Entry.Media.Title</h2>
-                        <p class="movie-cover-fallback__copy">Add a cover image from the edit page to make this movie card feel more complete.</p>
+                        <p class="movie-cover-fallback__copy">@L["Add a cover image from the edit page to make this movie card feel more complete."]</p>
                     </div>
                 }
             </AppCard>
@@ -72,12 +72,12 @@
 
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div class="soft-block p-5">
-                                <p class="text-sm font-semibold text-text">Runtime</p>
+                                <p class="text-sm font-semibold text-text">@L["Runtime"]</p>
                                 <p class="mt-2 text-lg">@GetRuntime()</p>
                             </div>
 
                             <div class="soft-block p-5">
-                                <p class="text-sm font-semibold text-text">Watched Date</p>
+                                <p class="text-sm font-semibold text-text">@L["Watched Date"]</p>
                                 <p class="mt-2 text-lg">@GetWatchedDate()</p>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                         @if (!string.IsNullOrWhiteSpace(Entry.Media.Description))
                         {
                             <div class="space-y-2">
-                                <h2 class="text-xl">Description</h2>
+                                <h2 class="text-xl">@L["Description"]</h2>
                                 <p class="text-sm leading-7 text-muted">@Entry.Media.Description</p>
                             </div>
                         }
@@ -104,21 +104,21 @@
 
                 <AppCard>
                     <div class="space-y-4">
-                        <h2 class="text-2xl">Notes</h2>
+                        <h2 class="text-2xl">@L["Notes"]</h2>
                         <p class="text-sm leading-7 text-muted">
                             @(string.IsNullOrWhiteSpace(Entry.Media.Notes)
-                                ? "No notes have been added for this movie yet."
+                                ? L["No notes have been added for this movie yet."]
                                 : Entry.Media.Notes)
                         </p>
 
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div class="soft-block-strong p-5">
-                                <p class="text-sm font-semibold text-text">Created</p>
+                                <p class="text-sm font-semibold text-text">@L["Created"]</p>
                                 <p class="mt-2 text-lg">@Entry.Media.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
                             </div>
 
                             <div class="soft-block-strong p-5">
-                                <p class="text-sm font-semibold text-text">Updated</p>
+                                <p class="text-sm font-semibold text-text">@L["Updated"]</p>
                                 <p class="mt-2 text-lg">@Entry.Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
                             </div>
                         </div>
@@ -128,8 +128,8 @@
         </section>
 
         <AppModal IsOpen="@IsDeleteModalOpen"
-                  Title="Delete this movie?"
-                  Description="This permanently removes the movie and its stored watch details from browser storage."
+                  Title="@L["Delete this movie?"]"
+                  Description="@L["This permanently removes the movie and its stored watch details from browser storage."]"
                   OnClose="CloseDeleteModalAsync">
             <ChildContent>
                 <p class="text-sm leading-7 text-muted">
@@ -137,8 +137,8 @@
                 </p>
             </ChildContent>
             <Footer>
-                <AppButton Variant="secondary" Disabled="@IsDeleting" OnClick="CloseDeleteModalButtonAsync">Cancel</AppButton>
-                <AppButton IsLoading="@IsDeleting" OnClick="ConfirmDeleteAsync">Delete Movie</AppButton>
+                <AppButton Variant="secondary" Disabled="@IsDeleting" OnClick="CloseDeleteModalButtonAsync">@L["Cancel"]</AppButton>
+                <AppButton IsLoading="@IsDeleting" OnClick="ConfirmDeleteAsync">@L["Delete Movie"]</AppButton>
             </Footer>
         </AppModal>
     }
@@ -155,8 +155,8 @@
     private string? ErrorMessage { get; set; }
 
     private RenderFragment ActionButtons => @<div class="flex flex-wrap gap-3">
-        <AppButton Href="@($"movies/{Id}/edit")" Variant="secondary">Edit Movie</AppButton>
-        <AppButton OnClick="OpenDeleteModalAsync">Delete Movie</AppButton>
+        <AppButton Href="@($"movies/{Id}/edit")" Variant="secondary">@L["Edit Movie"]</AppButton>
+        <AppButton OnClick="OpenDeleteModalAsync">@L["Delete Movie"]</AppButton>
     </div>;
 
     protected override async Task OnParametersSetAsync()
@@ -179,8 +179,8 @@
         }
 
         return Entry.Movie?.IsWatched == true
-            ? "Watched movie details, runtime, and notes are stored locally and ready to edit."
-            : "This movie is in your library and ready for watch progress, notes, and metadata updates.";
+            ? L["Watched movie details, runtime, and notes are stored locally and ready to edit."]
+            : L["This movie is in your library and ready for watch progress, notes, and metadata updates."];
     }
 
     private string GetRuntime()
@@ -188,11 +188,11 @@
         var runtimeMinutes = Entry?.Movie?.DurationMinutes;
         return runtimeMinutes.HasValue && runtimeMinutes.Value > 0
             ? runtimeMinutes.Value.ToReadableDuration()
-            : "Not tracked yet";
+            : L["Not tracked yet"];
     }
 
     private string GetWatchedDate()
-        => Entry?.Movie?.WatchedDate?.ToLocalTime().ToString("dd MMM yyyy") ?? "Not set";
+        => Entry?.Movie?.WatchedDate?.ToLocalTime().ToString("dd MMM yyyy") ?? L["Not set"];
 
     private Task OpenDeleteModalAsync(MouseEventArgs _)
     {
@@ -223,13 +223,13 @@
             IsDeleting = true;
             ErrorMessage = null;
             await LibraryState.DeleteAsync(Entry.Media.Id);
-            ToastState.ShowSuccess("Movie deleted.", $"\"{deletedTitle}\" was removed from your library.");
+            ToastState.ShowSuccess(L["Movie deleted."], L.Format("\"{0}\" was removed from your library.", deletedTitle));
             NavigationManager.NavigateTo("library");
         }
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
-            ToastState.ShowError("Movie could not be deleted.", exception.Message);
+            ToastState.ShowError(L["Movie could not be deleted."], exception.Message);
         }
         finally
         {

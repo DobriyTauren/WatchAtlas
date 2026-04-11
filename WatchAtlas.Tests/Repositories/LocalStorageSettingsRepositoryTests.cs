@@ -34,7 +34,6 @@ public class LocalStorageSettingsRepositoryTests
             LibraryViewMode = LibraryViewMode.List,
             DefaultLibrarySortBy = LibrarySortBy.Progress,
             DefaultLibrarySortDescending = false,
-            ShowCompletedItemsFirst = true
         };
 
         await repository.SaveAsync(settings);

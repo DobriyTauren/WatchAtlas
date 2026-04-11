@@ -30,6 +30,19 @@ public class SettingsState(ISettingsRepository repository) : StateStoreBase
         NotifyStateChanged();
     }
 
+    public async Task UpdateLanguageAsync(AppLanguage language, CancellationToken cancellationToken = default)
+    {
+        await EnsureLoadedAsync(cancellationToken);
+        if (Current.Language == language)
+        {
+            return;
+        }
+
+        Current.Language = language;
+        await repository.SaveAsync(Current, cancellationToken);
+        NotifyStateChanged();
+    }
+
     public async Task UpdateLibraryViewModeAsync(LibraryViewMode viewMode, CancellationToken cancellationToken = default)
     {
         await EnsureLoadedAsync(cancellationToken);
@@ -57,32 +70,6 @@ public class SettingsState(ISettingsRepository repository) : StateStoreBase
 
         Current.DefaultLibrarySortBy = sortBy;
         Current.DefaultLibrarySortDescending = descending;
-        await repository.SaveAsync(Current, cancellationToken);
-        NotifyStateChanged();
-    }
-
-    public async Task UpdateDenseLibraryGridAsync(bool value, CancellationToken cancellationToken = default)
-    {
-        await EnsureLoadedAsync(cancellationToken);
-        if (Current.UseDenseLibraryGrid == value)
-        {
-            return;
-        }
-
-        Current.UseDenseLibraryGrid = value;
-        await repository.SaveAsync(Current, cancellationToken);
-        NotifyStateChanged();
-    }
-
-    public async Task UpdateCompletedItemsFirstAsync(bool value, CancellationToken cancellationToken = default)
-    {
-        await EnsureLoadedAsync(cancellationToken);
-        if (Current.ShowCompletedItemsFirst == value)
-        {
-            return;
-        }
-
-        Current.ShowCompletedItemsFirst = value;
         await repository.SaveAsync(Current, cancellationToken);
         NotifyStateChanged();
     }

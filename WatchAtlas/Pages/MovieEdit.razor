@@ -3,39 +3,39 @@
 @inject NavigationManager NavigationManager
 @inject ToastState ToastState
 
-<PageTitle>Edit Movie</PageTitle>
+<PageTitle>@L["Edit Movie"]</PageTitle>
 
 <section class="space-y-8">
     @if (!IsReady)
     {
-        <PageHeader Eyebrow="Movie Editor"
-                    Title="Loading movie editor."
-                    Subtitle="Getting this movie ready to edit." />
+        <PageHeader Eyebrow="@L["Movie Editor"]"
+                    Title="@L["Loading movie editor."]"
+                    Subtitle="@L["Getting this movie ready to edit."]" />
     }
     else if (Entry is null)
     {
-        <PageHeader Eyebrow="Movie Editor"
-                    Title="This movie could not be found."
-                    Subtitle="It may have been removed, or the link may be out of date." />
+        <PageHeader Eyebrow="@L["Movie Editor"]"
+                    Title="@L["This movie could not be found."]"
+                    Subtitle="@L["It may have been removed, or the link may be out of date."]" />
 
-        <EmptyStateCard Badge="Movie Editor"
-                        Title="Movie not found."
-                        Description="Create a movie first or return to the library to pick an existing item."
-                        PrimaryLabel="Create Movie"
+        <EmptyStateCard Badge="@L["Movie Editor"]"
+                        Title="@L["Movie not found."]"
+                        Description="@L["Create a movie first or return to the library to pick an existing item."]"
+                        PrimaryLabel="@L["Create Movie"]"
                         PrimaryHref="movies/new"
-                        SecondaryLabel="Open Library"
+                        SecondaryLabel="@L["Open Library"]"
                         SecondaryHref="library" />
     }
     else
     {
-        <PageHeader Eyebrow="Edit Movie"
+        <PageHeader Eyebrow="@L["Edit Movie"]"
                     Title="@Entry.Media.Title"
-                    Subtitle="Update the details, notes, and watch status for this movie." />
+                    Subtitle="@L["Update the details, notes, and watch status for this movie."]" />
 
         <section class="grid gap-4 xl:grid-cols-[1.15fr,0.85fr]">
             <AppCard>
                 <MovieForm Model="Form"
-                           SubmitLabel="Save Changes"
+                           SubmitLabel="@L["Save Changes"]"
                            CancelHref="@($"movies/{Id}")"
                            FieldPrefix="movie-edit"
                            ExternalErrorMessage="@ErrorMessage"
@@ -46,7 +46,7 @@
             <AppCard>
                 <div class="space-y-5">
                     <div class="flex flex-wrap gap-2">
-                        <AppBadge>Movie</AppBadge>
+                        <AppBadge>@L["Movie"]</AppBadge>
                         @if (Entry.Media.PersonalRating is { } rating)
                         {
                             <span class="rating-pill">@rating/10</span>
@@ -55,19 +55,19 @@
 
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div class="soft-block-strong p-5">
-                            <p class="text-sm font-semibold text-text">Created</p>
+                            <p class="text-sm font-semibold text-text">@L["Created"]</p>
                             <p class="mt-2 text-lg">@Entry.Media.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
                         </div>
 
                         <div class="soft-block-strong p-5">
-                            <p class="text-sm font-semibold text-text">Last Updated</p>
+                            <p class="text-sm font-semibold text-text">@L["Last Updated"]</p>
                             <p class="mt-2 text-lg">@Entry.Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
                         </div>
                     </div>
 
                     <div class="flex flex-wrap gap-3">
-                        <AppButton Href="@($"movies/{Id}")" Variant="secondary">Back to Details</AppButton>
-                        <AppButton Href="library" Variant="secondary">Open Library</AppButton>
+                        <AppButton Href="@($"movies/{Id}")" Variant="secondary">@L["Back to Details"]</AppButton>
+                        <AppButton Href="library" Variant="secondary">@L["Open Library"]</AppButton>
                     </div>
                 </div>
             </AppCard>
@@ -128,13 +128,13 @@
             if (Entry is not null)
             {
                 Form = MovieFormModel.From(Entry.Media, Entry.Movie);
-                ToastState.ShowSuccess("Movie saved.", "Your movie details were updated successfully.");
+                ToastState.ShowSuccess(L["Movie saved."], L["Your movie details were updated successfully."]);
             }
         }
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
-            ToastState.ShowError("Movie changes could not be saved.", exception.Message);
+            ToastState.ShowError(L["Movie changes could not be saved."], exception.Message);
         }
         finally
         {

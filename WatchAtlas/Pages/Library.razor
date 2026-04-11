@@ -4,12 +4,12 @@
 @inject LibraryState LibraryState
 @inject SettingsState SettingsState
 
-<PageTitle>Library</PageTitle>
+<PageTitle>@L["Library"]</PageTitle>
 
 <section class="space-y-8">
-    <PageHeader Eyebrow="Library"
-                Title="Browse your full watch collection."
-                Subtitle="Search, filter, sort, and switch layouts across your full movie and series collection. The browsing view updates instantly from shared browser-backed state.">
+    <PageHeader Eyebrow="@L["Library"]"
+                Title="@L["Browse your full watch collection."]"
+                Subtitle="@L["Search, filter, sort, and switch layouts across your full movie and series collection. The browsing view updates instantly from shared browser-backed state."]">
     </PageHeader>
 
     @if (LibraryState.IsLoading && !LibraryState.IsLoaded)
@@ -45,17 +45,17 @@
     <AppCard Class="space-y-5">
         <div class="grid gap-4 xl:grid-cols-[minmax(0,1.05fr),minmax(0,1fr),minmax(0,1fr),auto] xl:items-end">
             <SortDropdown Id="library-sort"
-                          Label="Sort"
+                          Label="@L["Sort"]"
                           Value="@SelectedSortKey"
                           ValueChanged="HandleSortChanged"
                           Options="@SortOptions" />
 
             <AppSelect TValue="string"
                        Id="library-genre-top"
-                       Label="Genre"
+                       Label="@L["Genre"]"
                        Value="@SelectedGenreValue"
                        ValueChanged="HandleGenreChanged">
-                <option value="">All genres</option>
+                <option value="">@L["All genres"]</option>
                 @foreach (var genre in AvailableGenres)
                 {
                     <option value="@genre">@genre</option>
@@ -64,10 +64,10 @@
 
             <AppSelect TValue="string"
                        Id="library-series-top"
-                       Label="Selected Series"
+                       Label="@L["Selected Series"]"
                        Value="@SelectedSeriesValue"
                        ValueChanged="HandleSeriesChanged">
-                <option value="">All series</option>
+                <option value="">@L["All series"]</option>
                 @foreach (var series in AvailableSeries)
                 {
                     <option value="@series.Media.Id">@series.Media.Title</option>
@@ -75,21 +75,21 @@
             </AppSelect>
 
             <div class="min-w-[8.5rem] pb-1 text-left xl:text-right">
-                <p class="text-sm font-semibold text-text">@QueryResult.FilteredCount @VisibleItemsLabel</p>
+                <p class="text-sm font-semibold text-text">@LocalizedText.FormatCount(QueryResult.FilteredCount, "item")</p>
                 <p class="mt-1 text-sm text-muted">@VisibleItemsSummary</p>
             </div>
         </div>
 
         <FilterBar>
             <div class="space-y-3">
-                <p class="text-sm font-semibold text-text">Quick Filters</p>
+                <p class="text-sm font-semibold text-text">@L["Quick Filters"]</p>
                 <div class="flex flex-wrap gap-2">
-                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType is null && FilterState.Options.Status is null)" type="button" @onclick="() => SelectQuickFilter(null, null)">All Items</button>
-                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Movie)" type="button" @onclick="() => SelectQuickFilter(MediaType.Movie, null)">Movies</button>
-                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Series)" type="button" @onclick="() => SelectQuickFilter(MediaType.Series, null)">Series</button>
-                    <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.Completed)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.Completed)">Completed</button>
-                    <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.InProgress)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.InProgress)">In Progress</button>
-                    <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.NotStarted)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.NotStarted)">Not Started</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType is null && FilterState.Options.Status is null)" type="button" @onclick="() => SelectQuickFilter(null, null)">@L["All Items"]</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Movie)" type="button" @onclick="() => SelectQuickFilter(MediaType.Movie, null)">@L["Movies"]</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Series)" type="button" @onclick="() => SelectQuickFilter(MediaType.Series, null)">@L["Series"]</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.Completed)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.Completed)">@L["Completed"]</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.InProgress)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.InProgress)">@L["In Progress"]</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.NotStarted)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.NotStarted)">@L["Not Started"]</button>
                 </div>
             </div>
 
@@ -97,11 +97,11 @@
                 <div class="flex flex-wrap items-center gap-3">
                     <ViewModeToggle Value="@CurrentViewMode" ValueChanged="HandleViewModeChanged" />
                     <button class="@GetDirectionButtonClass()" type="button" @onclick="ToggleSortDirection">
-                        @(FilterState.Options.Descending ? "Descending" : "Ascending")
+                        @(FilterState.Options.Descending ? L["Descending"] : L["Ascending"])
                     </button>
                 </div>
 
-                <AppButton Variant="secondary" OnClick="ClearFiltersAsync">Reset Filters</AppButton>
+                <AppButton Variant="secondary" OnClick="ClearFiltersAsync">@L["Reset Filters"]</AppButton>
             </div>
         </FilterBar>
     </AppCard>
@@ -109,24 +109,24 @@
     @if (QueryResult.TotalCount == 0)
     {
         <EmptyStateCard Badge="Library"
-                        Title="Your library is still empty."
-                        Description="Start by adding your first movie or series. Once it is saved, this page becomes your main browsing hub for search, filters, and progress tracking."
-                        PrimaryLabel="Add First Entry"
+                        Title="@L["Your library is still empty."]"
+                        Description="@L["Start by adding your first movie or series. Once it is saved, this page becomes your main browsing hub for search, filters, and progress tracking."]"
+                        PrimaryLabel="@L["Add First Entry"]"
                         PrimaryHref="media/new"
-                        SecondaryLabel="Open Settings"
+                        SecondaryLabel="@L["Open Settings"]"
                         SecondaryHref="settings" />
     }
     else if (FilteredEntries.Count == 0)
     {
         <AppCard Class="text-center">
             <div class="mx-auto flex max-w-2xl flex-col items-center gap-4">
-                <AppBadge>No Results</AppBadge>
-                <h2 class="text-2xl">Nothing matches these filters.</h2>
-                <p class="text-sm leading-7 text-muted sm:text-base">Try clearing one or two filters, broadening the search text, or switching the media type and status filters back to a wider view.</p>
+                <AppBadge>@L["No Results"]</AppBadge>
+                <h2 class="text-2xl">@L["Nothing matches these filters."]</h2>
+                <p class="text-sm leading-7 text-muted sm:text-base">@L["Try clearing one or two filters, broadening the search text, or switching the media type and status filters back to a wider view."]</p>
 
                 <div class="flex flex-wrap justify-center gap-3 pt-2">
-                    <AppButton Variant="secondary" OnClick="ClearFiltersAsync">Reset Filters</AppButton>
-                    <AppButton Href="media/new">Add New Item</AppButton>
+                    <AppButton Variant="secondary" OnClick="ClearFiltersAsync">@L["Reset Filters"]</AppButton>
+                    <AppButton Href="media/new">@L["Add New Item"]</AppButton>
                 </div>
             </div>
         </AppCard>
@@ -135,7 +135,7 @@
     {
         @if (CurrentViewMode == LibraryViewMode.Grid)
         {
-            <MediaGrid Entries="FilteredEntries" Dense="@SettingsState.Current.UseDenseLibraryGrid" />
+            <MediaGrid Entries="FilteredEntries" />
         }
         else
         {
@@ -151,16 +151,15 @@
 </section>
 
 @code {
-    private static readonly IReadOnlyList<SortDropdown.SortDropdownOption> SortOptions = LibrarySortOptionHelper.Options
+    private LibraryQueryResult QueryResult => FilterState.Apply(LibraryState.Entries);
+    private IReadOnlyList<SortDropdown.SortDropdownOption> SortOptions => LibrarySortOptionHelper.Options
         .Select(option => new SortDropdown.SortDropdownOption
         {
             Key = option.Key,
-            Label = option.Label
+            Label = L[option.Label]
         })
         .ToList();
-
-    private LibraryQueryResult QueryResult => FilterState.Apply(LibraryState.Entries);
-    private IReadOnlyList<LibraryEntry> FilteredEntries => GetVisibleEntries();
+    private IReadOnlyList<LibraryEntry> FilteredEntries => QueryResult.Items;
     private IReadOnlyList<string> AvailableGenres => LibraryState.Entries
         .SelectMany(entry => entry.Media.Genres)
         .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -174,10 +173,9 @@
     private string SelectedGenreValue => FilterState.Options.Genre ?? string.Empty;
     private string SelectedSeriesValue => FilterState.Options.SeriesId?.ToString() ?? string.Empty;
     private string SelectedSortKey => LibrarySortOptionHelper.ToKey(FilterState.Options.SortBy, FilterState.Options.Descending);
-    private string VisibleItemsLabel => QueryResult.FilteredCount == 1 ? "item" : "items";
     private string VisibleItemsSummary => QueryResult.TotalCount == QueryResult.FilteredCount
-        ? "Everything is visible."
-        : $"{QueryResult.FilteredCount} of {QueryResult.TotalCount} match.";
+        ? L["Everything is visible."]
+        : L.Format("{0} of {1} match.", QueryResult.FilteredCount, QueryResult.TotalCount);
 
     protected override async Task OnInitializedAsync()
     {
@@ -248,18 +246,6 @@
             FilterState.SetSortBy(SettingsState.Current.DefaultLibrarySortBy);
             FilterState.SetDescending(SettingsState.Current.DefaultLibrarySortDescending);
         }
-    }
-
-    private IReadOnlyList<LibraryEntry> GetVisibleEntries()
-    {
-        if (!SettingsState.Current.ShowCompletedItemsFirst)
-        {
-            return QueryResult.Items;
-        }
-
-        return QueryResult.Items
-            .OrderByDescending(entry => WatchStatusHelper.GetStatus(entry) == WatchStatus.Completed)
-            .ToList();
     }
 
     private void HandleStateChanged() => InvokeAsync(StateHasChanged);

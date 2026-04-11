@@ -3,17 +3,17 @@
 @inject NavigationManager NavigationManager
 @inject ToastState ToastState
 
-<PageTitle>Create Movie</PageTitle>
+<PageTitle>@L["Create Movie"]</PageTitle>
 
 <section class="space-y-8">
-    <PageHeader Eyebrow="New Movie"
-                Title="Add a movie to your library."
-                Subtitle="Add the title, cover, and any details you want to remember." />
+    <PageHeader Eyebrow="@L["Create Movie"]"
+                Title="@L["Add a movie to your library."]"
+                Subtitle="@L["Add the title, cover, and any details you want to remember."]" />
 
     <section>
         <AppCard>
             <MovieForm Model="Form"
-                       SubmitLabel="Create Movie"
+                       SubmitLabel="@L["Create Movie"]"
                        CancelHref="library"
                        FieldPrefix="movie-new"
                        ExternalErrorMessage="@ErrorMessage"
@@ -41,13 +41,13 @@
             ErrorMessage = null;
 
             await LibraryState.AddAsync(media, movie, null);
-            ToastState.ShowSuccess("Movie created.", "The new movie has been saved in your library.");
+            ToastState.ShowSuccess(L["Movie created."], L["The new movie has been saved in your library."]);
             NavigationManager.NavigateTo(MediaRouteHelper.GetDetailsHref(media));
         }
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
-            ToastState.ShowError("Movie could not be created.", exception.Message);
+            ToastState.ShowError(L["Movie could not be created."], exception.Message);
         }
         finally
         {

@@ -8,11 +8,10 @@ public static class LibraryCloneHelper
     public static AppSettings Clone(AppSettings source) => new()
     {
         ThemeMode = source.ThemeMode,
+        Language = source.Language,
         LibraryViewMode = source.LibraryViewMode,
         DefaultLibrarySortBy = source.DefaultLibrarySortBy,
-        DefaultLibrarySortDescending = source.DefaultLibrarySortDescending,
-        UseDenseLibraryGrid = source.UseDenseLibraryGrid,
-        ShowCompletedItemsFirst = source.ShowCompletedItemsFirst
+        DefaultLibrarySortDescending = source.DefaultLibrarySortDescending
     };
 
     public static MediaItem Clone(MediaItem source) => new()

@@ -4,36 +4,36 @@
 @inject NavigationManager NavigationManager
 @using WatchAtlas.Extensions
 
-<PageTitle>Media Details</PageTitle>
+<PageTitle>@L["Media Details"]</PageTitle>
 
 <section class="space-y-8">
     @if (Media is null)
     {
-        <PageHeader Eyebrow="Media Details"
-                    Title="This entry is not in the library yet."
-                    Subtitle="The route is ready for editing, but the requested item was not found in local storage." />
+        <PageHeader Eyebrow="@L["Media Details"]"
+                    Title="@L["This entry is not in the library yet."]"
+                    Subtitle="@L["The route is ready for editing, but the requested item was not found in local storage."]" />
 
-        <EmptyStateCard Badge="Details"
-                        Title="No media entry found."
-                        Description="Create a new item first, then return here to edit metadata, seasons, episodes, and watch progress."
-                        PrimaryLabel="Create New Item"
+        <EmptyStateCard Badge="@L["Details"]"
+                        Title="@L["No media entry found."]"
+                        Description="@L["Create a new item first, then return here to edit metadata, seasons, episodes, and watch progress."]"
+                        PrimaryLabel="@L["Create New Item"]"
                         PrimaryHref="media/new"
-                        SecondaryLabel="Return to Library"
+                        SecondaryLabel="@L["Return to Library"]"
                         SecondaryHref="library" />
     }
     else
     {
-        <PageHeader Eyebrow="Media Details"
+        <PageHeader Eyebrow="@L["Media Details"]"
                     Title="@Media.Title"
-                    Subtitle="Edit the stored item, adjust progress, and keep the browser-backed library in sync." />
+                    Subtitle="@L["Edit the stored item, adjust progress, and keep the browser-backed library in sync."]" />
 
         <section class="grid gap-4 xl:grid-cols-[1.2fr,0.9fr]">
             <AppCard>
                 <MediaEditorForm Media="Media"
                                  MovieDetails="Movie"
                                  SeriesDetails="Series"
-                                 SubmitLabel="Save Changes"
-                                 DeleteLabel="Delete Entry"
+                                 SubmitLabel="@L["Save Changes"]"
+                                 DeleteLabel="@L["Delete Entry"]"
                                  CancelHref="library"
                                  FieldPrefix="media-details"
                                  AllowDelete="true"
@@ -48,20 +48,20 @@
                 {
                     <div class="space-y-5">
                         <div class="flex flex-wrap gap-2">
-                            <AppBadge>@(PreviewEntry.Media.Type == MediaType.Movie ? "Movie" : "Series")</AppBadge>
+                            <AppBadge>@(PreviewEntry.Media.Type == MediaType.Movie ? L["Movie"] : L["Series"])</AppBadge>
                             <span class="rating-pill">
-                                Rating: @(PreviewEntry.Media.PersonalRating?.ToString() ?? "Not set")
+                                @L.Format("Rating: {0}", PreviewEntry.Media.PersonalRating?.ToString() ?? L["Not set"])
                             </span>
                         </div>
 
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div class="soft-block-strong p-5">
-                                <p class="text-sm font-semibold text-text">Last Updated</p>
+                                <p class="text-sm font-semibold text-text">@L["Last Updated"]</p>
                                 <p class="mt-2 text-lg">@Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
                             </div>
 
                             <div class="soft-block-strong p-5">
-                                <p class="text-sm font-semibold text-text">Tracked Time</p>
+                                <p class="text-sm font-semibold text-text">@L["Tracked Time"]</p>
                                 <p class="mt-2 text-lg">@GetRuntimeSummary()</p>
                             </div>
                         </div>
@@ -71,16 +71,16 @@
                             {
                                 var seriesStats = StatisticsService.CalculateSeriesStatistics(PreviewEntry);
 
-                                <ProgressBar Label="Completion"
+                                <ProgressBar Label="@L["Completion"]"
                                              Value="@seriesStats.WatchedEpisodes"
                                              Max="@Math.Max(seriesStats.TotalEpisodes, 1)" />
-                                <p>@seriesStats.SeasonCount season(s), @seriesStats.TotalEpisodes tracked episode(s), @seriesStats.WatchedEpisodes watched.</p>
-                                <p>@seriesStats.CompletionPercent.ToString("0")% complete with @seriesStats.WatchedMinutes.ToReadableDuration() of watched runtime.</p>
+                                <p>@L.Format("{0} season(s), {1} tracked episode(s), {2} watched.", seriesStats.SeasonCount, seriesStats.TotalEpisodes, seriesStats.WatchedEpisodes)</p>
+                                <p>@L.Format("{0}% complete with {1} of watched runtime.", seriesStats.CompletionPercent.ToString("0"), seriesStats.WatchedMinutes.ToReadableDuration())</p>
                             }
                             else
                             {
-                                <p>@(PreviewEntry.Movie?.IsWatched == true ? "This movie is marked as watched." : "This movie is still marked as not watched.")</p>
-                                <p>Stored runtime: @((PreviewEntry.Movie?.DurationMinutes ?? 0).ToReadableDuration()).</p>
+                                <p>@(PreviewEntry.Movie?.IsWatched == true ? L["This movie is marked as watched."] : L["This movie is still marked as not watched."])</p>
+                                <p>@L.Format("Stored runtime: {0}.", (PreviewEntry.Movie?.DurationMinutes ?? 0).ToReadableDuration())</p>
                             }
                         </div>
                     </div>
@@ -125,7 +125,7 @@
     {
         if (PreviewEntry is null)
         {
-            return "Not available";
+            return L["Not available"];
         }
 
         if (PreviewEntry.Media.Type == MediaType.Movie)

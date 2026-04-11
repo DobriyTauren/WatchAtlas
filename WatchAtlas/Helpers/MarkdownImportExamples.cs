@@ -4,21 +4,20 @@ public static class MarkdownImportExamples
 {
     public static IReadOnlyList<string> MovieImportSteps =>
     [
-        "Enter the exact movie title below and copy the AI prompt.",
-        "Paste the returned markdown here without extra commentary and click Fill Form."
+        LocalizedText.Translate("Enter the exact movie title below and copy the AI prompt."),
+        LocalizedText.Translate("Paste the returned markdown here without extra commentary and click Fill Form.")
     ];
 
     public static IReadOnlyList<string> SeriesImportSteps =>
     [
-        "Enter the exact series title below and copy the AI prompt.",
-        "Paste the returned markdown here without extra commentary and click Fill Form."
+        LocalizedText.Translate("Enter the exact series title below and copy the AI prompt."),
+        LocalizedText.Translate("Paste the returned markdown here without extra commentary and click Fill Form.")
     ];
 
     public static IReadOnlyList<string> SeasonImportSteps =>
     [
-        "Enter the series title and the seasons you want to add, then copy the AI prompt.",
-        "Keep the answer as raw markdown with no code fences or extra text.",
-        "Paste the result here to append the new seasons to the current series draft."
+        LocalizedText.Translate("Enter the series title and the seasons you want to add, then copy the AI prompt."),
+        LocalizedText.Translate("Paste the returned markdown here as raw markdown with no code fences or extra text.")
     ];
 
     public static string Movie =>

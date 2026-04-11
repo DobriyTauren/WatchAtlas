@@ -18,6 +18,25 @@ window.watchAtlasStorage = {
         } catch {
         }
     },
+    getPreferredLanguage: function () {
+        try {
+            var language = (navigator.languages && navigator.languages.length > 0
+                ? navigator.languages[0]
+                : navigator.language) || "en";
+
+            return language.toLowerCase();
+        } catch {
+            return "en";
+        }
+    },
+    setDocumentLanguage: function (language) {
+        try {
+            if (document && document.documentElement) {
+                document.documentElement.lang = language || "en";
+            }
+        } catch {
+        }
+    },
     downloadTextFile: function (fileName, content, contentType) {
         try {
             var blob = new Blob([content], { type: contentType || "application/json;charset=utf-8" });

@@ -26,7 +26,7 @@ public class ImportExportService : IImportExportService
     {
         if (string.IsNullOrWhiteSpace(json))
         {
-            return CreateFailure("The selected backup file is empty.");
+            return CreateFailure(LocalizedText.Translate("The selected backup file is empty."));
         }
 
         try
@@ -39,7 +39,7 @@ public class ImportExportService : IImportExportService
                 var backup = root.Deserialize<LibraryBackupModel>(JsonOptions);
                 if (backup is null)
                 {
-                    return CreateFailure("The selected backup file could not be read.");
+            return CreateFailure(LocalizedText.Translate("The selected backup file could not be read."));
                 }
 
                 return CreateSuccess(NormalizeBackup(backup));
@@ -57,11 +57,11 @@ public class ImportExportService : IImportExportService
                 });
             }
 
-            return CreateFailure("The selected file does not match the WatchAtlas backup format.");
+            return CreateFailure(LocalizedText.Translate("The selected file does not match the WatchAtlas backup format."));
         }
         catch (JsonException)
         {
-            return CreateFailure("The selected file is not valid JSON.");
+            return CreateFailure(LocalizedText.Translate("The selected file is not valid JSON."));
         }
     }
 

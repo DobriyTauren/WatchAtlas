@@ -2,18 +2,18 @@
 @layout MainLayout
 @inject NavigationManager NavigationManager
 
-<PageTitle>Not Found</PageTitle>
+<PageTitle>@L["Not Found"]</PageTitle>
 
 <section class="space-y-8">
     <PageHeader Eyebrow="404"
-                Title="This page drifted out of orbit."
-                Subtitle="The GitHub Pages fallback is configured, but this route still needs a matching page in the app." />
+                Title="@L["This page drifted out of orbit."]"
+                Subtitle="@L["The GitHub Pages fallback is configured, but this route still needs a matching page in the app."]" />
 
-    <EmptyStateCard Badge="Routing"
-                    Title="Nothing is mapped here yet."
-                    Description="Try returning to the dashboard or jump into the library shell while the rest of the watch-tracking features are built out."
-                    PrimaryLabel="Go Home"
+    <EmptyStateCard Badge="@L["Routing"]"
+                    Title="@L["Nothing is mapped here yet."]"
+                    Description="@L["Try returning to the dashboard or jump into the library shell while the rest of the watch-tracking features are built out."]"
+                    PrimaryLabel="@L["Go Home"]"
                     PrimaryHref="@NavigationManager.BaseUri"
-                    SecondaryLabel="Open Library"
+                    SecondaryLabel="@L["Open Library"]"
                     SecondaryHref="library" />
 </section>

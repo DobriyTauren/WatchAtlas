@@ -7,7 +7,7 @@ namespace WatchAtlas.Models.Forms;
 
 public class SeriesFormModel : IValidatableObject
 {
-    [Required(ErrorMessage = "Title is required.")]
+    [Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.TitleRequired))]
     public string Title { get; set; } = string.Empty;
 
     public string? CoverImageUrl { get; set; }
@@ -16,7 +16,7 @@ public class SeriesFormModel : IValidatableObject
 
     public string GenresText { get; set; } = string.Empty;
 
-    [Range(1, 10, ErrorMessage = "Rating should be between 1 and 10.")]
+    [Range(1, 10, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.RatingRange))]
     public int? PersonalRating { get; set; }
 
     public string? Notes { get; set; }
@@ -28,7 +28,7 @@ public class SeriesFormModel : IValidatableObject
         if (!CoverImageValueHelper.IsValidStoredValue(CoverImageUrl))
         {
             yield return new ValidationResult(
-                "Enter a valid http/https image URL or upload an image file.",
+                ValidationMessages.CoverImageInvalid,
                 new[] { nameof(CoverImageUrl) });
         }
 
@@ -39,14 +39,14 @@ public class SeriesFormModel : IValidatableObject
             if (season.SeasonNumber <= 0)
             {
                 yield return new ValidationResult(
-                    "Season numbers should be greater than zero.",
+                    LocalizedText.Translate("Season numbers should be greater than zero."),
                     new[] { nameof(Seasons) });
             }
 
             if (!seasonNumbers.Add(season.SeasonNumber))
             {
                 yield return new ValidationResult(
-                    $"Season {season.SeasonNumber} appears more than once.",
+                    LocalizedText.Format("Season {0} appears more than once.", season.SeasonNumber),
                     new[] { nameof(Seasons) });
             }
 
@@ -56,28 +56,28 @@ public class SeriesFormModel : IValidatableObject
                 if (episode.EpisodeNumber <= 0)
                 {
                     yield return new ValidationResult(
-                        $"Season {season.SeasonNumber} contains an episode number that is not greater than zero.",
+                        LocalizedText.Format("Season {0} contains an episode number that is not greater than zero.", season.SeasonNumber),
                         new[] { nameof(Seasons) });
                 }
 
                 if (!episodeNumbers.Add(episode.EpisodeNumber))
                 {
                     yield return new ValidationResult(
-                        $"Season {season.SeasonNumber} contains duplicate episode numbers.",
+                        LocalizedText.Format("Season {0} contains duplicate episode numbers.", season.SeasonNumber),
                         new[] { nameof(Seasons) });
                 }
 
                 if (episode.DurationMinutes is <= 0)
                 {
                     yield return new ValidationResult(
-                        $"Season {season.SeasonNumber}, episode {episode.EpisodeNumber} must have a positive duration when provided.",
+                        LocalizedText.Format("Season {0}, episode {1} must have a positive duration when provided.", season.SeasonNumber, episode.EpisodeNumber),
                         new[] { nameof(Seasons) });
                 }
 
                 if (episode.WatchedDate.HasValue && !episode.IsWatched)
                 {
                     yield return new ValidationResult(
-                        $"Season {season.SeasonNumber}, episode {episode.EpisodeNumber} cannot have a watched date unless it is marked as watched.",
+                        LocalizedText.Format("Season {0}, episode {1} cannot have a watched date unless it is marked as watched.", season.SeasonNumber, episode.EpisodeNumber),
                         new[] { nameof(Seasons) });
                 }
             }
@@ -170,8 +170,8 @@ public class SeriesFormModel : IValidatableObject
             {
                 clone.SeasonNumber = Seasons.Count == 0 ? 1 : Seasons.Max(existing => existing.SeasonNumber) + 1;
                 notices.Add(originalSeasonNumber > 0
-                    ? $"Imported season {originalSeasonNumber} was added as season {clone.SeasonNumber} because that number is already in use."
-                    : $"An imported season was added as season {clone.SeasonNumber}.");
+                    ? LocalizedText.Format("Imported season {0} was added as season {1} because that number is already in use.", originalSeasonNumber, clone.SeasonNumber)
+                    : LocalizedText.Format("An imported season was added as season {0}.", clone.SeasonNumber));
             }
 
             Seasons.Add(clone);

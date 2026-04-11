@@ -1,19 +1,20 @@
 @implements IDisposable
 @inject FilterState FilterState
+@inject LocalizationState LocalizationState
 @inject NavigationManager NavigationManager
 
-<header class="shell-card sticky top-4 z-20 flex flex-col gap-4 p-4 sm:p-5" role="search" aria-label="Library search and quick actions">
+<header class="shell-card sticky top-4 z-20 flex flex-col gap-4 p-4 sm:p-5" role="search" aria-label="@L["Library search and quick actions"]">
     <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <AppInput Class="flex-1"
                   InputClassName="rounded-full border-0 bg-surface-strong"
                   Value="@SearchTerm"
                   ValueChanged="HandleSearchChanged"
-                  Placeholder="Search titles from your library"
-                  aria-label="Search titles" />
+                  Placeholder="@L["Search titles from your library"]"
+                  aria-label="@L["Search titles"]" />
 
         <div class="flex flex-wrap items-center gap-3 max-sm:w-full">
             <ThemeSwitcher Compact="true" ShowCurrentButton="false" />
-            <AppButton Href="media/new" Class="max-sm:flex-1">Add Movie or Series</AppButton>
+            <AppButton Href="media/new" Class="max-sm:flex-1">@L["Add Movie or Series"]</AppButton>
         </div>
     </div>
 </header>
@@ -22,6 +23,7 @@
     protected override void OnInitialized()
     {
         FilterState.Changed += HandleFilterChanged;
+        LocalizationState.Changed += HandleLocalizationChanged;
     }
 
     private string SearchTerm
@@ -50,8 +52,11 @@
 
     private void HandleFilterChanged() => InvokeAsync(StateHasChanged);
 
+    private void HandleLocalizationChanged() => InvokeAsync(StateHasChanged);
+
     public void Dispose()
     {
         FilterState.Changed -= HandleFilterChanged;
+        LocalizationState.Changed -= HandleLocalizationChanged;
     }
 }

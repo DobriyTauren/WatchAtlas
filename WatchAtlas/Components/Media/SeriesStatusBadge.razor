@@ -6,15 +6,15 @@
 
     private string Label => Statistics.WatchedEpisodes switch
     {
-        0 => "Not Started",
-        var watched when watched == Statistics.TotalEpisodes && Statistics.TotalEpisodes > 0 => "Completed",
-        _ => "In Progress"
+        0 => L["Not Started"],
+        var watched when watched == Statistics.TotalEpisodes && Statistics.TotalEpisodes > 0 => L["Completed"],
+        _ => L["In Progress"]
     };
 
     private string Variant => Label switch
     {
-        "Completed" => "success",
-        "In Progress" => "outline",
+        var value when value == L["Completed"] => "success",
+        var value when value == L["In Progress"] => "outline",
         _ => "muted"
     };
 }

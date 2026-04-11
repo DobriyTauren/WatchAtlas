@@ -1,15 +1,15 @@
 @inject IImageService ImageService
 
 <div class="space-y-4">
-    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-            <label class="app-field-label">@Label</label>
-<p class="app-field-help">Use an image link or upload a file from your device.</p>
+            <label class="app-field-label">@ResolvedLabel</label>
+            <p class="app-field-help">@L["Use an image link or upload a file from your device."]</p>
         </div>
 
         <div class="cover-uploader__mode">
-            <button class="@GetModeButtonClass(CoverImageInputMode.Url)" type="button" @onclick="() => SetMode(CoverImageInputMode.Url)">URL</button>
-            <button class="@GetModeButtonClass(CoverImageInputMode.Upload)" type="button" @onclick="() => SetMode(CoverImageInputMode.Upload)">Upload</button>
+            <button class="@GetModeButtonClass(CoverImageInputMode.Url)" type="button" @onclick="() => SetMode(CoverImageInputMode.Url)">@L["URL"]</button>
+            <button class="@GetModeButtonClass(CoverImageInputMode.Upload)" type="button" @onclick="() => SetMode(CoverImageInputMode.Upload)">@L["Upload"]</button>
         </div>
     </div>
 
@@ -18,18 +18,18 @@
             @if (SelectedMode == CoverImageInputMode.Url)
             {
                 <AppInput Id="@($"{FieldPrefix}-cover-url")"
-                          Label="External Image URL"
+                          Label="@L["External Image URL"]"
                           Value="@UrlDraft"
                           ValueChanged="HandleUrlChanged"
                           Placeholder="https://example.com/cover.jpg"
-                          HelpText="Accepted: absolute http/https image URLs." />
+                          HelpText="@L["Accepted: absolute http/https image URLs."]" />
             }
             else
             {
                 <div class="cover-uploader__dropzone">
                     <div class="space-y-2">
-                        <p class="text-sm font-semibold text-text">Upload Image File</p>
-                        <p class="text-sm leading-7 text-muted">Accepted: JPG, PNG, WEBP, GIF. Max size: @(ImageService.MaxFileSizeBytes / 1024 / 1024) MB.</p>
+                        <p class="text-sm font-semibold text-text">@L["Upload Image File"]</p>
+                        <p class="text-sm leading-7 text-muted">@L.Format("Accepted: JPG, PNG, WEBP, GIF. Max size: {0} MB.", ImageService.MaxFileSizeBytes / 1024 / 1024)</p>
                     </div>
 
                     <InputFile id="@($"{FieldPrefix}-cover-upload")"
@@ -56,7 +56,7 @@
             <div class="flex flex-wrap gap-3">
                 @if (!string.IsNullOrWhiteSpace(Value))
                 {
-                    <AppButton Variant="secondary" Size="sm" OnClick="RemoveImageAsync">Remove Image</AppButton>
+                    <AppButton Variant="secondary" Size="sm" OnClick="RemoveImageAsync">@L["Remove Image"]</AppButton>
                 }
             </div>
         </div>
@@ -90,7 +90,7 @@
     private bool PreviewErrored { get; set; }
 
     [Parameter]
-    public string Label { get; set; } = "Cover Image";
+    public string Label { get; set; } = string.Empty;
 
     [Parameter]
     public string? Value { get; set; }
@@ -109,6 +109,8 @@
 
     [Parameter]
     public string PlaceholderCopy { get; set; } = "Add an image URL or upload a local file to preview it here.";
+
+    private string ResolvedLabel => string.IsNullOrWhiteSpace(Label) ? L["Cover Image"] : Label;
 
     protected override void OnParametersSet()
     {
@@ -159,7 +161,7 @@
 
         if (!ImageService.IsValidExternalImageUrl(UrlDraft))
         {
-            WarningMessage = "Enter a valid absolute http/https image URL.";
+            WarningMessage = L["Enter a valid absolute http/https image URL."];
             return;
         }
 
@@ -191,7 +193,7 @@
         await ValueChanged.InvokeAsync(result.ImageDataUrl);
         LastBoundValue = result.ImageDataUrl;
         SelectedMode = CoverImageInputMode.Upload;
-        InfoMessage = "Image uploaded and stored locally for this item.";
+        InfoMessage = L["Image uploaded and stored locally for this item."];
     }
 
     private async Task RemoveImageAsync(MouseEventArgs _)
@@ -210,7 +212,7 @@
 
         if (CoverImageValueHelper.IsExternalUrl(Value))
         {
-            WarningMessage ??= "The image URL could not be loaded for preview.";
+            WarningMessage ??= L["The image URL could not be loaded for preview."];
         }
 
         return Task.CompletedTask;
@@ -220,8 +222,8 @@
         => SelectedMode == mode ? "nav-chip nav-chip-active" : "nav-chip";
 
     private string GetFallbackTitle()
-        => string.IsNullOrWhiteSpace(PlaceholderTitle) ? "No cover selected yet" : PlaceholderTitle;
+        => string.IsNullOrWhiteSpace(PlaceholderTitle) ? L["No cover selected yet"] : PlaceholderTitle;
 
     private string GetPreviewAlt()
-        => string.IsNullOrWhiteSpace(PlaceholderTitle) ? "Cover preview" : $"{PlaceholderTitle} cover preview";
+        => string.IsNullOrWhiteSpace(PlaceholderTitle) ? L["Cover preview"] : L.Format("{0} cover preview", PlaceholderTitle);
 }

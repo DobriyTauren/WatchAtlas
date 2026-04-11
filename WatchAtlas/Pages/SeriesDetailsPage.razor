@@ -4,32 +4,32 @@
 @inject NavigationManager NavigationManager
 @inject ToastState ToastState
 
-<PageTitle>Series Details</PageTitle>
+<PageTitle>@L["Series Details"]</PageTitle>
 
 <section class="space-y-8">
     @if (!IsReady)
     {
-        <PageHeader Eyebrow="Series Details"
-                    Title="Loading series details."
-                    Subtitle="Reading the selected series from browser storage." />
+        <PageHeader Eyebrow="@L["Series Details"]"
+                    Title="@L["Loading series details."]"
+                    Subtitle="@L["Reading the selected series from browser storage."]" />
     }
     else if (Entry is null)
     {
-        <PageHeader Eyebrow="Series Details"
-                    Title="This series is not in the library yet."
-                    Subtitle="The details route is ready, but the requested series was not found in browser storage." />
+        <PageHeader Eyebrow="@L["Series Details"]"
+                    Title="@L["This series is not in the library yet."]"
+                    Subtitle="@L["The details route is ready, but the requested series was not found in browser storage."]" />
 
-        <EmptyStateCard Badge="Series Details"
-                        Title="No series found."
-                        Description="Create a series first, then return here to review seasons, episodes, and progress."
-                        PrimaryLabel="Create Series"
+        <EmptyStateCard Badge="@L["Series Details"]"
+                        Title="@L["No series found."]"
+                        Description="@L["Create a series first, then return here to review seasons, episodes, and progress."]"
+                        PrimaryLabel="@L["Create Series"]"
                         PrimaryHref="series/new"
-                        SecondaryLabel="Return to Library"
+                        SecondaryLabel="@L["Return to Library"]"
                         SecondaryHref="library" />
     }
     else
     {
-        <PageHeader Eyebrow="Series Details"
+        <PageHeader Eyebrow="@L["Series Details"]"
                     Title="@Entry.Media.Title"
                     Subtitle="@GetSubtitle()"
                     Actions="@ActionButtons" />
@@ -53,9 +53,9 @@
                     else
                     {
                         <div class="movie-cover-fallback h-full">
-                            <span class="movie-cover-fallback__badge">Series</span>
+                            <span class="movie-cover-fallback__badge">@L["Series"]</span>
                             <h2 class="movie-cover-fallback__title">@Entry.Media.Title</h2>
-                            <p class="movie-cover-fallback__copy">Add a cover image from the edit page to give the series page a stronger visual identity.</p>
+                            <p class="movie-cover-fallback__copy">@L["Add a cover image from the edit page to give the series page a stronger visual identity."]</p>
                         </div>
                     }
                 </div>
@@ -73,7 +73,7 @@
                             }
                         </div>
 
-                        <ProgressBar Label="Series Completion"
+                        <ProgressBar Label="@L["Series Completion"]"
                                      Value="@SeriesStats.CompletionPercent"
                                      Max="100" />
 
@@ -89,12 +89,12 @@
 
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div class="soft-block p-5">
-                                <p class="text-sm font-semibold text-text">Episodes</p>
-                                <p class="mt-2 text-lg">@SeriesStats.WatchedEpisodes / @SeriesStats.TotalEpisodes watched</p>
+                                <p class="text-sm font-semibold text-text">@L["Episodes"]</p>
+                                <p class="mt-2 text-lg">@L.Format("{0} / {1} watched", SeriesStats.WatchedEpisodes, SeriesStats.TotalEpisodes)</p>
                             </div>
 
                             <div class="soft-block p-5">
-                                <p class="text-sm font-semibold text-text">Watch Time</p>
+                                <p class="text-sm font-semibold text-text">@L["Watch Time"]</p>
                                 <p class="mt-2 text-lg">@SeriesStats.WatchedMinutes.ToReadableDuration()</p>
                             </div>
                         </div>
@@ -102,7 +102,7 @@
                         @if (!string.IsNullOrWhiteSpace(Entry.Media.Description))
                         {
                             <div class="space-y-2">
-                                <h2 class="text-xl">Summary</h2>
+                                <h2 class="text-xl">@L["Summary"]</h2>
                                 <p class="text-sm leading-7 text-muted">@Entry.Media.Description</p>
                             </div>
                         }
@@ -110,10 +110,10 @@
                 </AppCard>
 
                 <section class="grid gap-4 sm:grid-cols-2">
-                    <StatTile Title="Seasons" Value="@SeriesStats.SeasonCount.ToString()" Caption="Tracked in this series." ChipLabel="Series" />
-                    <StatTile Title="Episodes" Value="@SeriesStats.TotalEpisodes.ToString()" Caption="Total episodes tracked." ChipLabel="Episodes" />
-                    <StatTile Title="Watched" Value="@SeriesStats.WatchedEpisodes.ToString()" Caption="Marked as watched." ChipLabel="Progress" />
-                    <StatTile Title="Runtime" Value="@SeriesStats.WatchedMinutes.ToReadableDuration()" Caption="Watched episode time." ChipLabel="Runtime" />
+                    <StatTile Title="@L["Seasons"]" Value="@SeriesStats.SeasonCount.ToString()" Caption="@L["Tracked in this series."]" ChipLabel="@L["Series"]" />
+                    <StatTile Title="@L["Episodes"]" Value="@SeriesStats.TotalEpisodes.ToString()" Caption="@L["Total episodes tracked."]" ChipLabel="@L["Episodes"]" />
+                    <StatTile Title="@L["Watched"]" Value="@SeriesStats.WatchedEpisodes.ToString()" Caption="@L["Marked as watched."]" ChipLabel="@L["Progress"]" />
+                    <StatTile Title="@L["Runtime"]" Value="@SeriesStats.WatchedMinutes.ToReadableDuration()" Caption="@L["Watched episode time."]" ChipLabel="@L["Runtime"]" />
                 </section>
             </div>
         </section>
@@ -122,20 +122,20 @@
             <div class="space-y-5">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <h2 class="text-2xl">Season Breakdown</h2>
-                        <p class="mt-2 text-sm leading-7 text-muted">Open each season to inspect episode progress, runtime, and watched dates.</p>
+                        <h2 class="text-2xl">@L["Season Breakdown"]</h2>
+                        <p class="mt-2 text-sm leading-7 text-muted">@L["Open each season to inspect episode progress, runtime, and watched dates."]</p>
                     </div>
 
                     <div class="flex flex-wrap gap-3">
-                        <AppButton Href="@($"series/{Id}/edit")" Variant="secondary">Quick Edit</AppButton>
-                        <AppButton Href="library" Variant="secondary">Open Library</AppButton>
+                        <AppButton Href="@($"series/{Id}/edit")" Variant="secondary">@L["Quick Edit"]</AppButton>
+                        <AppButton Href="library" Variant="secondary">@L["Open Library"]</AppButton>
                     </div>
                 </div>
 
                 @if (SeriesStats.Seasons.Count == 0)
                 {
                     <div class="soft-block p-5 text-sm text-muted">
-                        No seasons have been added yet. Open the editor to create the first season and generate episodes.
+                        @L["No seasons have been added yet. Open the editor to create the first season and generate episodes."]
                     </div>
                 }
                 else
@@ -148,7 +148,7 @@
                             <summary class="series-accordion__summary">
                                 <div class="space-y-2">
                                     <div class="flex flex-wrap items-center gap-2">
-                                        <h3 class="text-xl">Season @seasonStats.SeasonNumber</h3>
+                                        <h3 class="text-xl">@L.Format("Season {0}", seasonStats.SeasonNumber)</h3>
                                         <SeriesStatusBadge Statistics="seasonStats" />
                                     </div>
                                     @if (!string.IsNullOrWhiteSpace(seasonStats.Title))
@@ -158,13 +158,13 @@
                                 </div>
 
                                 <div class="series-accordion__meta">
-                                    <span>@seasonStats.WatchedEpisodes / @seasonStats.TotalEpisodes watched</span>
+                                    <span>@L.Format("{0} / {1} watched", seasonStats.WatchedEpisodes, seasonStats.TotalEpisodes)</span>
                                     <span>@seasonStats.WatchedMinutes.ToReadableDuration()</span>
                                 </div>
                             </summary>
 
                             <div class="space-y-4 pt-4">
-                                <ProgressBar Label="Season Completion"
+                                <ProgressBar Label="@L["Season Completion"]"
                                              Value="@seasonStats.CompletionPercent"
                                              Max="100" />
 
@@ -176,7 +176,7 @@
                                             <article class="soft-block flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between">
                                                 <div class="space-y-1">
                                                     <div class="flex flex-wrap items-center gap-2">
-                                                        <p class="font-semibold text-text">Episode @episode.EpisodeNumber</p>
+                                                        <p class="font-semibold text-text">@L.Format("Episode {0}", episode.EpisodeNumber)</p>
                                                         <AppBadge Variant="@GetEpisodeBadgeVariant(episode)">@GetEpisodeBadgeLabel(episode)</AppBadge>
                                                     </div>
 
@@ -188,7 +188,7 @@
 
                                                 <div class="flex flex-wrap gap-4 text-sm text-muted">
                                                     <span>@((episode.DurationMinutes ?? 0).ToReadableDuration())</span>
-                                                    <span>@(episode.WatchedDate?.ToLocalTime().ToString("dd MMM yyyy") ?? "No watch date")</span>
+                                                    <span>@(episode.WatchedDate?.ToLocalTime().ToString("dd MMM yyyy") ?? L["No watch date"])</span>
                                                 </div>
                                             </article>
                                         }
@@ -196,7 +196,7 @@
                                 }
                                 else
                                 {
-                                    <div class="soft-block p-4 text-sm text-muted">This season does not contain any episodes yet.</div>
+                                    <div class="soft-block p-4 text-sm text-muted">@L["This season does not contain any episodes yet."]</div>
                                 }
                             </div>
                         </details>
@@ -206,8 +206,8 @@
         </AppCard>
 
         <AppModal IsOpen="@IsDeleteModalOpen"
-                  Title="Delete this series?"
-                  Description="This permanently removes the series and all stored seasons and episodes from browser storage."
+                  Title="@L["Delete this series?"]"
+                  Description="@L["This permanently removes the series and all stored seasons and episodes from browser storage."]"
                   OnClose="CloseDeleteModalAsync">
             <ChildContent>
                 <p class="text-sm leading-7 text-muted">
@@ -215,8 +215,8 @@
                 </p>
             </ChildContent>
             <Footer>
-                <AppButton Variant="secondary" Disabled="@IsDeleting" OnClick="CloseDeleteModalButtonAsync">Cancel</AppButton>
-                <AppButton IsLoading="@IsDeleting" OnClick="ConfirmDeleteAsync">Delete Series</AppButton>
+                <AppButton Variant="secondary" Disabled="@IsDeleting" OnClick="CloseDeleteModalButtonAsync">@L["Cancel"]</AppButton>
+                <AppButton IsLoading="@IsDeleting" OnClick="ConfirmDeleteAsync">@L["Delete Series"]</AppButton>
             </Footer>
         </AppModal>
     }
@@ -234,8 +234,8 @@
     private string? ErrorMessage { get; set; }
 
     private RenderFragment ActionButtons => @<div class="flex flex-wrap gap-3">
-        <AppButton Href="@($"series/{Id}/edit")" Variant="secondary">Edit Series</AppButton>
-        <AppButton OnClick="OpenDeleteModalAsync">Delete Series</AppButton>
+        <AppButton Href="@($"series/{Id}/edit")" Variant="secondary">@L["Edit Series"]</AppButton>
+        <AppButton OnClick="OpenDeleteModalAsync">@L["Delete Series"]</AppButton>
     </div>;
 
     protected override async Task OnParametersSetAsync()
@@ -259,15 +259,15 @@
         }
 
         return SeriesStats.TotalEpisodes == 0
-            ? "This series is saved and ready for seasons, episodes, and watch tracking."
-            : "Progress, watched runtime, and per-season completion are calculated automatically from episode state.";
+            ? L["This series is saved and ready for seasons, episodes, and watch tracking."]
+            : L["Progress, watched runtime, and per-season completion are calculated automatically from episode state."];
     }
 
     private static string GetEpisodeBadgeVariant(Episode episode)
         => episode.IsWatched ? "success" : "muted";
 
     private static string GetEpisodeBadgeLabel(Episode episode)
-        => episode.IsWatched ? "Watched" : "Pending";
+        => episode.IsWatched ? LocalizedText.Translate("Watched") : LocalizedText.Translate("Pending");
 
     private Task OpenDeleteModalAsync(MouseEventArgs _)
     {
@@ -298,13 +298,13 @@
             IsDeleting = true;
             ErrorMessage = null;
             await LibraryState.DeleteAsync(Entry.Media.Id);
-            ToastState.ShowSuccess("Series deleted.", $"\"{deletedTitle}\" and its tracked progress were removed.");
+            ToastState.ShowSuccess(L["Series deleted."], L.Format("\"{0}\" and its tracked progress were removed.", deletedTitle));
             NavigationManager.NavigateTo("library");
         }
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
-            ToastState.ShowError("Series could not be deleted.", exception.Message);
+            ToastState.ShowError(L["Series could not be deleted."], exception.Message);
         }
         finally
         {

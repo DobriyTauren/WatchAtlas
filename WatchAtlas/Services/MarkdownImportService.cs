@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using WatchAtlas.Helpers;
 using WatchAtlas.Models.Forms;
 using WatchAtlas.Models.Markdown;
 
@@ -15,7 +16,7 @@ public partial class MarkdownImportService : IMarkdownImportService
         var lines = PrepareLines(markdown);
         if (lines.Count == 0)
         {
-            return MarkdownImportParseResult<MovieFormModel>.Failure("Paste some markdown first.");
+            return MarkdownImportParseResult<MovieFormModel>.Failure(LocalizedText.Translate("Paste some markdown first."));
         }
 
         var movie = new MovieFormModel();
@@ -61,7 +62,7 @@ public partial class MarkdownImportService : IMarkdownImportService
 
         if (string.IsNullOrWhiteSpace(movie.Title))
         {
-            return MarkdownImportParseResult<MovieFormModel>.Failure("A movie title could not be found. Add a `Title:` line or use the first heading for the title.");
+            return MarkdownImportParseResult<MovieFormModel>.Failure(LocalizedText.Translate("A movie title could not be found. Add a `Title:` line or use the first heading for the title."));
         }
 
         return MarkdownImportParseResult<MovieFormModel>.Success(movie, warnings);
@@ -72,7 +73,7 @@ public partial class MarkdownImportService : IMarkdownImportService
         var lines = PrepareLines(markdown);
         if (lines.Count == 0)
         {
-            return MarkdownImportParseResult<SeriesFormModel>.Failure("Paste some markdown first.");
+            return MarkdownImportParseResult<SeriesFormModel>.Failure(LocalizedText.Translate("Paste some markdown first."));
         }
 
         var series = new SeriesFormModel();
@@ -154,7 +155,7 @@ public partial class MarkdownImportService : IMarkdownImportService
 
         if (string.IsNullOrWhiteSpace(series.Title))
         {
-            return MarkdownImportParseResult<SeriesFormModel>.Failure("A series title could not be found. Add a `Title:` line or use the first heading for the title.");
+            return MarkdownImportParseResult<SeriesFormModel>.Failure(LocalizedText.Translate("A series title could not be found. Add a `Title:` line or use the first heading for the title."));
         }
 
         NormalizeSeasonOrdering(series);
@@ -166,7 +167,7 @@ public partial class MarkdownImportService : IMarkdownImportService
         var lines = PrepareLines(markdown);
         if (lines.Count == 0)
         {
-            return MarkdownImportParseResult<IReadOnlyList<SeasonFormModel>>.Failure("Paste some markdown first.");
+            return MarkdownImportParseResult<IReadOnlyList<SeasonFormModel>>.Failure(LocalizedText.Translate("Paste some markdown first."));
         }
 
         var seasons = new List<SeasonFormModel>();
@@ -247,7 +248,7 @@ public partial class MarkdownImportService : IMarkdownImportService
 
         if (seasons.Count == 0)
         {
-            return MarkdownImportParseResult<IReadOnlyList<SeasonFormModel>>.Failure("No season blocks were found. Add `## Season 1` headings or `- Season 1:` list items.");
+            return MarkdownImportParseResult<IReadOnlyList<SeasonFormModel>>.Failure(LocalizedText.Translate("No season blocks were found. Add `## Season 1` headings or `- Season 1:` list items."));
         }
 
         NormalizeSeasonOrdering(seasons);

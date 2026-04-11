@@ -1,4 +1,5 @@
 @implements IDisposable
+@inject LocalizationState LocalizationState
 @inject ThemeState ThemeState
 
 <div class="@WrapperClass">
@@ -6,7 +7,7 @@
         @if (ShowCurrentButton)
         {
             <AppButton Variant="secondary" Size="sm" OnClick="CycleThemeAsync">
-                Theme: @ThemeState.CurrentTheme.DisplayName
+                @L.Format("Theme: {0}", GetDisplayName(ThemeState.CurrentTheme))
             </AppButton>
         }
 
@@ -15,7 +16,7 @@
             @foreach (var theme in ThemeState.AvailableThemes)
             {
                 <button class="@GetCompactButtonClass(theme)" type="button" @onclick="() => ThemeState.ApplyThemeAsync(theme.Mode)">
-                    @theme.AccentLabel
+                    @L[theme.AccentLabel]
                 </button>
             }
         }
@@ -28,15 +29,15 @@
             {
                 <button class="@GetCardClass(theme)" type="button" @onclick="() => ThemeState.ApplyThemeAsync(theme.Mode)">
                     <span class="flex items-center justify-between gap-3">
-                        <span class="text-left text-sm font-semibold text-text">@theme.DisplayName</span>
+                        <span class="text-left text-sm font-semibold text-text">@GetDisplayName(theme)</span>
                         <span class="flex items-center gap-2">
                             <span class="h-3 w-3 rounded-full border border-white/50" style="@($"background:{theme.AccentHex}")"></span>
                             <span class="h-3 w-3 rounded-full border border-white/50" style="@($"background:{theme.HighlightHex}")"></span>
                             <span class="h-3 w-3 rounded-full border border-white/50" style="@($"background:{theme.SurfaceHex}")"></span>
                         </span>
                     </span>
-                    <span class="text-left text-sm leading-6 text-muted">@theme.Description</span>
-                    <span class="text-left text-xs font-semibold uppercase tracking-[0.24em] text-muted">@theme.AccentLabel</span>
+                    <span class="text-left text-sm leading-6 text-muted">@L[theme.Description]</span>
+                    <span class="text-left text-xs font-semibold uppercase tracking-[0.24em] text-muted">@L[theme.AccentLabel]</span>
                 </button>
             }
         </div>
@@ -55,6 +56,7 @@
 
     protected override void OnInitialized()
     {
+        LocalizationState.Changed += HandleLocalizationChanged;
         ThemeState.Changed += HandleThemeChanged;
     }
 
@@ -78,11 +80,18 @@
             ? "theme-card theme-card-active"
             : "theme-card";
 
+    private string GetDisplayName(ThemeSettings theme)
+        => L[theme.DisplayName];
+
     private void HandleThemeChanged()
+        => InvokeAsync(StateHasChanged);
+
+    private void HandleLocalizationChanged()
         => InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
+        LocalizationState.Changed -= HandleLocalizationChanged;
         ThemeState.Changed -= HandleThemeChanged;
     }
 }

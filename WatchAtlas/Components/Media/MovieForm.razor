@@ -19,19 +19,19 @@
 
         <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div class="flex flex-wrap gap-3">
-                <MarkdownImportLauncher ButtonLabel="Fill From Markdown"
-                                        ModalTitle="Fill this movie from markdown"
-                                        ModalDescription="Paste one clean markdown document for a single movie, or copy the AI prompt below to generate it automatically in the right format."
+                <MarkdownImportLauncher ButtonLabel="@L["Fill From Markdown"]"
+                                        ModalTitle="@L["Fill this movie from markdown"]"
+                                        ModalDescription="@L["Paste one clean markdown document for a single movie, or copy the AI prompt below to generate it automatically in the right format."]"
                                         ExampleMarkdown="@MarkdownImportExamples.Movie"
-                                        ExampleTitle="See a movie example"
+                                        ExampleTitle="@L["See a movie example"]"
                                     UsageSteps="@MarkdownImportExamples.MovieImportSteps"
                                     CopyablePrompt="@MarkdownImportExamples.MovieAiPrompt"
-                                    CopyablePromptTitle="Prompt for ChatGPT or Claude"
-                                    CopyablePromptDescription="Copy this prepared prompt and ask your assistant for import-ready markdown."
+                                    CopyablePromptTitle="@L["Prompt for ChatGPT or Claude"]"
+                                    CopyablePromptDescription="@L["Copy this prepared prompt and ask your assistant for import-ready markdown."]"
                                     PromptPrimaryToken="[MOVIE TITLE]"
-                                        PromptPrimaryLabel="Movie title for AI"
+                                        PromptPrimaryLabel="@L["Movie title for AI"]"
                                         PromptPrimaryPlaceholder="The Matrix"
-                                        PromptPrimaryHelpText="This title will be inserted into the copied prompt automatically."
+                                        PromptPrimaryHelpText="@L["This title will be inserted into the copied prompt automatically."]"
                                         PromptPrimaryValue="@Model.Title"
                                         Placeholder="# Movie&#10;Title: ...&#10;Genres: ...&#10;Duration: 120"
                                         FieldPrefix="@($"{FieldPrefix}-markdown")"
@@ -43,7 +43,7 @@
 
                 @if (!string.IsNullOrWhiteSpace(CancelHref))
                 {
-                    <AppButton Href="@CancelHref" Variant="secondary">Cancel</AppButton>
+                    <AppButton Href="@CancelHref" Variant="secondary">@L["Cancel"]</AppButton>
                 }
             </div>
         </div>
@@ -94,16 +94,16 @@
         var result = MarkdownImportService.ParseMovie(markdown);
         if (!result.IsSuccessful || result.Value is null)
         {
-            return Task.FromResult(MarkdownImportApplyResult.Failure(result.ErrorMessage ?? "The markdown could not be applied."));
+            return Task.FromResult(MarkdownImportApplyResult.Failure(result.ErrorMessage ?? L["The markdown could not be applied."]));
         }
 
         Model.CopyFrom(result.Value);
         RefreshEditContext();
-        ToastState.ShowSuccess("Movie details added.", "The movie form was filled from your markdown.");
+        ToastState.ShowSuccess(L["Movie details added."], L["The movie form was filled from your markdown."]);
 
         if (result.Warnings.Count > 0)
         {
-            ToastState.ShowInfo("A few details need a quick check.", result.Warnings[0]);
+            ToastState.ShowInfo(L["A few details need a quick check."], result.Warnings[0]);
         }
 
         return Task.FromResult(MarkdownImportApplyResult.Success());
@@ -112,7 +112,7 @@
     private void HandleInvalidSubmit(EditContext editContext)
     {
         var firstMessage = editContext.GetValidationMessages().FirstOrDefault();
-        ToastState.ShowWarning("Please review the form fields.", firstMessage ?? "Some movie details still need attention before save.");
+        ToastState.ShowWarning(L["Please review the form fields."], firstMessage ?? L["Some movie details still need attention before save."]);
     }
 
     private void RefreshEditContext()

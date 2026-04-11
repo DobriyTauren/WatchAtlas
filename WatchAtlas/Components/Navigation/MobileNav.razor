@@ -1,8 +1,25 @@
+@implements IDisposable
+@inject LocalizationState LocalizationState
+
 <nav class="fixed inset-x-4 bottom-4 z-30 lg:hidden" aria-label="Primary navigation">
     <div class="shell-card flex items-center justify-between gap-2 px-3 py-3">
-        <NavLink href="" Match="NavLinkMatch.All" class="nav-chip flex-1 justify-center px-3" ActiveClass="nav-chip-active">Home</NavLink>
-        <NavLink href="library" class="nav-chip flex-1 justify-center px-3" ActiveClass="nav-chip-active">Library</NavLink>
-        <NavLink href="statistics" class="nav-chip flex-1 justify-center px-3" ActiveClass="nav-chip-active">Stats</NavLink>
-        <NavLink href="settings" class="nav-chip flex-1 justify-center px-3" ActiveClass="nav-chip-active">Settings</NavLink>
+        <NavLink href="" Match="NavLinkMatch.All" class="nav-chip flex-1 justify-center px-3" ActiveClass="nav-chip-active">@L["Home"]</NavLink>
+        <NavLink href="library" class="nav-chip flex-1 justify-center px-3" ActiveClass="nav-chip-active">@L["Library"]</NavLink>
+        <NavLink href="statistics" class="nav-chip flex-1 justify-center px-3" ActiveClass="nav-chip-active">@L["Stats"]</NavLink>
+        <NavLink href="settings" class="nav-chip flex-1 justify-center px-3" ActiveClass="nav-chip-active">@L["Settings"]</NavLink>
     </div>
 </nav>
+
+@code {
+    protected override void OnInitialized()
+    {
+        LocalizationState.Changed += HandleLocalizationChanged;
+    }
+
+    private void HandleLocalizationChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        LocalizationState.Changed -= HandleLocalizationChanged;
+    }
+}
