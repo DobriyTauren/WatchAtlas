@@ -24,14 +24,9 @@ public static class MarkdownImportExamples
         """
         # Movie
         Title: The Matrix
-        Cover: https://example.com/matrix.jpg
         Description: A hacker discovers that reality is a simulation.
         Genres: Science Fiction, Action
-        Rating: 9/10
-        Duration: 136 min
-        Watched: yes
-        Watched Date: 2026-04-01
-        Notes: Rewatch before starting the sequel.
+        Duration: 136
         """;
 
     public static string MovieAiPrompt =>
@@ -40,29 +35,26 @@ public static class MarkdownImportExamples
 
         Replace [MOVIE TITLE] with the exact movie name before generating.
 
+        Research rules:
+        - Use the latest available public information at generation time.
+        - If a value cannot be confirmed, omit that line instead of guessing.
+
         Output rules:
         - Return only raw markdown.
-        - Do not wrap the answer in code fences.
+        - Do not use code fences.
         - Do not add explanations, notes, or commentary outside the markdown.
-        - If a value is unknown, omit that line instead of guessing.
+        - Do not include poster URLs, image links, or reference/source URLs.
+        - Description should be plain text and ideally should not contain links, citations, source mentions, footnotes, or markdown link syntax.
         - Keep genres on one comma-separated line.
-        - Use dates only in YYYY-MM-DD format.
         - Use duration as minutes only, for example `Duration: 136`.
-        - Use `Watched: yes` or `Watched: no` only if that status is clearly known.
-        - Include `Watched Date:` only when an exact watch date is known.
 
-        Use exactly this structure:
+        Use this structure:
 
         # Movie
         Title: [MOVIE TITLE]
-        Cover:
         Description:
         Genres:
-        Rating:
         Duration:
-        Watched:
-        Watched Date:
-        Notes:
 
         Create the markdown for: [MOVIE TITLE]
         """;
@@ -71,25 +63,19 @@ public static class MarkdownImportExamples
         """
         # Series
         Title: Arcane
-        Cover: https://example.com/arcane.jpg
         Description: Sisters from Zaun are pulled into the conflict around Hextech.
         Genres: Animation, Fantasy, Drama
-        Rating: 10
-        Notes: Keep special episodes marked as watched.
 
-        ## Season 1: 2021
+        ## Season 1: 2021-11-06
         - Episode 1: Welcome to the Playground
           - Duration: 43
-          - Watched: yes
-          - Watched Date: 2026-03-01
         - Episode 2: Some Mysteries Are Better Left Unsolved
           - Duration: 41
-          - Watched: yes
 
-        ## Season 2: 2024 (planned)
-        - Episode 9: Heavy Is the Crown
+        ## Season 2: 2024-11-09
+        - Episode 1: Heavy Is the Crown
           - Duration: 44
-        - Episode 10: Watch It All Burn
+        - Episode 2: Watch It All Burn
           - Duration: 42
         """;
 
@@ -99,57 +85,57 @@ public static class MarkdownImportExamples
 
         Replace [SERIES TITLE] with the exact show name before generating.
 
+        Research rules:
+        - Use the latest available public information at generation time.
+        - Include every released season and every released episode.
+        - Also include officially announced upcoming seasons or episodes when their existence is confirmed by reliable public sources.
+        - If upcoming seasons or episodes already have confirmed episode count, titles, release dates, or durations, include those confirmed details too.
+        - If only part of the upcoming information is known, include only the confirmed fields and omit the rest.
+        - Do not invent unconfirmed seasons, episodes, titles, dates, counts, or durations.
+
         Output rules:
         - Return only raw markdown.
-        - Do not wrap the answer in code fences.
+        - Do not use code fences.
         - Do not add explanations, notes, or commentary outside the markdown.
-        - If a value is unknown, omit that line instead of guessing.
+        - Do not include poster URLs, image links, or reference/source URLs.
+        - Description should be plain text and ideally should not contain links, citations, source mentions, footnotes, or markdown link syntax.
         - Keep genres on one comma-separated line.
-        - Use dates only in YYYY-MM-DD format.
         - Use episode duration as minutes only, for example `Duration: 42`.
-        - Use `Watched: yes` or `Watched: no` only if that status is clearly known.
-        - Include `Watched Date:` only when an exact watch date is known.
-        - Always put the season year in the season title position after the colon, for example `## Season 1: 2021`.
-        - For officially announced but unreleased seasons, still include the planned year in that same title position, for example `## Season 3: 2026 (planned)`.
-        - Include not only released episodes, but also officially announced upcoming seasons or episodes that have not aired yet.
-        - If a future season is officially announced, include its episode list too whenever episode count, numbering, or titles are already known.
-        - If a future season is announced but episode titles are not published yet, still list the announced episode numbers as `Episode 1`, `Episode 2`, and so on whenever the episode count or numbering is known.
-        - Continue episode numbering from the previous seasons already listed in the same markdown instead of restarting from 1 in each new season.
-        - Do not invent unconfirmed future episodes or placeholder items that have not been officially announced.
-        - For announced but unreleased episodes, omit `Watched Date:` and omit `Duration:` if it is not confirmed yet.
+        - Each season heading must be `## Season N: RELEASE DATE`.
+        - After the colon, put the season release date or announced release date.
+        - Use the most precise confirmed date available after the colon: `YYYY-MM-DD`, otherwise `YYYY-MM`, otherwise `YYYY`.
+        - Number episodes starting from 1 inside each season.
+        - For unreleased episodes, omit `Duration:` if it is not confirmed yet.
+        - If a season is announced but no episode list is confirmed yet, include the season heading without inventing episode entries.
 
-        Use exactly this structure:
+        Use this structure:
 
         # Series
         Title: [SERIES TITLE]
-        Cover:
         Description:
         Genres:
-        Rating:
-        Notes:
 
-        ## Season 1: 2021
+        ## Season 1: 2021-11-06
         - Episode 1: Episode Title
           - Duration: 42
-          - Watched: no
+        - Episode 2: Episode Title
+          - Duration: 41
 
-        ## Season 2: 2026 (planned)
-        - Episode 9: Episode Title
+        ## Season 2: 2026-10 (announced)
+        - Episode 1: Episode Title
           - Duration: 44
-        - Episode 10
+        - Episode 2
 
         Include all released seasons and episodes, plus officially announced upcoming seasons or episodes, for: [SERIES TITLE]
         """;
 
     public static string Season =>
         """
-        ## Season 3: 2026
+        ## Season 3: 2026-10
         - Episode 1: First Light
           - Duration: 46
         - Episode 2: The Last Signal
           - Duration: 49
-          - Watched: yes
-          - Watched Date: 2026-04-05
         """;
 
     public static string SeasonAiPrompt =>
@@ -158,34 +144,39 @@ public static class MarkdownImportExamples
 
         Replace [SERIES TITLE] and [SEASONS TO ADD] before generating.
 
+        Research rules:
+        - Use the latest available public information at generation time.
+        - Include every requested season that has already been released.
+        - Also include requested seasons or episodes that are officially announced but not yet released when their existence is confirmed by reliable public sources.
+        - If upcoming seasons or episodes already have confirmed episode count, titles, release dates, or durations, include those confirmed details too.
+        - If only part of the information is known, include only the confirmed fields and omit the rest.
+        - Do not invent unconfirmed seasons, episodes, titles, dates, counts, or durations.
+
         Output rules:
         - Return only raw markdown.
         - Do not use code fences.
         - Do not add commentary before or after the markdown.
         - Start directly with the first season heading.
-        - If a value is unknown, omit that line instead of guessing.
+        - Do not include poster URLs, image links, or reference/source URLs.
+        - If any description text is included anywhere, it should be plain text and ideally should not contain links, citations, source mentions, footnotes, or markdown link syntax.
         - Use minutes only for duration, for example `Duration: 47`.
-        - Use `Watched: yes` or `Watched: no` only if that status is clearly known.
-        - Include `Watched Date:` only when an exact watch date is known.
-        - Always put the season year in the season title position after the colon, for example `## Season 3: 2026`.
-        - For officially announced but unreleased seasons, put the planned year in that same title position, for example `## Season 4: 2027 (planned)`.
-        - Include officially announced upcoming episodes even if they have not aired yet.
-        - If the target season is planned but already has announced episode count, numbering, or titles, include those episode entries too.
-        - If titles are not published yet, still list the announced episode numbers as `Episode 1`, `Episode 2`, and so on whenever the episode count or numbering is known.
-        - Continue episode numbering from the previous seasons already listed in the same markdown instead of restarting from 1 in each new season.
-        - Do not invent unconfirmed future episodes or placeholder items that have not been officially announced.
-        - For announced but unreleased episodes, omit `Watched Date:` and omit `Duration:` if it is not confirmed yet.
+        - Each season heading must be `## Season N: RELEASE DATE`.
+        - After the colon, put the season release date or announced release date.
+        - Use the most precise confirmed date available after the colon: `YYYY-MM-DD`, otherwise `YYYY-MM`, otherwise `YYYY`.
+        - Number episodes starting from 1 inside each season.
+        - For unreleased episodes, omit `Duration:` if it is not confirmed yet.
+        - If a season is announced but no episode list is confirmed yet, include the season heading without inventing episode entries.
 
-        Use exactly this structure:
+        Use this structure:
 
-        ## Season 3: 2026
+        ## Season 3: 2026-10
         - Episode 1: Episode Title
           - Duration: 46
 
-        ## Season 4: 2027 (planned)
-        - Episode 9: Episode Title
+        ## Season 4: 2027 (announced)
+        - Episode 1: Episode Title
           - Duration: 49
-        - Episode 10
+        - Episode 2
 
         Create seasons for: [SERIES TITLE]
         Seasons to add: [SEASONS TO ADD]

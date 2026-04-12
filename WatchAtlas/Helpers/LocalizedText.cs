@@ -105,7 +105,7 @@ public static class LocalizedText
             ["Everything is visible."] = "Показаны все элементы.",
             ["Quick Filters"] = "Быстрые фильтры",
             ["All Items"] = "Все элементы",
-            ["Movies"] = "Фильмы",
+            ["Movies"] = "Фильм",
             ["Series"] = "Сериал",
             ["Completed"] = "Завершено",
             ["In Progress"] = "В процессе",
