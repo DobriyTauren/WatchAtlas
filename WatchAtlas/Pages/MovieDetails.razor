@@ -20,7 +20,7 @@
 
         <EmptyStateCard Badge="@L["Movie Details"]"
                         Title="@L["No movie found."]"
-                        Description="@L["Create a movie first, then return here to review metadata, watch status, and notes."]"
+                        Description="@L["Create a movie first, then return here to review metadata and watch status."]"
                         PrimaryLabel="@L["Create Movie"]"
                         PrimaryHref="movies/new"
                         SecondaryLabel="@L["Return to Library"]"
@@ -82,6 +82,14 @@
                             </div>
                         </div>
 
+                        @if (!string.IsNullOrWhiteSpace(Entry.Movie?.Universe))
+                        {
+                            <div class="soft-block p-4">
+                                <p class="text-sm font-semibold text-text">@UniverseLabel</p>
+                                <p class="mt-2 text-sm text-muted">@Entry.Movie.Universe</p>
+                            </div>
+                        }
+
                         @if (Entry.Media.Genres.Count > 0)
                         {
                             <div class="flex flex-wrap gap-2">
@@ -103,24 +111,15 @@
                 </AppCard>
 
                 <AppCard>
-                    <div class="space-y-4">
-                        <h2 class="text-2xl">@L["Notes"]</h2>
-                        <p class="text-sm leading-7 text-muted">
-                            @(string.IsNullOrWhiteSpace(Entry.Media.Notes)
-                                ? L["No notes have been added for this movie yet."]
-                                : Entry.Media.Notes)
-                        </p>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="soft-block-strong p-5">
+                            <p class="text-sm font-semibold text-text">@L["Created"]</p>
+                            <p class="mt-2 text-lg">@Entry.Media.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
+                        </div>
 
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <div class="soft-block-strong p-5">
-                                <p class="text-sm font-semibold text-text">@L["Created"]</p>
-                                <p class="mt-2 text-lg">@Entry.Media.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
-                            </div>
-
-                            <div class="soft-block-strong p-5">
-                                <p class="text-sm font-semibold text-text">@L["Updated"]</p>
-                                <p class="mt-2 text-lg">@Entry.Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
-                            </div>
+                        <div class="soft-block-strong p-5">
+                            <p class="text-sm font-semibold text-text">@L["Updated"]</p>
+                            <p class="mt-2 text-lg">@Entry.Media.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
                         </div>
                     </div>
                 </AppCard>
@@ -179,8 +178,8 @@
         }
 
         return Entry.Movie?.IsWatched == true
-            ? L["Watched movie details, runtime, and notes are stored locally and ready to edit."]
-            : L["This movie is in your library and ready for watch progress, notes, and metadata updates."];
+            ? L["Watched movie details and runtime are stored locally and ready to edit."]
+            : L["This movie is in your library and ready for watch progress and metadata updates."];
     }
 
     private string GetRuntime()
@@ -193,6 +192,11 @@
 
     private string GetWatchedDate()
         => Entry?.Movie?.WatchedDate?.ToLocalTime().ToString("dd MMM yyyy") ?? L["Not set"];
+
+    private string UniverseLabel
+        => LocalizedText.GetCurrentLanguage() == WatchAtlas.Models.Enums.AppLanguage.Russian
+            ? "\u0412\u0441\u0435\u043b\u0435\u043d\u043d\u0430\u044f"
+            : "Universe";
 
     private Task OpenDeleteModalAsync(MouseEventArgs _)
     {

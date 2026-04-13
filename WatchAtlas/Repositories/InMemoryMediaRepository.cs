@@ -185,7 +185,6 @@ public class LocalStorageMediaRepository(IJSRuntime jsRuntime) : IMediaRepositor
         normalized.Title = normalized.Title.Trim();
         normalized.CoverImageUrl = NormalizeString(normalized.CoverImageUrl);
         normalized.Description = NormalizeString(normalized.Description);
-        normalized.Notes = NormalizeString(normalized.Notes);
         normalized.PersonalRating = normalized.PersonalRating is >= 1 and <= 10 ? normalized.PersonalRating : null;
         normalized.CreatedAt = normalized.CreatedAt == default ? DateTime.UtcNow : normalized.CreatedAt;
         normalized.UpdatedAt = normalized.UpdatedAt == default ? normalized.CreatedAt : normalized.UpdatedAt;
@@ -225,6 +224,7 @@ public class LocalStorageMediaRepository(IJSRuntime jsRuntime) : IMediaRepositor
     private static MovieDetails NormalizeMovieDetails(MovieDetails details)
     {
         var normalized = LibraryCloneHelper.Clone(details)!;
+        normalized.Universe = NormalizeString(normalized.Universe);
 
         if (normalized.DurationMinutes <= 0)
         {
@@ -242,6 +242,7 @@ public class LocalStorageMediaRepository(IJSRuntime jsRuntime) : IMediaRepositor
     private static SeriesDetails NormalizeSeriesDetails(SeriesDetails details)
     {
         var normalized = LibraryCloneHelper.Clone(details)!;
+        normalized.Universe = NormalizeString(normalized.Universe);
 
         normalized.Seasons = normalized.Seasons
             .OrderBy(season => season.SeasonNumber)

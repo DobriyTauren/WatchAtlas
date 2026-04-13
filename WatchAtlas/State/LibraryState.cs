@@ -180,7 +180,6 @@ public class LibraryState(IMediaRepository repository) : StateStoreBase
         target.Description = source.Description;
         target.Genres = source.Genres.ToList();
         target.PersonalRating = source.PersonalRating;
-        target.Notes = source.Notes;
         target.CreatedAt = source.CreatedAt;
         target.UpdatedAt = source.UpdatedAt;
     }

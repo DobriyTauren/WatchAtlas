@@ -80,7 +80,7 @@ public class ImportExportService : IImportExportService
         return root.ValueKind == JsonValueKind.Object &&
                (root.TryGetProperty("mediaItems", out _) ||
                 root.TryGetProperty("movies", out _) ||
-                root.TryGetProperty("series", out _) ||
+                root.TryGetProperty("shows", out _) ||
                 root.TryGetProperty("entries", out _));
     }
 

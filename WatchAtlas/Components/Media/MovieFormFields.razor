@@ -13,7 +13,12 @@
                    PlaceholderCopy="@L["Choose an external cover URL or upload a poster image from this device."]" />
     <ValidationMessage For="@(() => Model.CoverImageUrl)" class="mt-2 block text-sm text-red-600" />
 
-    <div class="grid gap-4 sm:grid-cols-2">
+    <div class="grid gap-4 lg:grid-cols-3">
+        <AppInput Id="@($"{FieldPrefix}-universe")"
+                  Label="@UniverseLabel"
+                  @bind-Value="Model.Universe"
+                  Placeholder="Marvel" />
+
         <div class="app-field">
             <label class="app-field-label" for="@($"{FieldPrefix}-rating")">@L["Rating"]</label>
             <InputNumber TValue="int?" id="@($"{FieldPrefix}-rating")" class="app-input" @bind-Value="Model.PersonalRating" />
@@ -36,11 +41,6 @@
                  Label="@L["Description"]"
                  @bind-Value="Model.Description"
                  TextareaClassName="min-h-32" />
-
-    <AppTextarea Id="@($"{FieldPrefix}-notes")"
-                 Label="@L["Notes"]"
-                 @bind-Value="Model.Notes"
-                 TextareaClassName="min-h-28" />
 
     <div class="soft-block space-y-4 p-5">
         <div class="flex items-center justify-between gap-3">
@@ -91,4 +91,9 @@
 
     private string GetPlaceholderTitle()
         => string.IsNullOrWhiteSpace(Model.Title) ? L["Movie cover preview"] : Model.Title;
+
+    private string UniverseLabel
+        => LocalizedText.GetCurrentLanguage() == WatchAtlas.Models.Enums.AppLanguage.Russian
+            ? "\u0412\u0441\u0435\u043b\u0435\u043d\u043d\u0430\u044f"
+            : "Universe";
 }

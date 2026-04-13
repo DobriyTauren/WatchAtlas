@@ -2,7 +2,7 @@
     <div class="space-y-6">
         <div>
             <h2 class="text-2xl">@L["Completion Overview"]</h2>
-            <p class="mt-2 text-sm leading-7 text-muted">@L["A quick breakdown of watched versus remaining items across movies, series, and episodes."]</p>
+            <p class="mt-2 text-sm leading-7 text-muted">@L["A quick breakdown of watched versus remaining items across movies, shows, and episodes."]</p>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -19,15 +19,15 @@
             </div>
 
             <div class="soft-block-strong p-5">
-                <p class="text-sm font-semibold text-text">@L["Series Completion"]</p>
+                <p class="text-sm font-semibold text-text">@L["Shows Completion"]</p>
                 <p class="mt-2 text-3xl">@Stats.AverageSeriesCompletionPercent.ToPercentageLabel()</p>
-                <p class="mt-2 text-sm text-muted">@L.Format("{0} completed, {1} in progress.", Stats.CompletedSeries.ToCountLabel("series", "series"), Stats.InProgressSeries.ToCountLabel("series", "series"))</p>
+                <p class="mt-2 text-sm text-muted">@L.Format("{0} completed, {1} in progress.", Stats.CompletedSeries.ToCountLabel("show", "shows"), Stats.InProgressSeries.ToCountLabel("show", "shows"))</p>
             </div>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-3">
             <div class="soft-block p-4">
-                <p class="text-sm font-semibold text-text">@L["Completed Series"]</p>
+                <p class="text-sm font-semibold text-text">@L["Completed Shows"]</p>
                 <p class="mt-2 text-lg">@Stats.CompletedSeries</p>
             </div>
 

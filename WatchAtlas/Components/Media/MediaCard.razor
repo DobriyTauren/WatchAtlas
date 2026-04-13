@@ -31,7 +31,7 @@
                     }
                     else
                     {
-                        <p class="mt-2 text-sm leading-6 text-muted">@L["No description yet. Open details to add notes, cover art, and richer tracking info."]</p>
+                        <p class="mt-2 text-sm leading-6 text-muted">@L["No description yet. Open details to add cover art and richer tracking info."]</p>
                     }
                 </div>
             </div>
@@ -74,7 +74,7 @@
 
         @if (seriesProgress is not null)
         {
-            <ProgressBar Label="@L["Series Completion"]"
+            <ProgressBar Label="@L["Show Completion"]"
                          Value="@seriesProgress.WatchedEpisodes"
                          Max="@Math.Max(seriesProgress.TotalEpisodes, 1)" />
         }

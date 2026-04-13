@@ -53,14 +53,15 @@ public class FilterState : StateStoreBase
         NotifyStateChanged();
     }
 
-    public void SetSeriesId(Guid? value)
+    public void SetUniverse(string? value)
     {
-        if (Options.SeriesId == value)
+        var normalized = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+        if (Options.Universe == normalized)
         {
             return;
         }
 
-        Options.SeriesId = value;
+        Options.Universe = normalized;
         NotifyStateChanged();
     }
 
@@ -90,9 +91,9 @@ public class FilterState : StateStoreBase
     {
         Options.SearchTerm = string.Empty;
         Options.Genre = null;
+        Options.Universe = null;
         Options.MediaType = null;
         Options.Status = null;
-        Options.SeriesId = null;
         Options.SortBy = sortBy ?? LibrarySortBy.UpdatedAt;
         Options.Descending = descending ?? true;
         NotifyStateChanged();
@@ -108,6 +109,7 @@ public class FilterState : StateStoreBase
             query = query.Where(entry =>
                 entry.Media.Title.Contains(Options.SearchTerm, StringComparison.OrdinalIgnoreCase) ||
                 (entry.Media.Description?.Contains(Options.SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (GetUniverse(entry)?.Contains(Options.SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
                 entry.Media.Genres.Any(genre => genre.Contains(Options.SearchTerm, StringComparison.OrdinalIgnoreCase)));
         }
 
@@ -126,9 +128,9 @@ public class FilterState : StateStoreBase
             query = query.Where(entry => WatchStatusHelper.GetStatus(entry) == Options.Status);
         }
 
-        if (Options.SeriesId is not null)
+        if (!string.IsNullOrWhiteSpace(Options.Universe))
         {
-            query = query.Where(entry => entry.Media.Id == Options.SeriesId.Value);
+            query = query.Where(entry => string.Equals(GetUniverse(entry), Options.Universe, StringComparison.OrdinalIgnoreCase));
         }
 
         query = Options.SortBy switch
@@ -161,9 +163,9 @@ public class FilterState : StateStoreBase
             {
                 SearchTerm = Options.SearchTerm,
                 Genre = Options.Genre,
+                Universe = Options.Universe,
                 MediaType = Options.MediaType,
                 Status = Options.Status,
-                SeriesId = Options.SeriesId,
                 SortBy = Options.SortBy,
                 Descending = Options.Descending
             },
@@ -171,4 +173,7 @@ public class FilterState : StateStoreBase
             FilteredCount = items.Count
         };
     }
+
+    private static string? GetUniverse(LibraryEntry entry)
+        => entry.Media.Type == MediaType.Movie ? entry.Movie?.Universe : entry.Series?.Universe;
 }

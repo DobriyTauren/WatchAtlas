@@ -28,9 +28,9 @@
     }
     else
     {
-        <PageHeader Eyebrow="@L["Edit Series"]"
+        <PageHeader Eyebrow="@L["Edit Show"]"
                     Title="@Entry.Media.Title"
-                    Subtitle="@L["Update the series details, seasons, and episodes."]" />
+                    Subtitle="@L["Update the show details, seasons, and episodes."]" />
 
         <section class="grid gap-4 xl:grid-cols-[1.15fr,0.85fr]">
             <AppCard>
@@ -46,7 +46,7 @@
             <AppCard>
                 <div class="space-y-5">
                     <div class="flex flex-wrap gap-2">
-                        <AppBadge>@L["Series"]</AppBadge>
+                        <AppBadge>@L["Show"]</AppBadge>
                         @if (Entry.Media.PersonalRating is { } rating)
                         {
                             <span class="rating-pill">@rating/10</span>
@@ -128,13 +128,13 @@
             if (Entry is not null)
             {
                 Form = SeriesFormModel.From(Entry.Media, Entry.Series);
-                ToastState.ShowSuccess(L["Series saved."], L["Your series details were updated successfully."]);
+                ToastState.ShowSuccess(L["Show saved."], L["Your show details were updated successfully."]);
             }
         }
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
-            ToastState.ShowError(L["Series changes could not be saved."], exception.Message);
+            ToastState.ShowError(L["Show changes could not be saved."], exception.Message);
         }
         finally
         {

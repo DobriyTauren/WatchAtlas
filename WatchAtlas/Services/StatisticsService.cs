@@ -214,6 +214,57 @@ public class StatisticsService : IStatisticsService
             .ToList();
     }
 
+    public IReadOnlyList<UniverseWatchTimeStatistics> GetTopUniversesByWatchTime(IEnumerable<LibraryEntry> entries, int count)
+    {
+        var universeTotals = new Dictionary<string, UniverseWatchTimeAggregate>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var entry in entries)
+        {
+            var universe = GetUniverse(entry);
+            if (string.IsNullOrWhiteSpace(universe))
+            {
+                continue;
+            }
+
+            var watchedMovieMinutes = entry.Media.Type == MediaType.Movie && entry.Movie?.IsWatched == true
+                ? entry.Movie.DurationMinutes ?? 0
+                : 0;
+            var watchedEpisodeMinutes = entry.Media.Type == MediaType.Series
+                ? CalculateSeriesStatistics(entry).WatchedMinutes
+                : 0;
+
+            if (watchedMovieMinutes <= 0 && watchedEpisodeMinutes <= 0)
+            {
+                continue;
+            }
+
+            if (!universeTotals.TryGetValue(universe, out var aggregate))
+            {
+                aggregate = new UniverseWatchTimeAggregate(universe);
+                universeTotals.Add(universe, aggregate);
+            }
+
+            aggregate.WatchedMovieMinutes += watchedMovieMinutes;
+            aggregate.WatchedEpisodeMinutes += watchedEpisodeMinutes;
+            aggregate.TitleIds.Add(entry.Media.Id);
+        }
+
+        return universeTotals.Values
+            .Select(aggregate => new UniverseWatchTimeStatistics
+            {
+                Universe = aggregate.Universe,
+                WatchedMovieMinutes = aggregate.WatchedMovieMinutes,
+                WatchedEpisodeMinutes = aggregate.WatchedEpisodeMinutes,
+                TotalWatchedMinutes = aggregate.WatchedMovieMinutes + aggregate.WatchedEpisodeMinutes,
+                TitleCount = aggregate.TitleIds.Count
+            })
+            .OrderByDescending(stats => stats.TotalWatchedMinutes)
+            .ThenByDescending(stats => stats.TitleCount)
+            .ThenBy(stats => stats.Universe)
+            .Take(Math.Max(count, 0))
+            .ToList();
+    }
+
     public IReadOnlyList<SeasonStatistics> GetTopSeasonsByWatchTime(IEnumerable<LibraryEntry> entries, int count)
     {
         return CalculateSeriesStatistics(entries)
@@ -268,4 +319,20 @@ public class StatisticsService : IStatisticsService
         public int WatchedEpisodeMinutes { get; set; }
         public HashSet<Guid> TitleIds { get; } = new();
     }
+
+    private sealed class UniverseWatchTimeAggregate(string universe)
+    {
+        public string Universe { get; } = universe;
+        public int WatchedMovieMinutes { get; set; }
+        public int WatchedEpisodeMinutes { get; set; }
+        public HashSet<Guid> TitleIds { get; } = new();
+    }
+
+    private static string? GetUniverse(LibraryEntry entry)
+        => entry.Media.Type == MediaType.Movie
+            ? NormalizeOptional(entry.Movie?.Universe)
+            : NormalizeOptional(entry.Series?.Universe);
+
+    private static string? NormalizeOptional(string? value)
+        => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }

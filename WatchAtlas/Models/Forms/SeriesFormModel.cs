@@ -14,12 +14,12 @@ public class SeriesFormModel : IValidatableObject
 
     public string? Description { get; set; }
 
+    public string? Universe { get; set; }
+
     public string GenresText { get; set; } = string.Empty;
 
     [Range(1, 10, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.RatingRange))]
     public int? PersonalRating { get; set; }
-
-    public string? Notes { get; set; }
 
     public List<SeasonFormModel> Seasons { get; set; } = new();
 
@@ -91,9 +91,9 @@ public class SeriesFormModel : IValidatableObject
             Title = media.Title,
             CoverImageUrl = media.CoverImageUrl,
             Description = media.Description,
+            Universe = details?.Universe,
             GenresText = string.Join(", ", media.Genres),
             PersonalRating = media.PersonalRating,
-            Notes = media.Notes,
             Seasons = (details?.Seasons ?? Enumerable.Empty<Season>())
                 .OrderBy(season => season.SeasonNumber)
                 .Select(SeasonFormModel.From)
@@ -106,9 +106,9 @@ public class SeriesFormModel : IValidatableObject
         Title = source.Title;
         CoverImageUrl = source.CoverImageUrl;
         Description = source.Description;
+        Universe = source.Universe;
         GenresText = source.GenresText;
         PersonalRating = source.PersonalRating;
-        Notes = source.Notes;
         Seasons = source.Seasons
             .OrderBy(season => season.SeasonNumber)
             .Select(season => season.Clone())
@@ -126,9 +126,9 @@ public class SeriesFormModel : IValidatableObject
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
         media.PersonalRating = PersonalRating;
-        media.Notes = Normalize(Notes);
 
         details.MediaItemId = media.Id;
+        details.Universe = Normalize(Universe);
         details.Seasons = Seasons
             .OrderBy(season => season.SeasonNumber)
             .Select(season => season.ToDomain(media.Id))

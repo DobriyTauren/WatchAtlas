@@ -4,32 +4,32 @@
 @inject NavigationManager NavigationManager
 @inject ToastState ToastState
 
-<PageTitle>@L["Series Details"]</PageTitle>
+<PageTitle>@L["Show Details"]</PageTitle>
 
 <section class="space-y-8">
     @if (!IsReady)
     {
-        <PageHeader Eyebrow="@L["Series Details"]"
-                    Title="@L["Loading series details."]"
-                    Subtitle="@L["Reading the selected series from browser storage."]" />
+        <PageHeader Eyebrow="@L["Show Details"]"
+                    Title="@L["Loading show details."]"
+                    Subtitle="@L["Reading the selected show from browser storage."]" />
     }
     else if (Entry is null)
     {
-        <PageHeader Eyebrow="@L["Series Details"]"
-                    Title="@L["This series is not in the library yet."]"
-                    Subtitle="@L["The details route is ready, but the requested series was not found in browser storage."]" />
+        <PageHeader Eyebrow="@L["Show Details"]"
+                    Title="@L["This show is not in the library yet."]"
+                    Subtitle="@L["The details route is ready, but the requested show was not found in browser storage."]" />
 
-        <EmptyStateCard Badge="@L["Series Details"]"
-                        Title="@L["No series found."]"
-                        Description="@L["Create a series first, then return here to review seasons, episodes, and progress."]"
-                        PrimaryLabel="@L["Create Series"]"
+        <EmptyStateCard Badge="@L["Show Details"]"
+                        Title="@L["No shows found."]"
+                        Description="@L["Create a show first, then return here to review seasons, episodes, and progress."]"
+                        PrimaryLabel="@L["Create Show"]"
                         PrimaryHref="series/new"
                         SecondaryLabel="@L["Return to Library"]"
                         SecondaryHref="library" />
     }
     else
     {
-        <PageHeader Eyebrow="@L["Series Details"]"
+        <PageHeader Eyebrow="@L["Show Details"]"
                     Title="@Entry.Media.Title"
                     Subtitle="@GetSubtitle()"
                     Actions="@ActionButtons" />
@@ -53,9 +53,9 @@
                     else
                     {
                         <div class="movie-cover-fallback h-full">
-                            <span class="movie-cover-fallback__badge">@L["Series"]</span>
+                            <span class="movie-cover-fallback__badge">@L["Show"]</span>
                             <h2 class="movie-cover-fallback__title">@Entry.Media.Title</h2>
-                            <p class="movie-cover-fallback__copy">@L["Add a cover image from the edit page to give the series page a stronger visual identity."]</p>
+                            <p class="movie-cover-fallback__copy">@L["Add a cover image from the edit page to give the show page a stronger visual identity."]</p>
                         </div>
                     }
                 </div>
@@ -73,7 +73,7 @@
                             }
                         </div>
 
-                        <ProgressBar Label="@L["Series Completion"]"
+                        <ProgressBar Label="@L["Show Completion"]"
                                      Value="@SeriesStats.CompletionPercent"
                                      Max="100" />
 
@@ -84,6 +84,14 @@
                                 {
                                     <AppBadge Variant="outline">@genre</AppBadge>
                                 }
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(Entry.Series?.Universe))
+                        {
+                            <div class="soft-block p-4">
+                                <p class="text-sm font-semibold text-text">@UniverseLabel</p>
+                                <p class="mt-2 text-sm text-muted">@Entry.Series.Universe</p>
                             </div>
                         }
 
@@ -110,7 +118,7 @@
                 </AppCard>
 
                 <section class="grid gap-4 sm:grid-cols-2">
-                    <StatTile Title="@L["Seasons"]" Value="@SeriesStats.SeasonCount.ToString()" Caption="@L["Tracked in this series."]" ChipLabel="@L["Series"]" />
+                    <StatTile Title="@L["Seasons"]" Value="@SeriesStats.SeasonCount.ToString()" Caption="@L["Tracked in this show."]" ChipLabel="@L["Show"]" />
                     <StatTile Title="@L["Episodes"]" Value="@SeriesStats.TotalEpisodes.ToString()" Caption="@L["Total episodes tracked."]" ChipLabel="@L["Episodes"]" />
                     <StatTile Title="@L["Watched"]" Value="@SeriesStats.WatchedEpisodes.ToString()" Caption="@L["Marked as watched."]" ChipLabel="@L["Progress"]" />
                     <StatTile Title="@L["Runtime"]" Value="@SeriesStats.WatchedMinutes.ToReadableDuration()" Caption="@L["Watched episode time."]" ChipLabel="@L["Runtime"]" />
@@ -206,8 +214,8 @@
         </AppCard>
 
         <AppModal IsOpen="@IsDeleteModalOpen"
-                  Title="@L["Delete this series?"]"
-                  Description="@L["This permanently removes the series and all stored seasons and episodes from browser storage."]"
+                  Title="@L["Delete this show?"]"
+                  Description="@L["This permanently removes the show and all stored seasons and episodes from browser storage."]"
                   OnClose="CloseDeleteModalAsync">
             <ChildContent>
                 <p class="text-sm leading-7 text-muted">
@@ -216,7 +224,7 @@
             </ChildContent>
             <Footer>
                 <AppButton Variant="secondary" Disabled="@IsDeleting" OnClick="CloseDeleteModalButtonAsync">@L["Cancel"]</AppButton>
-                <AppButton IsLoading="@IsDeleting" OnClick="ConfirmDeleteAsync">@L["Delete Series"]</AppButton>
+                <AppButton IsLoading="@IsDeleting" OnClick="ConfirmDeleteAsync">@L["Delete Show"]</AppButton>
             </Footer>
         </AppModal>
     }
@@ -234,8 +242,8 @@
     private string? ErrorMessage { get; set; }
 
     private RenderFragment ActionButtons => @<div class="flex flex-wrap gap-3">
-        <AppButton Href="@($"series/{Id}/edit")" Variant="secondary">@L["Edit Series"]</AppButton>
-        <AppButton OnClick="OpenDeleteModalAsync">@L["Delete Series"]</AppButton>
+        <AppButton Href="@($"series/{Id}/edit")" Variant="secondary">@L["Edit Show"]</AppButton>
+        <AppButton OnClick="OpenDeleteModalAsync">@L["Delete Show"]</AppButton>
     </div>;
 
     protected override async Task OnParametersSetAsync()
@@ -259,7 +267,7 @@
         }
 
         return SeriesStats.TotalEpisodes == 0
-            ? L["This series is saved and ready for seasons, episodes, and watch tracking."]
+            ? L["This show is saved and ready for seasons, episodes, and watch tracking."]
             : L["Progress, watched runtime, and per-season completion are calculated automatically from episode state."];
     }
 
@@ -268,6 +276,11 @@
 
     private static string GetEpisodeBadgeLabel(Episode episode)
         => episode.IsWatched ? LocalizedText.Translate("Watched") : LocalizedText.Translate("Pending");
+
+    private string UniverseLabel
+        => LocalizedText.GetCurrentLanguage() == AppLanguage.Russian
+            ? "Вселенная"
+            : "Universe";
 
     private Task OpenDeleteModalAsync(MouseEventArgs _)
     {
@@ -298,13 +311,13 @@
             IsDeleting = true;
             ErrorMessage = null;
             await LibraryState.DeleteAsync(Entry.Media.Id);
-            ToastState.ShowSuccess(L["Series deleted."], L.Format("\"{0}\" and its tracked progress were removed.", deletedTitle));
+            ToastState.ShowSuccess(L["Show deleted."], L.Format("\"{0}\" and its tracked progress were removed.", deletedTitle));
             NavigationManager.NavigateTo("library");
         }
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
-            ToastState.ShowError(L["Series could not be deleted."], exception.Message);
+            ToastState.ShowError(L["Show could not be deleted."], exception.Message);
         }
         finally
         {

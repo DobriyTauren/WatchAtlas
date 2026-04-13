@@ -10,13 +10,13 @@ public static class MarkdownImportExamples
 
     public static IReadOnlyList<string> SeriesImportSteps =>
     [
-        LocalizedText.Translate("Enter the exact series title below and copy the AI prompt."),
+        LocalizedText.Translate("Enter the exact show title below and copy the AI prompt."),
         LocalizedText.Translate("Paste the returned markdown here without extra commentary and click Fill Form.")
     ];
 
     public static IReadOnlyList<string> SeasonImportSteps =>
     [
-        LocalizedText.Translate("Enter the series title and the seasons you want to add, then copy the AI prompt."),
+        LocalizedText.Translate("Enter the show title and the seasons you want to add, then copy the AI prompt."),
         LocalizedText.Translate("Paste the returned markdown here as raw markdown with no code fences or extra text.")
     ];
 
@@ -24,6 +24,7 @@ public static class MarkdownImportExamples
         """
         # Movie
         Title: The Matrix
+        Universe: The Matrix
         Description: A hacker discovers that reality is a simulation.
         Genres: Science Fiction, Action
         Duration: 136
@@ -42,9 +43,10 @@ public static class MarkdownImportExamples
         Output rules:
         - Return only raw markdown.
         - Do not use code fences.
-        - Do not add explanations, notes, or commentary outside the markdown.
+        - Do not add explanations or commentary outside the markdown.
         - Do not include poster URLs, image links, or reference/source URLs.
         - Description should be plain text and ideally should not contain links, citations, source mentions, footnotes, or markdown link syntax.
+        - Include `Universe:` when the movie clearly belongs to a named shared universe, franchise, or story world. If there is no clear shared universe, omit that line.
         - Keep genres on one comma-separated line.
         - Use duration as minutes only, for example `Duration: 136`.
 
@@ -52,6 +54,7 @@ public static class MarkdownImportExamples
 
         # Movie
         Title: [MOVIE TITLE]
+        Universe:
         Description:
         Genres:
         Duration:
@@ -63,6 +66,7 @@ public static class MarkdownImportExamples
         """
         # Series
         Title: Arcane
+        Universe: League of Legends
         Description: Sisters from Zaun are pulled into the conflict around Hextech.
         Genres: Animation, Fantasy, Drama
 
@@ -96,9 +100,10 @@ public static class MarkdownImportExamples
         Output rules:
         - Return only raw markdown.
         - Do not use code fences.
-        - Do not add explanations, notes, or commentary outside the markdown.
+        - Do not add explanations or commentary outside the markdown.
         - Do not include poster URLs, image links, or reference/source URLs.
         - Description should be plain text and ideally should not contain links, citations, source mentions, footnotes, or markdown link syntax.
+        - Include `Universe:` when the series clearly belongs to a named shared universe, franchise, or story world. If there is no clear shared universe, omit that line.
         - Keep genres on one comma-separated line.
         - Use episode duration as minutes only, for example `Duration: 42`.
         - Each season heading must be `## Season N: RELEASE DATE`.
@@ -112,6 +117,7 @@ public static class MarkdownImportExamples
 
         # Series
         Title: [SERIES TITLE]
+        Universe:
         Description:
         Genres:
 

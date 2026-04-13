@@ -27,7 +27,7 @@
                 }
             </div>
 
-            <ProgressBar Label="Completion" Value="@completion" Max="100" />
+            <ProgressBar Label="@CompletionLabel" Value="@completion" Max="100" />
         </div>
 
         <div class="min-w-0 space-y-4">
@@ -89,4 +89,9 @@
 
     private string GetCoverBadge()
         => Entry.Media.Type == MediaType.Movie ? L["Movie"] : L["Series"];
+
+    private string CompletionLabel
+        => LocalizedText.GetCurrentLanguage() == WatchAtlas.Models.Enums.AppLanguage.Russian
+            ? "\u041f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u043d\u043e"
+            : "Completion";
 }

@@ -8,17 +8,22 @@
     <CoverUploader Value="@Model.CoverImageUrl"
                    ValueChanged="HandleCoverChanged"
                    FieldPrefix="@FieldPrefix"
-                   PlaceholderBadge="@L["Series"]"
+                   PlaceholderBadge="@L["Show"]"
                    PlaceholderTitle="@GetPlaceholderTitle()"
-                   PlaceholderCopy="@L["Choose an external cover URL or upload a local series key art image."]" />
+                   PlaceholderCopy="@L["Choose an external cover URL or upload a local show key art image."]" />
     <ValidationMessage For="@(() => Model.CoverImageUrl)" class="mt-2 block text-sm text-red-600" />
 
-    <div class="grid gap-4 sm:grid-cols-2">
+    <div class="grid gap-4 lg:grid-cols-3">
+        <AppInput Id="@($"{FieldPrefix}-universe")"
+                  Label="@UniverseLabel"
+                  @bind-Value="Model.Universe"
+                  Placeholder="The Walking Dead" />
+
         <AppInput Id="@($"{FieldPrefix}-genres")"
                   Label="@L["Genres"]"
                   @bind-Value="Model.GenresText"
                   Placeholder="Drama, Sci-Fi, Comedy" />
-
+        
         <div class="app-field">
             <label class="app-field-label" for="@($"{FieldPrefix}-rating")">@L["Rating"]</label>
             <InputNumber TValue="int?" id="@($"{FieldPrefix}-rating")" class="app-input" @bind-Value="Model.PersonalRating" />
@@ -31,11 +36,6 @@
                  @bind-Value="Model.Description"
                  TextareaClassName="min-h-32" />
 
-    <AppTextarea Id="@($"{FieldPrefix}-notes")"
-                 Label="@L["Notes"]"
-                 @bind-Value="Model.Notes"
-                 TextareaClassName="min-h-28" />
-
     <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
             <h2 class="text-xl">@L["Season Editor"]</h2>
@@ -46,7 +46,7 @@
             <AppButton Variant="secondary"
                        Disabled="@(Model.Seasons.Count == 0)"
                        OnClick="MarkSeriesWatchedAsync">
-                @L["Mark Entire Series Watched"]
+                @L["Mark Entire Show Watched"]
             </AppButton>
             <AppButton Variant="secondary" OnClick="AddSeasonAsync">@L["Add Season"]</AppButton>
         </div>
@@ -55,7 +55,7 @@
     @if (Model.Seasons.Count == 0)
     {
         <div class="soft-block p-5 text-sm text-muted">
-            @L["No seasons yet. Add one to start structuring the series."]
+            @L["No seasons yet. Add one to start structuring the show."]
         </div>
     }
     else
@@ -257,5 +257,10 @@
     }
 
     private string GetPlaceholderTitle()
-        => string.IsNullOrWhiteSpace(Model.Title) ? L["Series cover preview"] : Model.Title;
+        => string.IsNullOrWhiteSpace(Model.Title) ? L["Show cover preview"] : Model.Title;
+
+    private string UniverseLabel
+        => LocalizedText.GetCurrentLanguage() == WatchAtlas.Models.Enums.AppLanguage.Russian
+            ? "Вселенная"
+            : "Universe";
 }

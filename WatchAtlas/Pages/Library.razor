@@ -9,7 +9,7 @@
 <section class="space-y-8">
     <PageHeader Eyebrow="@L["Library"]"
                 Title="@L["Browse your full watch collection."]"
-                Subtitle="@L["Search, filter, sort, and switch layouts across your full movie and series collection. The browsing view updates instantly from shared browser-backed state."]">
+                Subtitle="@L["Search, filter, sort, and switch layouts across your full movie and show collection. The browsing view updates instantly from shared browser-backed state."]">
     </PageHeader>
 
     @if (LibraryState.IsLoading && !LibraryState.IsLoaded)
@@ -63,14 +63,14 @@
             </AppSelect>
 
             <AppSelect TValue="string"
-                       Id="library-series-top"
-                       Label="@L["Selected Series"]"
-                       Value="@SelectedSeriesValue"
-                       ValueChanged="HandleSeriesChanged">
-                <option value="">@L["All series"]</option>
-                @foreach (var series in AvailableSeries)
+                       Id="library-universe-top"
+                       Label="@UniverseLabel"
+                       Value="@SelectedUniverseValue"
+                       ValueChanged="HandleUniverseChanged">
+                <option value="">@AllUniversesLabel</option>
+                @foreach (var universe in AvailableUniverses)
                 {
-                    <option value="@series.Media.Id">@series.Media.Title</option>
+                    <option value="@universe">@universe</option>
                 }
             </AppSelect>
 
@@ -85,8 +85,8 @@
                 <p class="text-sm font-semibold text-text">@L["Quick Filters"]</p>
                 <div class="flex flex-wrap gap-2">
                     <button class="@GetFilterButtonClass(FilterState.Options.MediaType is null && FilterState.Options.Status is null)" type="button" @onclick="() => SelectQuickFilter(null, null)">@L["All Items"]</button>
-                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Movie)" type="button" @onclick="() => SelectQuickFilter(MediaType.Movie, null)">@L["Movies"]</button>
-                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Series)" type="button" @onclick="() => SelectQuickFilter(MediaType.Series, null)">@L["Series"]</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Movie)" type="button" @onclick="() => SelectQuickFilter(MediaType.Movie, null)">@L["Movie"]</button>
+                    <button class="@GetFilterButtonClass(FilterState.Options.MediaType == MediaType.Series)" type="button" @onclick="() => SelectQuickFilter(MediaType.Series, null)">@L["Show"]</button>
                     <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.Completed)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.Completed)">@L["Completed"]</button>
                     <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.InProgress)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.InProgress)">@L["In Progress"]</button>
                     <button class="@GetFilterButtonClass(FilterState.Options.Status == WatchStatus.NotStarted)" type="button" @onclick="() => SelectQuickFilter(null, WatchStatus.NotStarted)">@L["Not Started"]</button>
@@ -110,7 +110,7 @@
     {
         <EmptyStateCard Badge="Library"
                         Title="@L["Your library is still empty."]"
-                        Description="@L["Start by adding your first movie or series. Once it is saved, this page becomes your main browsing hub for search, filters, and progress tracking."]"
+                        Description="@L["Start by adding your first movie or show. Once it is saved, this page becomes your main browsing hub for search, filters, and progress tracking."]"
                         PrimaryLabel="@L["Add First Entry"]"
                         PrimaryHref="media/new"
                         SecondaryLabel="@L["Open Settings"]"
@@ -165,13 +165,16 @@
         .Distinct(StringComparer.OrdinalIgnoreCase)
         .OrderBy(genre => genre)
         .ToList();
-    private IReadOnlyList<LibraryEntry> AvailableSeries => LibraryState.Entries
-        .Where(entry => entry.Media.Type == MediaType.Series)
-        .OrderBy(entry => entry.Media.Title)
+    private IReadOnlyList<string> AvailableUniverses => LibraryState.Entries
+        .Select(GetUniverse)
+        .Where(universe => !string.IsNullOrWhiteSpace(universe))
+        .Cast<string>()
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(universe => universe)
         .ToList();
     private LibraryViewMode CurrentViewMode => SettingsState.Current.LibraryViewMode;
     private string SelectedGenreValue => FilterState.Options.Genre ?? string.Empty;
-    private string SelectedSeriesValue => FilterState.Options.SeriesId?.ToString() ?? string.Empty;
+    private string SelectedUniverseValue => FilterState.Options.Universe ?? string.Empty;
     private string SelectedSortKey => LibrarySortOptionHelper.ToKey(FilterState.Options.SortBy, FilterState.Options.Descending);
     private string VisibleItemsSummary => QueryResult.TotalCount == QueryResult.FilteredCount
         ? L["Everything is visible."]
@@ -201,9 +204,9 @@
         return Task.CompletedTask;
     }
 
-    private Task HandleSeriesChanged(string value)
+    private Task HandleUniverseChanged(string value)
     {
-        FilterState.SetSeriesId(Guid.TryParse(value, out var parsed) ? parsed : null);
+        FilterState.SetUniverse(value);
         return Task.CompletedTask;
     }
 
@@ -231,14 +234,24 @@
     private string GetDirectionButtonClass()
         => FilterState.Options.Descending ? "nav-chip nav-chip-active" : "nav-chip";
 
+    private string UniverseLabel
+        => LocalizedText.GetCurrentLanguage() == AppLanguage.Russian
+            ? "Вселенная"
+            : "Universe";
+
+    private string AllUniversesLabel
+        => LocalizedText.GetCurrentLanguage() == AppLanguage.Russian
+            ? "Все вселенные"
+            : "All universes";
+
     private void ApplyStoredSortDefaultsIfNeeded()
     {
         var hasActiveFilters =
             !string.IsNullOrWhiteSpace(FilterState.Options.SearchTerm) ||
             !string.IsNullOrWhiteSpace(FilterState.Options.Genre) ||
+            !string.IsNullOrWhiteSpace(FilterState.Options.Universe) ||
             FilterState.Options.MediaType is not null ||
-            FilterState.Options.Status is not null ||
-            FilterState.Options.SeriesId is not null;
+            FilterState.Options.Status is not null;
 
         var hasDefaultSort = FilterState.Options.SortBy == LibrarySortBy.UpdatedAt && FilterState.Options.Descending;
         if (!hasActiveFilters && hasDefaultSort)
@@ -256,4 +269,7 @@
         LibraryState.Changed -= HandleStateChanged;
         SettingsState.Changed -= HandleStateChanged;
     }
+
+    private static string? GetUniverse(LibraryEntry entry)
+        => entry.Media.Type == MediaType.Movie ? entry.Movie?.Universe : entry.Series?.Universe;
 }

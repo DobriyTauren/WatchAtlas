@@ -326,15 +326,17 @@ public partial class MarkdownImportService : IMarkdownImportService
             case "description":
                 movie.Description = value;
                 return string.IsNullOrWhiteSpace(value) ? nameof(movie.Description) : null;
+            case "universe":
+            case "franchise":
+            case "shared universe":
+                movie.Universe = value;
+                return string.IsNullOrWhiteSpace(value) ? nameof(movie.Universe) : null;
             case "genres":
                 movie.GenresText = NormalizeGenres(value);
                 return string.IsNullOrWhiteSpace(value) ? nameof(movie.GenresText) : null;
             case "rating":
                 movie.PersonalRating = ParseNullableRating(value, warnings, "movie");
                 return null;
-            case "notes":
-                movie.Notes = value;
-                return string.IsNullOrWhiteSpace(value) ? nameof(movie.Notes) : null;
             case "duration":
             case "runtime":
             case "duration minutes":
@@ -391,15 +393,17 @@ public partial class MarkdownImportService : IMarkdownImportService
             case "description":
                 series.Description = value;
                 return string.IsNullOrWhiteSpace(value) ? nameof(series.Description) : null;
+            case "universe":
+            case "franchise":
+            case "shared universe":
+                series.Universe = value;
+                return string.IsNullOrWhiteSpace(value) ? nameof(series.Universe) : null;
             case "genres":
                 series.GenresText = NormalizeGenres(value);
                 return string.IsNullOrWhiteSpace(value) ? nameof(series.GenresText) : null;
             case "rating":
                 series.PersonalRating = ParseNullableRating(value, warnings, "series");
                 return null;
-            case "notes":
-                series.Notes = value;
-                return string.IsNullOrWhiteSpace(value) ? nameof(series.Notes) : null;
             default:
                 return currentSeason is not null
                     ? ApplySeasonField(currentSeason, key, value, warnings)
@@ -504,8 +508,8 @@ public partial class MarkdownImportService : IMarkdownImportService
             case nameof(MovieFormModel.Description):
                 movie.Description = AppendLine(movie.Description, line);
                 break;
-            case nameof(MovieFormModel.Notes):
-                movie.Notes = AppendLine(movie.Notes, line);
+            case nameof(MovieFormModel.Universe):
+                movie.Universe = AppendLine(movie.Universe, line);
                 break;
             case nameof(MovieFormModel.GenresText):
                 movie.GenresText = AppendGenreLine(movie.GenresText, line);
@@ -531,8 +535,8 @@ public partial class MarkdownImportService : IMarkdownImportService
             case nameof(SeriesFormModel.Description):
                 series.Description = AppendLine(series.Description, line);
                 break;
-            case nameof(SeriesFormModel.Notes):
-                series.Notes = AppendLine(series.Notes, line);
+            case nameof(SeriesFormModel.Universe):
+                series.Universe = AppendLine(series.Universe, line);
                 break;
             case nameof(SeriesFormModel.GenresText):
                 series.GenresText = AppendGenreLine(series.GenresText, line);

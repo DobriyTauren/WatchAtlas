@@ -11,7 +11,6 @@ public class MediaItem
     public string? Description { get; set; }
     public List<string> Genres { get; set; } = new();
     public int? PersonalRating { get; set; }
-    public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

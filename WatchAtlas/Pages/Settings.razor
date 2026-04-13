@@ -81,7 +81,7 @@
 
                 <div class="soft-block p-5">
                     <p class="text-sm font-semibold text-text">@L["Export backup"]</p>
-                    <p class="mt-2 text-sm leading-7 text-muted">@L["Exports the full library snapshot, including movies, series, seasons, episodes, and current app settings."]</p>
+                    <p class="mt-2 text-sm leading-7 text-muted">@L["Exports the full library snapshot, including movies, shows, seasons, episodes, and current app settings."]</p>
                     <div class="mt-4 flex flex-wrap gap-3">
                         <AppButton IsLoading="@IsExporting" OnClick="ExportBackupAsync">
                             @(IsExporting ? L["Preparing Export..."] : L["Export JSON Backup"])
@@ -154,7 +154,7 @@
               OnClose="CloseResetModalAsync">
         <ChildContent>
             <p class="text-sm leading-7 text-muted">
-                @L["All movies, series, seasons, episodes, cover images, filters, and preferences will be removed from this device."]
+                @L["All movies, shows, seasons, episodes, cover images, filters, and preferences will be removed from this device."]
             </p>
         </ChildContent>
         <Footer>

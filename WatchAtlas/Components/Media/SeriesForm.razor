@@ -19,21 +19,21 @@
 
         <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div class="flex flex-wrap gap-3">
-                <MarkdownImportLauncher ButtonLabel="@L["Fill Series From Markdown"]"
-                                        ModalTitle="@L["Fill this series from markdown"]"
-                                        ModalDescription="@L["Paste one clean markdown document for a single series, or copy the AI prompt below to generate it automatically in the right format."]"
+                <MarkdownImportLauncher ButtonLabel="@L["Fill Show From Markdown"]"
+                                        ModalTitle="@L["Fill this show from markdown"]"
+                                        ModalDescription="@L["Paste one clean markdown document for a single show, or copy the AI prompt below to generate it automatically in the right format."]"
                                         ExampleMarkdown="@MarkdownImportExamples.Series"
-                                        ExampleTitle="@L["See a full series example"]"
+                                        ExampleTitle="@L["See a full show example"]"
                                     UsageSteps="@MarkdownImportExamples.SeriesImportSteps"
                                     CopyablePrompt="@MarkdownImportExamples.SeriesAiPrompt"
                                     CopyablePromptTitle="@L["Prompt for ChatGPT or Claude"]"
                                     CopyablePromptDescription="@L["Copy this prepared prompt and ask your assistant for import-ready markdown."]"
                                         PromptPrimaryToken="[SERIES TITLE]"
-                                        PromptPrimaryLabel="@L["Series title for AI"]"
+                                        PromptPrimaryLabel="@L["Show title for AI"]"
                                         PromptPrimaryPlaceholder="Arcane"
                                         PromptPrimaryHelpText="@L["This title will be inserted into the copied prompt automatically."]"
                                         PromptPrimaryValue="@Model.Title"
-                                        Placeholder="# Series&#10;Title: ...&#10;Genres: ...&#10;&#10;## Season 1&#10;- Episode 1: ..."
+                                        Placeholder="# Series&#10;Title: ...&#10;Universe: ...&#10;Genres: ...&#10;&#10;## Season 1&#10;- Episode 1: ..."
                                         FieldPrefix="@($"{FieldPrefix}-series-markdown")"
                                         OnConfirmAsync="@(HandleSeriesMarkdownImportAsync)" />
 
@@ -45,9 +45,9 @@
                                     UsageSteps="@MarkdownImportExamples.SeasonImportSteps"
                                     CopyablePrompt="@MarkdownImportExamples.SeasonAiPrompt"
                                     CopyablePromptTitle="@L["Prompt for missing seasons"]"
-                                    CopyablePromptDescription="@L["Use this when you already have a series draft and want your assistant to generate only the missing seasons."]"
+                                    CopyablePromptDescription="@L["Use this when you already have a show draft and want your assistant to generate only the missing seasons."]"
                                         PromptPrimaryToken="[SERIES TITLE]"
-                                        PromptPrimaryLabel="@L["Series title for AI"]"
+                                        PromptPrimaryLabel="@L["Show title for AI"]"
                                         PromptPrimaryPlaceholder="Arcane"
                                         PromptPrimaryHelpText="@L["This title will be inserted into the copied prompt automatically."]"
                                         PromptPrimaryValue="@Model.Title"
@@ -86,7 +86,7 @@
     public EventCallback OnSubmitRequested { get; set; }
 
     [Parameter]
-    public string SubmitLabel { get; set; } = "Save Series";
+    public string SubmitLabel { get; set; } = "Save Show";
 
     [Parameter]
     public string CancelHref { get; set; } = "/library";
@@ -122,7 +122,7 @@
 
         Model.CopyFrom(result.Value);
         RefreshEditContext();
-        ToastState.ShowSuccess(L["Series details added."], L["The series form was filled from your markdown."]);
+        ToastState.ShowSuccess(L["Show details added."], L["The show form was filled from your markdown."]);
 
         if (result.Warnings.Count > 0)
         {
@@ -142,12 +142,12 @@
 
         var notices = Model.AppendImportedSeasons(result.Value).ToList();
         RefreshEditContext();
-        ToastState.ShowSuccess(L["Seasons added."], L["New seasons and episodes were appended to the current series draft."]);
+        ToastState.ShowSuccess(L["Seasons added."], L["New seasons and episodes were appended to the current show draft."]);
 
         var firstNotice = notices.Concat(result.Warnings).FirstOrDefault();
         if (!string.IsNullOrWhiteSpace(firstNotice))
         {
-            ToastState.ShowInfo(L["Imported with a few notes."], firstNotice);
+                ToastState.ShowInfo(L["Imported with a few warnings."], firstNotice);
         }
 
         return Task.FromResult(MarkdownImportApplyResult.Success());
@@ -156,7 +156,7 @@
     private void HandleInvalidSubmit(EditContext editContext)
     {
         var firstMessage = editContext.GetValidationMessages().FirstOrDefault();
-        ToastState.ShowWarning(L["Please review the series form."], firstMessage ?? L["Some series details still need attention before save."]);
+        ToastState.ShowWarning(L["Please review the show form."], firstMessage ?? L["Some show details still need attention before save."]);
     }
 
     private void RefreshEditContext()

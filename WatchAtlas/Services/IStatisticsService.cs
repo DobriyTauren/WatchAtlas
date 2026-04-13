@@ -15,5 +15,6 @@ public interface IStatisticsService
     IReadOnlyList<SeriesStatistics> GetMostEpisodesWatchedSeries(IEnumerable<LibraryEntry> entries, int count);
     IReadOnlyList<SeriesStatistics> GetCurrentlyWatchingSeries(IEnumerable<LibraryEntry> entries, int count);
     IReadOnlyList<GenreWatchTimeStatistics> GetTopGenresByWatchTime(IEnumerable<LibraryEntry> entries, int count);
+    IReadOnlyList<UniverseWatchTimeStatistics> GetTopUniversesByWatchTime(IEnumerable<LibraryEntry> entries, int count);
     IReadOnlyList<SeasonStatistics> GetTopSeasonsByWatchTime(IEnumerable<LibraryEntry> entries, int count);
 }

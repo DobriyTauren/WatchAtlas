@@ -28,18 +28,17 @@
     else
     {
         <PageHeader Eyebrow="@L["Statistics"]"
-                    Title="@L["A clear overview of your watch progress."]"
-                    Subtitle="@L["The statistics service now centralizes totals, watch-time summaries, completion breakdowns, and ranked series or season views so analytics stay consistent everywhere."]" />
+                    Title="@L["A clear overview of your watch progress."]" />
 
         <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <StatCard Title="@L["Movies Watched"]"
                       Value="@Stats.WatchedMovies.ToString()"
                       Caption="@L.Format("{0} of {1} movies are marked watched.", Stats.WatchedMovies, Stats.TotalMovies)"
                       ChipLabel="@L["Movies"]" />
-            <StatCard Title="@L["Series Added"]"
+            <StatCard Title="@L["Shows Added"]"
                       Value="@Stats.TotalSeries.ToString()"
                       Caption="@L.Format("{0} completed, {1} in progress.", Stats.CompletedSeries, Stats.InProgressSeries)"
-                      ChipLabel="@L["Series"]" />
+                      ChipLabel="@L["Shows"]" />
             <StatCard Title="@L["Episodes Watched"]"
                       Value="@Stats.WatchedEpisodes.ToString()"
                       Caption="@L.Format("{0}/{1} tracked episodes watched.", Stats.WatchedEpisodes, Stats.TotalEpisodes)"
@@ -58,13 +57,13 @@
 
         <section class="space-y-4">
         <SectionHeader Eyebrow="@L["Rankings"]"
-                       Title="@L["Top series by watched duration."]"
-                       Description="@L["Series ordered by the amount of watched runtime already logged in the library."]" />
+                       Title="@L["Top shows by watched duration."]"
+                       Description="@L["Shows ordered by the amount of watched runtime already logged in the library."]" />
 
         @if (TopSeriesByDuration.Count == 0)
         {
             <AppCard>
-                <p class="text-sm leading-7 text-muted">@L["No tracked series runtime yet. Add a series with seasons and watched episodes to see rankings here."]</p>
+                <p class="text-sm leading-7 text-muted">@L["No tracked shows runtime yet. Add a show with seasons and watched episodes to see rankings here."]</p>
             </AppCard>
         }
         else
@@ -81,7 +80,7 @@
         <section class="space-y-4">
         <SectionHeader Eyebrow="@L["Episodes"]"
                        Title="@L["Most episodes watched."]"
-                       Description="@L["Series ranked by watched episode count, then by logged watch time."]" />
+                       Description="@L["Shows ranked by watched episode count, then by logged watch time."]" />
 
         @if (MostEpisodesWatchedSeries.Count == 0)
         {
@@ -103,12 +102,12 @@
         <section class="space-y-4">
         <SectionHeader Eyebrow="@L["In Progress"]"
                        Title="@L["Currently watching."]"
-                       Description="@L["Series that are in progress right now, ranked by watched episodes and active watch time."]" />
+                       Description="@L["Shows that are in progress right now, ranked by watched episodes and active watch time."]" />
 
         @if (CurrentlyWatchingSeries.Count == 0)
         {
             <AppCard>
-                <p class="text-sm leading-7 text-muted">@L["No in-progress series yet. Once a series is partly watched, it will show up here."]</p>
+                <p class="text-sm leading-7 text-muted">@L["No in-progress shows yet. Once a show is partly watched, it will show up here."]</p>
             </AppCard>
         }
         else
@@ -145,6 +144,28 @@
         </section>
 
         <section class="space-y-4">
+        <SectionHeader Eyebrow="@UniversesEyebrow"
+                       Title="@UniverseWatchTimeTitle"
+                       Description="@UniverseWatchTimeDescription" />
+
+        @if (TopUniversesByWatchTime.Count == 0)
+        {
+            <AppCard>
+                <p class="text-sm leading-7 text-muted">@UniverseWatchTimeEmptyState</p>
+            </AppCard>
+        }
+        else
+        {
+            <section class="grid gap-4 xl:grid-cols-3">
+                @foreach (var universe in TopUniversesByWatchTime)
+                {
+                    <UniverseWatchTimeCard Statistics="universe" />
+                }
+            </section>
+        }
+        </section>
+
+        <section class="space-y-4">
         <SectionHeader Eyebrow="@L["Seasons"]"
                        Title="@L["Top seasons by watched runtime."]"
                        Description="@L["Season totals are calculated from episode data and ranked across the whole library."]" />
@@ -175,7 +196,17 @@
     private IReadOnlyList<SeriesStatistics> MostEpisodesWatchedSeries => StatisticsService.GetMostEpisodesWatchedSeries(LibraryState.Entries, 3);
     private IReadOnlyList<SeriesStatistics> CurrentlyWatchingSeries => StatisticsService.GetCurrentlyWatchingSeries(LibraryState.Entries, 3);
     private IReadOnlyList<GenreWatchTimeStatistics> TopGenresByWatchTime => StatisticsService.GetTopGenresByWatchTime(LibraryState.Entries, 3);
+    private IReadOnlyList<UniverseWatchTimeStatistics> TopUniversesByWatchTime => StatisticsService.GetTopUniversesByWatchTime(LibraryState.Entries, 3);
     private IReadOnlyList<SeasonStatistics> TopSeasonsByDuration => StatisticsService.GetTopSeasonsByWatchTime(LibraryState.Entries, 3);
+    private bool IsRussian => LocalizedText.GetCurrentLanguage() == WatchAtlas.Models.Enums.AppLanguage.Russian;
+    private string UniversesEyebrow => IsRussian ? "\u0412\u0441\u0435\u043b\u0435\u043d\u043d\u044b\u0435" : "Universes";
+    private string UniverseWatchTimeTitle => IsRussian ? "\u0412\u0440\u0435\u043c\u044f \u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0430 \u043f\u043e \u0432\u0441\u0435\u043b\u0435\u043d\u043d\u044b\u043c." : "Watch time by universe.";
+    private string UniverseWatchTimeDescription => IsRussian
+        ? "\u041f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u043d\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0444\u0438\u043b\u044c\u043c\u043e\u0432 \u0438 \u044d\u043f\u0438\u0437\u043e\u0434\u043e\u0432, \u0441\u0433\u0440\u0443\u043f\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u043e\u0435 \u043f\u043e \u0432\u0441\u0435\u043b\u0435\u043d\u043d\u044b\u043c."
+        : "Watched movie runtime and watched episode runtime grouped by universe.";
+    private string UniverseWatchTimeEmptyState => IsRussian
+        ? "\u041f\u043e\u043a\u0430 \u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u043d\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u043d\u0435 \u0441\u0432\u044f\u0437\u0430\u043d\u043e \u0441\u043e \u0432\u0441\u0435\u043b\u0435\u043d\u043d\u044b\u043c\u0438. \u0414\u043e\u0431\u0430\u0432\u044c\u0442\u0435 \u0432\u0441\u0435\u043b\u0435\u043d\u043d\u0443\u044e \u0444\u0438\u043b\u044c\u043c\u0430\u043c \u0438\u043b\u0438 \u0441\u0435\u0440\u0438\u0430\u043b\u0430\u043c \u0438 \u043e\u0442\u043c\u0435\u0442\u044c\u0442\u0435 \u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440, \u0447\u0442\u043e\u0431\u044b \u0443\u0432\u0438\u0434\u0435\u0442\u044c \u0440\u0430\u0437\u0431\u0438\u0432\u043a\u0443."
+        : "No watched runtime has been matched to universes yet. Add universes to movies or series and track watched progress to see the breakdown.";
 
     protected override async Task OnInitializedAsync()
     {

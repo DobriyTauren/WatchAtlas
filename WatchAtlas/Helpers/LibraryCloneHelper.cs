@@ -23,7 +23,6 @@ public static class LibraryCloneHelper
         Description = source.Description,
         Genres = source.Genres.ToList(),
         PersonalRating = source.PersonalRating,
-        Notes = source.Notes,
         CreatedAt = source.CreatedAt,
         UpdatedAt = source.UpdatedAt
     };
@@ -34,6 +33,7 @@ public static class LibraryCloneHelper
             : new MovieDetails
             {
                 MediaItemId = source.MediaItemId,
+                Universe = source.Universe,
                 DurationMinutes = source.DurationMinutes,
                 IsWatched = source.IsWatched,
                 WatchedDate = source.WatchedDate
@@ -45,6 +45,7 @@ public static class LibraryCloneHelper
             : new SeriesDetails
             {
                 MediaItemId = source.MediaItemId,
+                Universe = source.Universe,
                 Seasons = source.Seasons.Select(Clone).ToList()
             };
 

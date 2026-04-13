@@ -14,12 +14,12 @@ public class MovieFormModel : IValidatableObject
 
     public string? Description { get; set; }
 
+    public string? Universe { get; set; }
+
     public string GenresText { get; set; } = string.Empty;
 
     [Range(1, 10, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.RatingRange))]
     public int? PersonalRating { get; set; }
-
-    public string? Notes { get; set; }
 
     [Range(1, int.MaxValue, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.DurationPositive))]
     public int? DurationMinutes { get; set; }
@@ -52,9 +52,9 @@ public class MovieFormModel : IValidatableObject
             Title = media.Title,
             CoverImageUrl = media.CoverImageUrl,
             Description = media.Description,
+            Universe = movieDetails?.Universe,
             GenresText = string.Join(", ", media.Genres),
             PersonalRating = media.PersonalRating,
-            Notes = media.Notes,
             DurationMinutes = movieDetails?.DurationMinutes,
             IsWatched = movieDetails?.IsWatched ?? false,
             WatchedDate = movieDetails?.WatchedDate
@@ -66,9 +66,9 @@ public class MovieFormModel : IValidatableObject
         Title = source.Title;
         CoverImageUrl = source.CoverImageUrl;
         Description = source.Description;
+        Universe = source.Universe;
         GenresText = source.GenresText;
         PersonalRating = source.PersonalRating;
-        Notes = source.Notes;
         DurationMinutes = source.DurationMinutes;
         IsWatched = source.IsWatched;
         WatchedDate = source.IsWatched ? source.WatchedDate : null;
@@ -85,9 +85,9 @@ public class MovieFormModel : IValidatableObject
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
         media.PersonalRating = PersonalRating;
-        media.Notes = Normalize(Notes);
 
         movieDetails.MediaItemId = media.Id;
+        movieDetails.Universe = Normalize(Universe);
         movieDetails.DurationMinutes = DurationMinutes;
         movieDetails.IsWatched = IsWatched;
         movieDetails.WatchedDate = IsWatched ? WatchedDate : null;
