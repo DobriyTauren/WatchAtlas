@@ -28,12 +28,12 @@
                                     CopyablePrompt="@MarkdownImportExamples.SeriesAiPrompt"
                                     CopyablePromptTitle="@L["Prompt for ChatGPT or Claude"]"
                                     CopyablePromptDescription="@L["Copy this prepared prompt and ask your assistant for import-ready markdown."]"
-                                        PromptPrimaryToken="[SERIES TITLE]"
+                                        PromptPrimaryToken="[SHOW TITLE]"
                                         PromptPrimaryLabel="@L["Show title for AI"]"
                                         PromptPrimaryPlaceholder="Arcane"
                                         PromptPrimaryHelpText="@L["This title will be inserted into the copied prompt automatically."]"
                                         PromptPrimaryValue="@Model.Title"
-                                        Placeholder="# Series&#10;Title: ...&#10;Universe: ...&#10;Genres: ...&#10;&#10;## Season 1&#10;- Episode 1: ..."
+                                        Placeholder="# Show&#10;Title: ...&#10;Universe: ...&#10;Genres: ...&#10;&#10;## Season 1&#10;- Episode 1: ..."
                                         FieldPrefix="@($"{FieldPrefix}-series-markdown")"
                                         OnConfirmAsync="@(HandleSeriesMarkdownImportAsync)" />
 
@@ -46,7 +46,7 @@
                                     CopyablePrompt="@MarkdownImportExamples.SeasonAiPrompt"
                                     CopyablePromptTitle="@L["Prompt for missing seasons"]"
                                     CopyablePromptDescription="@L["Use this when you already have a show draft and want your assistant to generate only the missing seasons."]"
-                                        PromptPrimaryToken="[SERIES TITLE]"
+                                        PromptPrimaryToken="[SHOW TITLE]"
                                         PromptPrimaryLabel="@L["Show title for AI"]"
                                         PromptPrimaryPlaceholder="Arcane"
                                         PromptPrimaryHelpText="@L["This title will be inserted into the copied prompt automatically."]"

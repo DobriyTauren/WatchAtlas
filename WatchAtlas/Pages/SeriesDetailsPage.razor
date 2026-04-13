@@ -90,7 +90,7 @@
                         @if (!string.IsNullOrWhiteSpace(Entry.Series?.Universe))
                         {
                             <div class="soft-block p-4">
-                                <p class="text-sm font-semibold text-text">@UniverseLabel</p>
+                                <p class="text-sm font-semibold text-text">@L["Universe"]</p>
                                 <p class="mt-2 text-sm text-muted">@Entry.Series.Universe</p>
                             </div>
                         }
@@ -219,7 +219,7 @@
                   OnClose="CloseDeleteModalAsync">
             <ChildContent>
                 <p class="text-sm leading-7 text-muted">
-                    <strong>@Entry.Media.Title</strong> and all tracked episode progress will be removed from the library immediately.
+                    @L.Format("\"{0}\" and all tracked episode progress will be removed from the library immediately.", Entry.Media.Title)
                 </p>
             </ChildContent>
             <Footer>

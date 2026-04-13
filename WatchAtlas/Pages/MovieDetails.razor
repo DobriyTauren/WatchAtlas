@@ -85,7 +85,7 @@
                         @if (!string.IsNullOrWhiteSpace(Entry.Movie?.Universe))
                         {
                             <div class="soft-block p-4">
-                                <p class="text-sm font-semibold text-text">@UniverseLabel</p>
+                                <p class="text-sm font-semibold text-text">@L["Universe"]</p>
                                 <p class="mt-2 text-sm text-muted">@Entry.Movie.Universe</p>
                             </div>
                         }
@@ -132,7 +132,7 @@
                   OnClose="CloseDeleteModalAsync">
             <ChildContent>
                 <p class="text-sm leading-7 text-muted">
-                    <strong>@Entry.Media.Title</strong> will be removed from the library immediately.
+                    @L.Format("\"{0}\" will be removed from the library immediately.", Entry.Media.Title)
                 </p>
             </ChildContent>
             <Footer>
@@ -193,10 +193,7 @@
     private string GetWatchedDate()
         => Entry?.Movie?.WatchedDate?.ToLocalTime().ToString("dd MMM yyyy") ?? L["Not set"];
 
-    private string UniverseLabel
-        => LocalizedText.GetCurrentLanguage() == WatchAtlas.Models.Enums.AppLanguage.Russian
-            ? "\u0412\u0441\u0435\u043b\u0435\u043d\u043d\u0430\u044f"
-            : "Universe";
+    private string UniverseLabel => L["Universe"];
 
     private Task OpenDeleteModalAsync(MouseEventArgs _)
     {

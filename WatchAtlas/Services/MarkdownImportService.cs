@@ -155,7 +155,7 @@ public partial class MarkdownImportService : IMarkdownImportService
 
         if (string.IsNullOrWhiteSpace(series.Title))
         {
-            return MarkdownImportParseResult<SeriesFormModel>.Failure(LocalizedText.Translate("A series title could not be found. Add a `Title:` line or use the first heading for the title."));
+            return MarkdownImportParseResult<SeriesFormModel>.Failure(LocalizedText.Translate("A show title could not be found. Add a `Title:` line or use the first heading for the title."));
         }
 
         NormalizeSeasonOrdering(series);
@@ -335,12 +335,12 @@ public partial class MarkdownImportService : IMarkdownImportService
                 movie.GenresText = NormalizeGenres(value);
                 return string.IsNullOrWhiteSpace(value) ? nameof(movie.GenresText) : null;
             case "rating":
-                movie.PersonalRating = ParseNullableRating(value, warnings, "movie");
+                movie.PersonalRating = ParseNullableRating(value, warnings, LocalizedText.Translate("movie"));
                 return null;
             case "duration":
             case "runtime":
             case "duration minutes":
-                movie.DurationMinutes = ParseNullableDuration(value, warnings, "movie");
+                movie.DurationMinutes = ParseNullableDuration(value, warnings, LocalizedText.Translate("movie"));
                 return null;
             case "watched":
             case "watched status":
@@ -352,7 +352,7 @@ public partial class MarkdownImportService : IMarkdownImportService
                 return null;
             case "watched date":
             case "date watched":
-                movie.WatchedDate = ParseNullableDate(value, warnings, "movie");
+                movie.WatchedDate = ParseNullableDate(value, warnings, LocalizedText.Translate("movie"));
                 movie.IsWatched = movie.WatchedDate.HasValue || movie.IsWatched;
                 return null;
             default:
@@ -402,7 +402,7 @@ public partial class MarkdownImportService : IMarkdownImportService
                 series.GenresText = NormalizeGenres(value);
                 return string.IsNullOrWhiteSpace(value) ? nameof(series.GenresText) : null;
             case "rating":
-                series.PersonalRating = ParseNullableRating(value, warnings, "series");
+                series.PersonalRating = ParseNullableRating(value, warnings, LocalizedText.Translate("show"));
                 return null;
             default:
                 return currentSeason is not null
@@ -436,7 +436,7 @@ public partial class MarkdownImportService : IMarkdownImportService
                 }
                 else
                 {
-                    warnings.Add($"A season number could not be read from `{value}`.");
+                    warnings.Add(LocalizedText.Format("A season number could not be read from `{0}`.", value));
                 }
 
                 return null;
@@ -475,13 +475,13 @@ public partial class MarkdownImportService : IMarkdownImportService
                 }
                 else
                 {
-                    warnings.Add($"An episode number could not be read from `{value}`{FormatSeasonContext(seasonNumber)}.");
+                    warnings.Add(LocalizedText.Format("An episode number could not be read from `{0}`{1}.", value, FormatSeasonContext(seasonNumber)));
                 }
 
                 return null;
             case "duration":
             case "runtime":
-                episode.DurationMinutes = ParseNullableDuration(value, warnings, $"season {seasonNumber ?? 0} episode {episode.EpisodeNumber}");
+                episode.DurationMinutes = ParseNullableDuration(value, warnings, LocalizedText.Format("season {0} episode {1}", seasonNumber ?? 0, episode.EpisodeNumber));
                 return null;
             case "watched":
             case "watched status":
@@ -493,7 +493,7 @@ public partial class MarkdownImportService : IMarkdownImportService
                 return null;
             case "watched date":
             case "date watched":
-                episode.WatchedDate = ParseNullableDate(value, warnings, $"season {seasonNumber ?? 0} episode {episode.EpisodeNumber}");
+                episode.WatchedDate = ParseNullableDate(value, warnings, LocalizedText.Format("season {0} episode {1}", seasonNumber ?? 0, episode.EpisodeNumber));
                 episode.IsWatched = episode.WatchedDate.HasValue || episode.IsWatched;
                 return null;
             default:
@@ -605,7 +605,7 @@ public partial class MarkdownImportService : IMarkdownImportService
         var match = NumberRegex().Match(value);
         if (!match.Success)
         {
-            warnings.Add($"A rating could not be read from `{value}` for the {context}.");
+            warnings.Add(LocalizedText.Format("A rating could not be read from `{0}` for the {1}.", value, context));
             return null;
         }
 
@@ -614,7 +614,7 @@ public partial class MarkdownImportService : IMarkdownImportService
             return Math.Clamp(rating, 1, 10);
         }
 
-        warnings.Add($"A rating could not be read from `{value}` for the {context}.");
+        warnings.Add(LocalizedText.Format("A rating could not be read from `{0}` for the {1}.", value, context));
         return null;
     }
 
@@ -641,7 +641,7 @@ public partial class MarkdownImportService : IMarkdownImportService
             return rawMinutes;
         }
 
-        warnings.Add($"A duration could not be read from `{value}` for {context}.");
+        warnings.Add(LocalizedText.Format("A duration could not be read from `{0}` for {1}.", value, context));
         return null;
     }
 
@@ -658,7 +658,7 @@ public partial class MarkdownImportService : IMarkdownImportService
             return parsedDate.Date;
         }
 
-        warnings.Add($"A watched date could not be read from `{value}` for {context}.");
+        warnings.Add(LocalizedText.Format("A watched date could not be read from `{0}` for {1}.", value, context));
         return null;
     }
 
@@ -791,7 +791,7 @@ public partial class MarkdownImportService : IMarkdownImportService
     }
 
     private static string FormatSeasonContext(int? seasonNumber)
-        => seasonNumber is > 0 ? $" in season {seasonNumber}" : string.Empty;
+        => seasonNumber is > 0 ? LocalizedText.Format(" in season {0}", seasonNumber) : string.Empty;
 
     [GeneratedRegex(@"^(?<level>#{1,6})\s+(?<text>.+)$", RegexOptions.Compiled)]
     private static partial Regex HeadingRegex();

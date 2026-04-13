@@ -15,7 +15,7 @@
 
     <div class="grid gap-4 lg:grid-cols-3">
         <AppInput Id="@($"{FieldPrefix}-universe")"
-                  Label="@UniverseLabel"
+                  Label="@L["Universe"]"
                   @bind-Value="Model.Universe"
                   Placeholder="The Walking Dead" />
 
@@ -87,7 +87,7 @@
                     <div class="soft-block space-y-4 p-4">
                         <div class="flex flex-wrap items-center justify-between gap-3">
                             <h3 class="text-lg">@L["Season Progress"]</h3>
-                            <span class="section-chip-muted">@season.Episodes.Count episode(s)</span>
+                            <span class="section-chip-muted">@LocalizedText.FormatCount(season.Episodes.Count, "episode")</span>
                         </div>
 
                         <ProgressBar Label="@L["Completion"]"

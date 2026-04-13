@@ -1,6 +1,4 @@
 @using WatchAtlas.Extensions
-@using WatchAtlas.Models.Enums
-
 <AppCard Class="h-full">
     <div class="space-y-5">
         <div class="flex flex-wrap items-start justify-between gap-3">
@@ -15,12 +13,12 @@
 
         <div class="grid gap-3 text-sm text-muted sm:grid-cols-2">
             <div class="soft-block p-4">
-                <p class="font-semibold text-text">@MoviesLabel</p>
+                <p class="font-semibold text-text">@L["Movies"]</p>
                 <p class="mt-1">@Statistics.WatchedMovieMinutes.ToReadableDuration()</p>
             </div>
 
             <div class="soft-block p-4">
-                <p class="font-semibold text-text">@EpisodesLabel</p>
+                <p class="font-semibold text-text">@L["Episodes"]</p>
                 <p class="mt-1">@Statistics.WatchedEpisodeMinutes.ToReadableDuration()</p>
             </div>
         </div>
@@ -31,13 +29,4 @@
     [Parameter, EditorRequired]
     public UniverseWatchTimeStatistics Statistics { get; set; } = default!;
 
-    private string MoviesLabel
-        => LocalizedText.GetCurrentLanguage() == AppLanguage.Russian
-            ? "\u0424\u0438\u043b\u044c\u043c\u044b"
-            : "Movies";
-
-    private string EpisodesLabel
-        => LocalizedText.GetCurrentLanguage() == AppLanguage.Russian
-            ? "\u042d\u043f\u0438\u0437\u043e\u0434\u044b"
-            : "Episodes";
 }

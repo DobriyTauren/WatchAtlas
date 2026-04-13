@@ -64,7 +64,7 @@ public static class MarkdownImportExamples
 
     public static string Series =>
         """
-        # Series
+        # Show
         Title: Arcane
         Universe: League of Legends
         Description: Sisters from Zaun are pulled into the conflict around Hextech.
@@ -85,9 +85,9 @@ public static class MarkdownImportExamples
 
     public static string SeriesAiPrompt =>
         """
-        Create import-ready markdown for one TV series for my WatchAtlas app.
+        Create import-ready markdown for one TV show for my WatchAtlas app.
 
-        Replace [SERIES TITLE] with the exact show name before generating.
+        Replace [SHOW TITLE] with the exact show name before generating.
 
         Research rules:
         - Use the latest available public information at generation time.
@@ -115,8 +115,8 @@ public static class MarkdownImportExamples
 
         Use this structure:
 
-        # Series
-        Title: [SERIES TITLE]
+        # Show
+        Title: [SHOW TITLE]
         Universe:
         Description:
         Genres:
@@ -132,7 +132,7 @@ public static class MarkdownImportExamples
           - Duration: 44
         - Episode 2
 
-        Include all released seasons and episodes, plus officially announced upcoming seasons or episodes, for: [SERIES TITLE]
+        Include all released seasons and episodes, plus officially announced upcoming seasons or episodes, for: [SHOW TITLE]
         """;
 
     public static string Season =>
@@ -148,7 +148,7 @@ public static class MarkdownImportExamples
         """
         Create import-ready markdown for additional TV seasons for my WatchAtlas app.
 
-        Replace [SERIES TITLE] and [SEASONS TO ADD] before generating.
+        Replace [SHOW TITLE] and [SEASONS TO ADD] before generating.
 
         Research rules:
         - Use the latest available public information at generation time.
@@ -184,7 +184,7 @@ public static class MarkdownImportExamples
           - Duration: 49
         - Episode 2
 
-        Create seasons for: [SERIES TITLE]
+        Create seasons for: [SHOW TITLE]
         Seasons to add: [SEASONS TO ADD]
         """;
 }

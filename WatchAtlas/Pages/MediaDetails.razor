@@ -48,7 +48,7 @@
                 {
                     <div class="space-y-5">
                         <div class="flex flex-wrap gap-2">
-                            <AppBadge>@(PreviewEntry.Media.Type == MediaType.Movie ? L["Movie"] : L["Series"])</AppBadge>
+                            <AppBadge>@(PreviewEntry.Media.Type == MediaType.Movie ? L["Movie"] : L["Show"])</AppBadge>
                             <span class="rating-pill">
                                 @L.Format("Rating: {0}", PreviewEntry.Media.PersonalRating?.ToString() ?? L["Not set"])
                             </span>

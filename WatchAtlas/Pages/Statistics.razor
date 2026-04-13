@@ -144,14 +144,14 @@
         </section>
 
         <section class="space-y-4">
-        <SectionHeader Eyebrow="@UniversesEyebrow"
-                       Title="@UniverseWatchTimeTitle"
-                       Description="@UniverseWatchTimeDescription" />
+        <SectionHeader Eyebrow="@L["Universes"]"
+                       Title="@L["Watch time by universe."]"
+                       Description="@L["Watched movie runtime and watched episode runtime grouped by universe."]" />
 
         @if (TopUniversesByWatchTime.Count == 0)
         {
             <AppCard>
-                <p class="text-sm leading-7 text-muted">@UniverseWatchTimeEmptyState</p>
+                <p class="text-sm leading-7 text-muted">@L["No watched runtime has been matched to universes yet. Add universes to movies or shows and track watched progress to see the breakdown."]</p>
             </AppCard>
         }
         else
@@ -198,16 +198,6 @@
     private IReadOnlyList<GenreWatchTimeStatistics> TopGenresByWatchTime => StatisticsService.GetTopGenresByWatchTime(LibraryState.Entries, 3);
     private IReadOnlyList<UniverseWatchTimeStatistics> TopUniversesByWatchTime => StatisticsService.GetTopUniversesByWatchTime(LibraryState.Entries, 3);
     private IReadOnlyList<SeasonStatistics> TopSeasonsByDuration => StatisticsService.GetTopSeasonsByWatchTime(LibraryState.Entries, 3);
-    private bool IsRussian => LocalizedText.GetCurrentLanguage() == WatchAtlas.Models.Enums.AppLanguage.Russian;
-    private string UniversesEyebrow => IsRussian ? "\u0412\u0441\u0435\u043b\u0435\u043d\u043d\u044b\u0435" : "Universes";
-    private string UniverseWatchTimeTitle => IsRussian ? "\u0412\u0440\u0435\u043c\u044f \u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0430 \u043f\u043e \u0432\u0441\u0435\u043b\u0435\u043d\u043d\u044b\u043c." : "Watch time by universe.";
-    private string UniverseWatchTimeDescription => IsRussian
-        ? "\u041f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u043d\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0444\u0438\u043b\u044c\u043c\u043e\u0432 \u0438 \u044d\u043f\u0438\u0437\u043e\u0434\u043e\u0432, \u0441\u0433\u0440\u0443\u043f\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u043e\u0435 \u043f\u043e \u0432\u0441\u0435\u043b\u0435\u043d\u043d\u044b\u043c."
-        : "Watched movie runtime and watched episode runtime grouped by universe.";
-    private string UniverseWatchTimeEmptyState => IsRussian
-        ? "\u041f\u043e\u043a\u0430 \u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u043d\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u043d\u0435 \u0441\u0432\u044f\u0437\u0430\u043d\u043e \u0441\u043e \u0432\u0441\u0435\u043b\u0435\u043d\u043d\u044b\u043c\u0438. \u0414\u043e\u0431\u0430\u0432\u044c\u0442\u0435 \u0432\u0441\u0435\u043b\u0435\u043d\u043d\u0443\u044e \u0444\u0438\u043b\u044c\u043c\u0430\u043c \u0438\u043b\u0438 \u0441\u0435\u0440\u0438\u0430\u043b\u0430\u043c \u0438 \u043e\u0442\u043c\u0435\u0442\u044c\u0442\u0435 \u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440, \u0447\u0442\u043e\u0431\u044b \u0443\u0432\u0438\u0434\u0435\u0442\u044c \u0440\u0430\u0437\u0431\u0438\u0432\u043a\u0443."
-        : "No watched runtime has been matched to universes yet. Add universes to movies or series and track watched progress to see the breakdown.";
-
     protected override async Task OnInitializedAsync()
     {
         LibraryState.Changed += HandleLibraryChanged;

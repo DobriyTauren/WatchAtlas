@@ -15,7 +15,7 @@
 
     <div class="grid gap-4 lg:grid-cols-3">
         <AppInput Id="@($"{FieldPrefix}-universe")"
-                  Label="@UniverseLabel"
+                  Label="@L["Universe"]"
                   @bind-Value="Model.Universe"
                   Placeholder="Marvel" />
 
@@ -92,8 +92,4 @@
     private string GetPlaceholderTitle()
         => string.IsNullOrWhiteSpace(Model.Title) ? L["Movie cover preview"] : Model.Title;
 
-    private string UniverseLabel
-        => LocalizedText.GetCurrentLanguage() == WatchAtlas.Models.Enums.AppLanguage.Russian
-            ? "\u0412\u0441\u0435\u043b\u0435\u043d\u043d\u0430\u044f"
-            : "Universe";
 }

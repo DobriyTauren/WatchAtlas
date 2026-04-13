@@ -6,6 +6,32 @@ namespace WatchAtlas.Helpers;
 public static class LocalizedText
 {
     private static readonly Dictionary<string, string> Russian = new(StringComparer.Ordinal);
+    private static readonly Dictionary<string, string> RussianOverrides = new(StringComparer.Ordinal)
+    {
+        ["Universe"] = "Вселенная",
+        ["All universes"] = "Все вселенные",
+        ["Universes"] = "Вселенные",
+        ["Watch time by universe."] = "Время просмотра по вселенным.",
+        ["Watched movie runtime and watched episode runtime grouped by universe."] = "Просмотренное время фильмов и эпизодов, сгруппированное по вселенным.",
+        ["No watched runtime has been matched to universes yet. Add universes to movies or shows and track watched progress to see the breakdown."] = "Пока просмотренное время не связано со вселенными. Добавьте вселенные фильмам или сериалам и отмечайте просмотр, чтобы увидеть разбивку.",
+        ["A media item with id '{0}' already exists."] = "Медиаэлемент с id '{0}' уже существует.",
+        ["A media item with id '{0}' does not exist."] = "Медиаэлемент с id '{0}' не существует.",
+        ["Unable to update media item '{0}' because it does not exist."] = "Не удалось обновить медиаэлемент '{0}', потому что он не существует.",
+        ["The selected file is too large. Please choose an image up to {0} MB."] = "Выбранный файл слишком большой. Пожалуйста, выберите изображение размером до {0} МБ.",
+        ["The image could not be processed: {0}"] = "Не удалось обработать изображение: {0}",
+        ["A show title could not be found. Add a `Title:` line or use the first heading for the title."] = "Не удалось найти название сериала. Добавьте строку `Title:` или используйте первый заголовок как название.",
+        ["A season number could not be read from `{0}`."] = "Не удалось прочитать номер сезона из `{0}`.",
+        ["An episode number could not be read from `{0}`{1}."] = "Не удалось прочитать номер эпизода из `{0}`{1}.",
+        ["A rating could not be read from `{0}` for the {1}."] = "Не удалось прочитать рейтинг из `{0}` для {1}.",
+        ["A duration could not be read from `{0}` for {1}."] = "Не удалось прочитать длительность из `{0}` для {1}.",
+        ["A watched date could not be read from `{0}` for {1}."] = "Не удалось прочитать дату просмотра из `{0}` для {1}.",
+        [" in season {0}"] = " в сезоне {0}",
+        ["movie"] = "фильма",
+        ["show"] = "сериала",
+        ["season {0} episode {1}"] = "сезона {0} эпизода {1}",
+        ["\"{0}\" will be removed from the library immediately."] = "«{0}» будет сразу удалён из библиотеки.",
+        ["\"{0}\" and all tracked episode progress will be removed from the library immediately."] = "«{0}» и весь отслеживаемый прогресс по эпизодам будут сразу удалены из библиотеки."
+    };
 
     static LocalizedText()
     {
@@ -323,6 +349,7 @@ public static class LocalizedText
             ["See a season block example"] = "Посмотреть пример блока сезона",
             ["Show changes could not be saved."] = "Не удалось сохранить изменения сериала.",
             ["Show Completion"] = "Завершённость сериала",
+            ["Shows Completion"] = "Завершённость сериалов",
             ["Show could not be created."] = "Не удалось создать сериал.",
             ["Show could not be deleted."] = "Не удалось удалить сериал.",
             ["Show cover preview"] = "Предпросмотр обложки сериала",
@@ -451,7 +478,17 @@ public static class LocalizedText
             return text;
         }
 
-        return GetCurrentLanguage() == AppLanguage.Russian && Russian.TryGetValue(text, out var translation)
+        if (GetCurrentLanguage() != AppLanguage.Russian)
+        {
+            return text;
+        }
+
+        if (RussianOverrides.TryGetValue(text, out var overrideTranslation))
+        {
+            return overrideTranslation;
+        }
+
+        return Russian.TryGetValue(text, out var translation)
             ? translation
             : text;
     }

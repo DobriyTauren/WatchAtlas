@@ -88,10 +88,7 @@
     public LibraryEntry Entry { get; set; } = default!;
 
     private string GetCoverBadge()
-        => Entry.Media.Type == MediaType.Movie ? L["Movie"] : L["Series"];
+        => Entry.Media.Type == MediaType.Movie ? L["Movie"] : L["Show"];
 
-    private string CompletionLabel
-        => LocalizedText.GetCurrentLanguage() == WatchAtlas.Models.Enums.AppLanguage.Russian
-            ? "\u041f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u043d\u043e"
-            : "Completion";
+    private string CompletionLabel => L["Watched"];
 }

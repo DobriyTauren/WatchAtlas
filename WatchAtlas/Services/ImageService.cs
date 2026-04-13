@@ -33,7 +33,7 @@ public class ImageService : IImageService
         {
             return new CoverImageProcessingResult
             {
-                ErrorMessage = $"The selected file is too large. Please choose an image up to {MaxFileSizeBytes / 1024 / 1024} MB."
+                ErrorMessage = LocalizedText.Format("The selected file is too large. Please choose an image up to {0} MB.", MaxFileSizeBytes / 1024 / 1024)
             };
         }
 
@@ -63,7 +63,7 @@ public class ImageService : IImageService
         {
             return new CoverImageProcessingResult
             {
-                ErrorMessage = $"The image could not be processed: {exception.Message}"
+                ErrorMessage = LocalizedText.Format("The image could not be processed: {0}", exception.Message)
             };
         }
     }

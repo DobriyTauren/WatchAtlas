@@ -3,25 +3,25 @@
 @inject NavigationManager NavigationManager
 @inject ToastState ToastState
 
-<PageTitle>@L["Edit Series"]</PageTitle>
+<PageTitle>@L["Edit Show"]</PageTitle>
 
 <section class="space-y-8">
     @if (!IsReady)
     {
-        <PageHeader Eyebrow="@L["Series Editor"]"
-                    Title="@L["Loading series editor."]"
-                    Subtitle="@L["Getting this series ready to edit."]" />
+        <PageHeader Eyebrow="@L["Show Editor"]"
+                    Title="@L["Loading show editor."]"
+                    Subtitle="@L["Getting this show ready to edit."]" />
     }
     else if (Entry is null)
     {
-        <PageHeader Eyebrow="@L["Series Editor"]"
-                    Title="@L["This series could not be found."]"
+        <PageHeader Eyebrow="@L["Show Editor"]"
+                    Title="@L["This show could not be found."]"
                     Subtitle="@L["It may have been removed, or the link may be out of date."]" />
 
-        <EmptyStateCard Badge="@L["Series Editor"]"
-                        Title="@L["Series not found."]"
-                        Description="@L["Create a series first or return to the library to pick an existing entry."]"
-                        PrimaryLabel="@L["Create Series"]"
+        <EmptyStateCard Badge="@L["Show Editor"]"
+                        Title="@L["Show not found."]"
+                        Description="@L["Create a show first or return to the library to pick an existing entry."]"
+                        PrimaryLabel="@L["Create Show"]"
                         PrimaryHref="series/new"
                         SecondaryLabel="@L["Open Library"]"
                         SecondaryHref="library" />

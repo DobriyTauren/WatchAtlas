@@ -65,7 +65,7 @@ public class LibraryState(IMediaRepository repository) : StateStoreBase
         var existing = await repository.GetByIdAsync(media.Id);
         if (existing is null)
         {
-            throw new InvalidOperationException($"Unable to update media item '{media.Id}' because it does not exist.");
+            throw new InvalidOperationException(LocalizedText.Format("Unable to update media item '{0}' because it does not exist.", media.Id));
         }
 
         var preparedMedia = PrepareMediaItemForUpdate(media, existing.CreatedAt);

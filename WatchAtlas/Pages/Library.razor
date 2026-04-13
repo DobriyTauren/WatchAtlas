@@ -64,10 +64,10 @@
 
             <AppSelect TValue="string"
                        Id="library-universe-top"
-                       Label="@UniverseLabel"
+                       Label="@L["Universe"]"
                        Value="@SelectedUniverseValue"
                        ValueChanged="HandleUniverseChanged">
-                <option value="">@AllUniversesLabel</option>
+                <option value="">@L["All universes"]</option>
                 @foreach (var universe in AvailableUniverses)
                 {
                     <option value="@universe">@universe</option>
@@ -108,7 +108,7 @@
 
     @if (QueryResult.TotalCount == 0)
     {
-        <EmptyStateCard Badge="Library"
+        <EmptyStateCard Badge="@L["Library"]"
                         Title="@L["Your library is still empty."]"
                         Description="@L["Start by adding your first movie or show. Once it is saved, this page becomes your main browsing hub for search, filters, and progress tracking."]"
                         PrimaryLabel="@L["Add First Entry"]"

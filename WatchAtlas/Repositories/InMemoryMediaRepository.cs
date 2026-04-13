@@ -38,7 +38,7 @@ public class LocalStorageMediaRepository(IJSRuntime jsRuntime) : IMediaRepositor
 
         if (storage.MediaItems.Any(candidate => candidate.Id == normalized.Id))
         {
-            throw new InvalidOperationException($"A media item with id '{normalized.Id}' already exists.");
+            throw new InvalidOperationException(LocalizedText.Format("A media item with id '{0}' already exists.", normalized.Id));
         }
 
         storage.MediaItems.Add(normalized);
@@ -53,7 +53,7 @@ public class LocalStorageMediaRepository(IJSRuntime jsRuntime) : IMediaRepositor
 
         if (existingIndex < 0)
         {
-            throw new InvalidOperationException($"A media item with id '{normalized.Id}' does not exist.");
+            throw new InvalidOperationException(LocalizedText.Format("A media item with id '{0}' does not exist.", normalized.Id));
         }
 
         storage.MediaItems[existingIndex] = normalized;
@@ -173,7 +173,7 @@ public class LocalStorageMediaRepository(IJSRuntime jsRuntime) : IMediaRepositor
     {
         if (storage.MediaItems.All(item => item.Id != mediaItemId))
         {
-            throw new InvalidOperationException($"A media item with id '{mediaItemId}' does not exist.");
+            throw new InvalidOperationException(LocalizedText.Format("A media item with id '{0}' does not exist.", mediaItemId));
         }
     }
 

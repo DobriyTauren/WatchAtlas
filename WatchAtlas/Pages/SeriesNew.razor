@@ -3,17 +3,17 @@
 @inject NavigationManager NavigationManager
 @inject ToastState ToastState
 
-<PageTitle>@L["Create Series"]</PageTitle>
+<PageTitle>@L["Create Show"]</PageTitle>
 
 <section class="space-y-8">
-    <PageHeader Eyebrow="@L["Create Series"]"
-                Title="@L["Add a series to your library."]"
-                Subtitle="@L["Set up the series, then add seasons and episodes whenever you're ready."]" />
+    <PageHeader Eyebrow="@L["Create Show"]"
+                Title="@L["Add a show to your library."]"
+                Subtitle="@L["Set up the show, then add seasons and episodes whenever you're ready."]" />
 
     <section>
         <AppCard>
             <SeriesForm Model="Form"
-                        SubmitLabel="@L["Create Series"]"
+                        SubmitLabel="@L["Create Show"]"
                         CancelHref="library"
                         FieldPrefix="series-new"
                         ExternalErrorMessage="@ErrorMessage"
@@ -41,13 +41,13 @@
             ErrorMessage = null;
 
             await LibraryState.AddAsync(media, null, series);
-            ToastState.ShowSuccess(L["Series created."], L["The new series has been saved in your library."]);
+            ToastState.ShowSuccess(L["Show created."], L["The new show has been saved in your library."]);
             NavigationManager.NavigateTo(MediaRouteHelper.GetDetailsHref(media));
         }
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
-            ToastState.ShowError(L["Series could not be created."], exception.Message);
+            ToastState.ShowError(L["Show could not be created."], exception.Message);
         }
         finally
         {
