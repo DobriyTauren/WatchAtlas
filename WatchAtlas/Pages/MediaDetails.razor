@@ -10,12 +10,12 @@
     @if (Media is null)
     {
         <PageHeader Eyebrow="@L["Media Details"]"
-                    Title="@L["This entry is not in the library yet."]"
-                    Subtitle="@L["The route is ready for editing, but the requested item was not found in local storage."]" />
+                    Title="@L["We couldn't find this item in your library."]"
+                    Subtitle="@L["Create it first, then come back here to edit it."]" />
 
         <EmptyStateCard Badge="@L["Details"]"
                         Title="@L["No media entry found."]"
-                        Description="@L["Create a new item first, then return here to edit metadata, seasons, episodes, and watch progress."]"
+                        Description="@L["Create an item first, then come back here to edit details and track progress."]"
                         PrimaryLabel="@L["Create New Item"]"
                         PrimaryHref="media/new"
                         SecondaryLabel="@L["Return to Library"]"
@@ -25,7 +25,7 @@
     {
         <PageHeader Eyebrow="@L["Media Details"]"
                     Title="@Media.Title"
-                    Subtitle="@L["Edit the stored item, adjust progress, and keep the browser-backed library in sync."]" />
+                    Subtitle="@L["Edit this item and update its details and progress."]" />
 
         <section class="grid gap-4 xl:grid-cols-[1.2fr,0.9fr]">
             <AppCard>

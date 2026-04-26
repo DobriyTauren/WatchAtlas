@@ -21,17 +21,17 @@
             <div class="flex flex-wrap gap-3">
                 <MarkdownImportLauncher ButtonLabel="@L["Fill Show From Markdown"]"
                                         ModalTitle="@L["Fill this show from markdown"]"
-                                        ModalDescription="@L["Paste one clean markdown document for a single show, or copy the AI prompt below to generate it automatically in the right format."]"
+                                        ModalDescription="@L["Paste markdown for one show, or copy the message below and let your assistant prepare it for you."]"
                                         ExampleMarkdown="@MarkdownImportExamples.Series"
                                         ExampleTitle="@L["See a full show example"]"
                                     UsageSteps="@MarkdownImportExamples.SeriesImportSteps"
                                     CopyablePrompt="@MarkdownImportExamples.SeriesAiPrompt"
-                                    CopyablePromptTitle="@L["Prompt for ChatGPT or Claude"]"
-                                    CopyablePromptDescription="@L["Copy this prepared prompt and ask your assistant for import-ready markdown."]"
+                                    CopyablePromptTitle="@L["Message for ChatGPT or Claude"]"
+                                    CopyablePromptDescription="@L["Copy this message into your assistant, then paste the markdown back here."]"
                                         PromptPrimaryToken="[SHOW TITLE]"
-                                        PromptPrimaryLabel="@L["Show title for AI"]"
+                                        PromptPrimaryLabel="@L["Show title"]"
                                         PromptPrimaryPlaceholder="Arcane"
-                                        PromptPrimaryHelpText="@L["This title will be inserted into the copied prompt automatically."]"
+                                        PromptPrimaryHelpText="@L["We'll place this title into the copied message automatically."]"
                                         PromptPrimaryValue="@Model.Title"
                                         Placeholder="# Show&#10;Title: ...&#10;Universe: ...&#10;Genres: ...&#10;&#10;## Season 1&#10;- Episode 1: ..."
                                         FieldPrefix="@($"{FieldPrefix}-series-markdown")"
@@ -39,20 +39,20 @@
 
                 <MarkdownImportLauncher ButtonLabel="@L["Add Seasons From Markdown"]"
                                         ModalTitle="@L["Add seasons from markdown"]"
-                                        ModalDescription="@L["Paste one or more season blocks, or copy the AI prompt below to generate only the seasons you still need to add."]"
+                                        ModalDescription="@L["Paste season blocks here, or copy the message below and let your assistant prepare the seasons you still need."]"
                                         ExampleMarkdown="@MarkdownImportExamples.Season"
                                         ExampleTitle="@L["See a season block example"]"
                                     UsageSteps="@MarkdownImportExamples.SeasonImportSteps"
                                     CopyablePrompt="@MarkdownImportExamples.SeasonAiPrompt"
-                                    CopyablePromptTitle="@L["Prompt for missing seasons"]"
-                                    CopyablePromptDescription="@L["Use this when you already have a show draft and want your assistant to generate only the missing seasons."]"
+                                    CopyablePromptTitle="@L["Message for missing seasons"]"
+                                    CopyablePromptDescription="@L["Use this when the show is already started and you only need the remaining seasons."]"
                                         PromptPrimaryToken="[SHOW TITLE]"
-                                        PromptPrimaryLabel="@L["Show title for AI"]"
+                                        PromptPrimaryLabel="@L["Show title"]"
                                         PromptPrimaryPlaceholder="Arcane"
-                                        PromptPrimaryHelpText="@L["This title will be inserted into the copied prompt automatically."]"
+                                        PromptPrimaryHelpText="@L["We'll place this title into the copied message automatically."]"
                                         PromptPrimaryValue="@Model.Title"
                                         PromptSecondaryToken="[SEASONS TO ADD]"
-                                        PromptSecondaryLabel="@L["Which seasons to add"]"
+                                        PromptSecondaryLabel="@L["Seasons to add"]"
                                         PromptSecondaryPlaceholder="@L["Season 3, Season 4"]"
                                         PromptSecondaryHelpText="@L["For example: `Season 3` or `Season 3 and Season 4`."]"
                                         Placeholder="## Season 3: Optional Title&#10;- Episode 1: ...&#10;  - Duration: 46"
@@ -122,7 +122,7 @@
 
         Model.CopyFrom(result.Value);
         RefreshEditContext();
-        ToastState.ShowSuccess(L["Show details added."], L["The show form was filled from your markdown."]);
+        ToastState.ShowSuccess(L["Show details added."], L["Your markdown filled the form."]);
 
         if (result.Warnings.Count > 0)
         {
@@ -142,7 +142,7 @@
 
         var notices = Model.AppendImportedSeasons(result.Value).ToList();
         RefreshEditContext();
-        ToastState.ShowSuccess(L["Seasons added."], L["New seasons and episodes were appended to the current show draft."]);
+        ToastState.ShowSuccess(L["Seasons added."], L["New seasons and episodes were added to the current show."]);
 
         var firstNotice = notices.Concat(result.Warnings).FirstOrDefault();
         if (!string.IsNullOrWhiteSpace(firstNotice))
@@ -156,7 +156,7 @@
     private void HandleInvalidSubmit(EditContext editContext)
     {
         var firstMessage = editContext.GetValidationMessages().FirstOrDefault();
-        ToastState.ShowWarning(L["Please review the show form."], firstMessage ?? L["Some show details still need attention before save."]);
+        ToastState.ShowWarning(L["Please review the show form."], firstMessage ?? L["A few show details still need attention before saving."]);
     }
 
     private void RefreshEditContext()

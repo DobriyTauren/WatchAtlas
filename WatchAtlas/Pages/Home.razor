@@ -11,8 +11,8 @@
     @if (LibraryState.IsLoading && !LibraryState.IsLoaded)
     {
         <PageHeader Eyebrow="@L["Overview"]"
-                    Title="@L["Loading your watch library."]"
-                    Subtitle="@L["Getting your movies, shows, and watch progress ready."]" />
+                    Title="@L["Getting your library ready."]"
+                    Subtitle="@L["Loading your movies, shows, and progress."]" />
 
         <section class="grid gap-4 xl:grid-cols-[1.4fr,1fr]">
             <AppCard Class="space-y-6">
@@ -39,16 +39,16 @@
     else
     {
         <PageHeader Eyebrow="@L["Overview"]"
-                    Title="@L["Your personal watch library starts here."]"
-                    Subtitle="@L["Track what you've watched, see your progress, and jump back into your library anytime."]">
+                    Title="@L["Your watch library"]"
+                    Subtitle="@L["Keep track of what you watch, see your progress, and pick up where you left off."]">
         </PageHeader>
 
         <section class="shell-card overflow-hidden p-6 sm:p-8">
             <div class="space-y-4">
                 <span class="section-chip">@L["Welcome"]</span>
-                <h2 class="max-w-2xl text-3xl">@L["A soft, simple place to keep up with what you've watched."]</h2>
+                <h2 class="max-w-2xl text-3xl">@L["A simple place to keep track of what you watch."]</h2>
                 <p class="max-w-3xl text-sm leading-7 text-muted sm:text-base">
-                    @L["Add films and shows, follow episode progress, and keep an eye on your total watch time without losing the calm feel of a personal collection."]
+                    @L["Add movies and shows, follow episode progress, and see your watch time in one place."]
                 </p>
             </div>
         </section>

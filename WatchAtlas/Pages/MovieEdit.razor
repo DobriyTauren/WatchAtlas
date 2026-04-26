@@ -8,17 +8,17 @@
 <section class="space-y-8">
     @if (!IsReady)
     {
-        <PageHeader Eyebrow="@L["Movie Editor"]"
-                    Title="@L["Loading movie editor."]"
-                    Subtitle="@L["Getting this movie ready to edit."]" />
+        <PageHeader Eyebrow="@L["Edit Movie"]"
+                    Title="@L["Loading editor."]"
+                    Subtitle="@L["Preparing this movie for editing."]" />
     }
     else if (Entry is null)
     {
-        <PageHeader Eyebrow="@L["Movie Editor"]"
+        <PageHeader Eyebrow="@L["Edit Movie"]"
                     Title="@L["This movie could not be found."]"
                     Subtitle="@L["It may have been removed, or the link may be out of date."]" />
 
-        <EmptyStateCard Badge="@L["Movie Editor"]"
+        <EmptyStateCard Badge="@L["Edit Movie"]"
                         Title="@L["Movie not found."]"
                         Description="@L["Create a movie first or return to the library to pick an existing item."]"
                         PrimaryLabel="@L["Create Movie"]"

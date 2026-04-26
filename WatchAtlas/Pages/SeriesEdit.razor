@@ -8,17 +8,17 @@
 <section class="space-y-8">
     @if (!IsReady)
     {
-        <PageHeader Eyebrow="@L["Show Editor"]"
-                    Title="@L["Loading show editor."]"
-                    Subtitle="@L["Getting this show ready to edit."]" />
+        <PageHeader Eyebrow="@L["Edit Show"]"
+                    Title="@L["Loading editor."]"
+                    Subtitle="@L["Preparing this show for editing."]" />
     }
     else if (Entry is null)
     {
-        <PageHeader Eyebrow="@L["Show Editor"]"
+        <PageHeader Eyebrow="@L["Edit Show"]"
                     Title="@L["This show could not be found."]"
                     Subtitle="@L["It may have been removed, or the link may be out of date."]" />
 
-        <EmptyStateCard Badge="@L["Show Editor"]"
+        <EmptyStateCard Badge="@L["Edit Show"]"
                         Title="@L["Show not found."]"
                         Description="@L["Create a show first or return to the library to pick an existing entry."]"
                         PrimaryLabel="@L["Create Show"]"

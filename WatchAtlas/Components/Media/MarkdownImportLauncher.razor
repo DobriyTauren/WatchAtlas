@@ -33,12 +33,12 @@
                         else
                         {
                             <p class="text-sm font-semibold text-text">@L["How to use it"]</p>
-                            <p class="text-sm leading-7 text-muted">@L["Generate clean markdown first, then paste it here."]</p>
+                            <p class="text-sm leading-7 text-muted">@L["Prepare the markdown first, then paste it here."]</p>
                         }
 
                         @if (!string.IsNullOrWhiteSpace(CopyablePrompt))
                         {
-                            <p class="text-xs leading-6 text-muted">@L["The full prompt will be copied to your clipboard."]</p>
+                            <p class="text-xs leading-6 text-muted">@L["The full message will be copied to your clipboard."]</p>
                         }
                     </div>
 
@@ -64,7 +64,7 @@
                                                        Size="sm"
                                                        Disabled="@IsBusy"
                                                        OnClick="CopyPromptAsync">
-                                                @L["Copy Prompt"]
+                                                @L["Copy Message"]
                                             </AppButton>
                                         }
                                     </div>
@@ -95,7 +95,7 @@
                                        style="border-radius: 1rem; white-space: nowrap;"
                                        Disabled="@IsBusy"
                                        OnClick="CopyPromptAsync">
-                                @L["Copy Prompt"]
+                                @L["Copy Message"]
                             </AppButton>
                         </div>
                     }
@@ -222,12 +222,12 @@
     public Func<string, Task<MarkdownImportApplyResult>> OnConfirmAsync { get; set; } = default!;
 
     private string ResolvedTextareaLabel => string.IsNullOrWhiteSpace(TextareaLabel) ? L["Markdown"] : TextareaLabel;
-    private string ResolvedHelpText => string.IsNullOrWhiteSpace(HelpText) ? L["Paste prepared markdown here after generating it with your assistant."] : HelpText;
-    private string ResolvedCopyablePromptTitle => string.IsNullOrWhiteSpace(CopyablePromptTitle) ? L["Prompt for AI"] : CopyablePromptTitle;
-    private string ResolvedCopyablePromptDescription => string.IsNullOrWhiteSpace(CopyablePromptDescription) ? L["Copy this prompt into ChatGPT or another assistant, then paste the generated markdown back here."] : CopyablePromptDescription;
+    private string ResolvedHelpText => string.IsNullOrWhiteSpace(HelpText) ? L["Paste the markdown here when it's ready."] : HelpText;
+    private string ResolvedCopyablePromptTitle => string.IsNullOrWhiteSpace(CopyablePromptTitle) ? L["Message for your assistant"] : CopyablePromptTitle;
+    private string ResolvedCopyablePromptDescription => string.IsNullOrWhiteSpace(CopyablePromptDescription) ? L["Copy this message into ChatGPT or another assistant, then paste the result back here."] : CopyablePromptDescription;
     private string ResolvedPromptPrimaryLabel => string.IsNullOrWhiteSpace(PromptPrimaryLabel) ? L["Title"] : PromptPrimaryLabel;
     private string ResolvedPromptSecondaryLabel => string.IsNullOrWhiteSpace(PromptSecondaryLabel) ? L["Additional details"] : PromptSecondaryLabel;
-    private string ResolvedConfirmLabel => string.IsNullOrWhiteSpace(ConfirmLabel) ? L["Fill Form"] : ConfirmLabel;
+    private string ResolvedConfirmLabel => string.IsNullOrWhiteSpace(ConfirmLabel) ? L["Apply Markdown"] : ConfirmLabel;
 
     private Task OpenAsync(MouseEventArgs _)
     {
@@ -287,11 +287,11 @@
         try
         {
             await JsRuntime.InvokeVoidAsync("watchAtlasStorage.copyText", BuildPrompt());
-            ToastState.ShowSuccess(L["Prompt copied."], L["Paste it into your assistant and generate the markdown from the prepared prompt."]);
+            ToastState.ShowSuccess(L["Message copied."], L["Paste it into your assistant to get the markdown."]);
         }
         catch (Exception exception)
         {
-            InlineErrorMessage = L.Format("The prompt could not be copied: {0}", exception.Message);
+            InlineErrorMessage = L.Format("The message could not be copied: {0}", exception.Message);
         }
     }
 

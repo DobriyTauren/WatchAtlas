@@ -2,32 +2,32 @@
     <div class="space-y-6">
         <div>
             <h2 class="text-2xl">@L["Watch Time Summary"]</h2>
-            <p class="mt-2 text-sm leading-7 text-muted">@L["Compare watched movie runtime, watched episode runtime, and how much tracked time is still left unseen."]</p>
+            <p class="mt-2 text-sm leading-7 text-muted">@L["See how much time you've already watched and how much is left."]</p>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
             <StatCard Title="@L["Movies"]"
                       Value="@Summary.WatchedMovieMinutes.ToReadableDuration()"
-                      Caption="@L["Watched movie runtime."]"
+                      Caption="@L["Time spent on movies."]"
                       ChipLabel="@L["Movies"]"
                       ChipVariant="outline" />
 
             <StatCard Title="@L["Episodes"]"
                       Value="@Summary.WatchedEpisodeMinutes.ToReadableDuration()"
-                      Caption="@L["Watched episode runtime."]"
+                      Caption="@L["Time spent on episodes."]"
                       ChipLabel="@L["Episodes"]"
                       ChipVariant="outline" />
 
             <StatCard Title="@L["Total Watched"]"
                       Value="@Summary.TotalWatchedMinutes.ToReadableDuration()"
-                      Caption="@L["Combined watched runtime."]"
-                      ChipLabel="@L["Runtime"]"
+                      Caption="@L["Total time watched in your library."]"
+                      ChipLabel="@L["Watched"]"
                       ChipVariant="success" />
 
             <StatCard Title="@L["Remaining"]"
                       Value="@Summary.RemainingMinutes.ToReadableDuration()"
-                      Caption="@L["Tracked runtime not watched yet."]"
-                      ChipLabel="@L["Pending"]"
+                      Caption="@L["How much time is left to watch."]"
+                      ChipLabel="@L["Remaining"]"
                       ChipVariant="muted" />
         </div>
     </div>

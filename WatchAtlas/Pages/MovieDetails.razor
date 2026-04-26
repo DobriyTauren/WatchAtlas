@@ -9,18 +9,18 @@
     @if (!IsReady)
     {
         <PageHeader Eyebrow="@L["Movie Details"]"
-                    Title="@L["Loading movie details."]"
-                    Subtitle="@L["Reading the selected movie from browser storage."]" />
+                    Title="@L["Loading movie."]"
+                    Subtitle="@L["Opening the selected movie from your library."]" />
     }
     else if (Entry is null)
     {
         <PageHeader Eyebrow="@L["Movie Details"]"
-                    Title="@L["This movie is not in the library yet."]"
-                    Subtitle="@L["The details route is ready, but the requested movie was not found in browser storage."]" />
+                    Title="@L["We couldn't find this movie in your library."]"
+                    Subtitle="@L["It may have been removed, or the link may be out of date."]" />
 
         <EmptyStateCard Badge="@L["Movie Details"]"
                         Title="@L["No movie found."]"
-                        Description="@L["Create a movie first, then return here to review metadata and watch status."]"
+                        Description="@L["Create a movie first, then come back here to review its details and watch status."]"
                         PrimaryLabel="@L["Create Movie"]"
                         PrimaryHref="movies/new"
                         SecondaryLabel="@L["Return to Library"]"
@@ -53,7 +53,7 @@
                     <div class="movie-cover-fallback h-full min-h-[24rem] xl:min-h-[32rem]">
                         <span class="movie-cover-fallback__badge">@L["Movie"]</span>
                         <h2 class="movie-cover-fallback__title">@Entry.Media.Title</h2>
-                        <p class="movie-cover-fallback__copy">@L["Add a cover image from the edit page to make this movie card feel more complete."]</p>
+                        <p class="movie-cover-fallback__copy">@L["Add a cover image from the edit page to make this movie feel complete."]</p>
                     </div>
                 }
             </AppCard>
@@ -128,7 +128,7 @@
 
         <AppModal IsOpen="@IsDeleteModalOpen"
                   Title="@L["Delete this movie?"]"
-                  Description="@L["This permanently removes the movie and its stored watch details from browser storage."]"
+                  Description="@L["This removes the movie from your library on this device."]"
                   OnClose="CloseDeleteModalAsync">
             <ChildContent>
                 <p class="text-sm leading-7 text-muted">
@@ -178,8 +178,8 @@
         }
 
         return Entry.Movie?.IsWatched == true
-            ? L["Watched movie details and runtime are stored locally and ready to edit."]
-            : L["This movie is in your library and ready for watch progress and metadata updates."];
+            ? L["This movie is marked as watched in your library."]
+            : L["This movie is saved in your library, and you can update its progress anytime."];
     }
 
     private string GetRuntime()
@@ -192,8 +192,6 @@
 
     private string GetWatchedDate()
         => Entry?.Movie?.WatchedDate?.ToLocalTime().ToString("dd MMM yyyy") ?? L["Not set"];
-
-    private string UniverseLabel => L["Universe"];
 
     private Task OpenDeleteModalAsync(MouseEventArgs _)
     {

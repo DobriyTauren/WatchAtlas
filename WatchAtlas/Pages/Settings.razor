@@ -13,8 +13,8 @@
 
 <section class="space-y-8">
     <PageHeader Eyebrow="@L["Settings"]"
-                Title="@L["Control your app preferences and local data safety."]"
-                Subtitle="@L["Choose how the app looks, save a backup, or clear everything and start fresh."]" />
+                Title="@L["Choose your language, backup your library, and manage your data."]"
+                Subtitle="@L["Adjust the app to your liking, keep a backup, or clear everything on this device."]" />
 
     @if (!string.IsNullOrWhiteSpace(ErrorMessage))
     {
@@ -28,12 +28,12 @@
             <div class="space-y-6">
                 <SectionHeader Eyebrow="@L["Appearance"]"
                                Title="@L["Theme and library defaults"]"
-                               Description="@L["These preferences shape how the library opens and how new browsing sessions feel before you start filtering."]" />
+                               Description="@L["Adjust how the app looks and how the library opens."]" />
 
                 <div class="space-y-4">
                     <div class="soft-block p-5">
                         <p class="text-sm font-semibold text-text">@L["Theme"]</p>
-                        <p class="mt-2 text-sm leading-7 text-muted">@L["Switch live between the soft light, dark, and pastel palettes. The selected theme is preserved after reload."]</p>
+                        <p class="mt-2 text-sm leading-7 text-muted">@L["Switch between light, dark, and pastel themes. Your choice is saved automatically."]</p>
                         <div class="mt-4">
                             <ThemeSwitcher ShowCurrentButton="false" />
                         </div>
@@ -67,7 +67,7 @@
                             <option value="@AppLanguage.English">@L["English"]</option>
                             <option value="@AppLanguage.Russian">@L["Russian"]</option>
                         </AppSelect>
-                        <p class="mt-3 text-sm leading-7 text-muted">@L["On your first launch, WatchAtlas uses the browser language automatically. After that, your choice is saved here."]</p>
+                        <p class="mt-3 text-sm leading-7 text-muted">@L["WatchAtlas uses your browser language the first time you open it. You can change it here anytime."]</p>
                     </div>
                 </div>
             </div>
@@ -80,8 +80,8 @@
                                Description="@L["Download a backup file with your library and settings, or restore everything from a saved file."]" />
 
                 <div class="soft-block p-5">
-                    <p class="text-sm font-semibold text-text">@L["Export backup"]</p>
-                    <p class="mt-2 text-sm leading-7 text-muted">@L["Exports the full library snapshot, including movies, shows, seasons, episodes, and current app settings."]</p>
+                    <p class="text-sm font-semibold text-text">@L["Save a backup of your library"]</p>
+                    <p class="mt-2 text-sm leading-7 text-muted">@L["Download a backup of your library and settings."]</p>
                     <div class="mt-4 flex flex-wrap gap-3">
                         <AppButton IsLoading="@IsExporting" OnClick="ExportBackupAsync">
                             @(IsExporting ? L["Preparing Export..."] : L["Export JSON Backup"])
@@ -91,7 +91,7 @@
 
                 <div class="soft-block p-5">
                     <p class="text-sm font-semibold text-text">@L["Import backup"]</p>
-                    <p class="mt-2 text-sm leading-7 text-muted">@L["The current MVP replaces local data after confirmation, so import is safe from partial merges but will overwrite the current browser snapshot."]</p>
+                    <p class="mt-2 text-sm leading-7 text-muted">@L["Importing a backup will replace your current library and settings after confirmation."]</p>
                     <div class="mt-4 flex flex-wrap items-center gap-3">
                         <label class="app-button app-button-secondary app-button-md cursor-pointer">
                             <InputFile OnChange="HandleImportSelectedAsync"
@@ -107,9 +107,9 @@
                 </div>
 
                 <div class="space-y-4 text-sm leading-7 text-muted">
-                    <p><span class="font-semibold text-text">@L["Tip:"]</span> @L["export a backup before clearing data or moving to another device."]</p>
-                    <p><span class="font-semibold text-text">@L["Import:"]</span> @L["only valid WatchAtlas backup files are accepted."]</p>
-                    <p><span class="font-semibold text-text">@L["Restore:"]</span> @L["importing replaces the current library and preferences with the contents of the selected backup."]</p>
+                    <p><span class="font-semibold text-text">@L["Tip:"]</span> @L["Save a backup before clearing data or moving to another device."]</p>
+                    <p><span class="font-semibold text-text">@L["Import:"]</span> @L["Choose a WatchAtlas backup file in JSON format."]</p>
+                    <p><span class="font-semibold text-text">@L["Restore:"]</span> @L["Restoring a backup replaces your current library and settings."]</p>
                 </div>
             </div>
         </AppCard>
@@ -118,13 +118,13 @@
     <AppCard Variant="strong">
         <div class="space-y-5">
             <SectionHeader Eyebrow="@L["Danger Zone"]"
-                           Title="@L["Reset local WatchAtlas data"]"
-                           Description="@L["This permanently clears your library and preferences on this device."]" />
+                           Title="@L["Reset app data on this device"]"
+                           Description="@L["This removes your library and saved preferences from this device."]" />
 
             <div class="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-red-200/70 bg-red-50/70 p-5 dark:border-red-400/20 dark:bg-red-500/10">
                 <div class="space-y-2">
-                    <p class="text-sm font-semibold text-red-700 dark:text-red-200">@L["Reset library and preferences"]</p>
-                    <p class="text-sm leading-7 text-red-700/80 dark:text-red-100/80">@L["Use this if you want to remove everything and start over."]</p>
+                    <p class="text-sm font-semibold text-red-700 dark:text-red-200">@L["Clear library and preferences"]</p>
+                    <p class="text-sm leading-7 text-red-700/80 dark:text-red-100/80">@L["Use this if you want to remove everything from this device and start over."]</p>
                 </div>
 
                 <AppButton Disabled="@IsResetting" OnClick="OpenResetModalAsync">@L["Reset All Local Data"]</AppButton>
@@ -133,13 +133,13 @@
     </AppCard>
 
     <AppModal IsOpen="@IsImportModalOpen"
-              Title="@L["Replace local data with this backup?"]"
-              Description="@L["Import replaces the current browser snapshot. Export first if you want an extra recovery point."]"
+              Title="@L["Replace your current library with this backup?"]"
+              Description="@L["This will replace your current library and settings. Export a backup first if you want an extra copy."]"
               OnClose="CloseImportModalAsync">
         <ChildContent>
             <div class="space-y-4 text-sm leading-7 text-muted">
-                <p>@L.Format("{0} media item(s) and the saved app preferences from {1} are ready to restore.", PendingImportBackup?.Library.MediaItems.Count ?? 0, SelectedImportFileName ?? L["the selected file"])</p>
-                <p>@L["The current library, filters, theme preferences, and saved settings will be replaced immediately after confirmation."]</p>
+                <p>@L.Format("This backup includes {0} item(s) and settings from {1}.", PendingImportBackup?.Library.MediaItems.Count ?? 0, SelectedImportFileName ?? L["the selected file"])</p>
+                <p>@L["Your current library, filters, theme, and settings will be replaced after confirmation."]</p>
             </div>
         </ChildContent>
         <Footer>
@@ -149,12 +149,12 @@
     </AppModal>
 
     <AppModal IsOpen="@IsResetModalOpen"
-              Title="@L["Reset all local data?"]"
-              Description="@L["This clears your saved library and preferences permanently."]"
+              Title="@L["Clear all app data on this device?"]"
+              Description="@L["This permanently removes your library and saved preferences from this device."]"
               OnClose="CloseResetModalAsync">
         <ChildContent>
             <p class="text-sm leading-7 text-muted">
-                @L["All movies, shows, seasons, episodes, cover images, filters, and preferences will be removed from this device."]
+                @L["All movies, shows, seasons, episodes, covers, filters, and preferences will be removed from this device."]
             </p>
         </ChildContent>
         <Footer>
@@ -226,7 +226,7 @@
             var fileName = $"watchatlas-backup-{DateTime.Now:yyyyMMdd-HHmmss}.json";
             var json = ImportExportService.Export(backup);
             await JsRuntime.InvokeVoidAsync("watchAtlasStorage.downloadTextFile", fileName, json, "application/json;charset=utf-8");
-            ToastState.ShowSuccess(L["Backup exported."], L["A full JSON snapshot of your library and settings has been downloaded."]);
+            ToastState.ShowSuccess(L["Backup exported."], L["A backup of your library and settings has been downloaded."]);
         }
         catch (Exception exception)
         {
@@ -321,7 +321,7 @@
             await ThemeState.ApplyThemeAsync(PendingImportBackup.Settings.ThemeMode);
             FilterState.Reset(SettingsState.Current.DefaultLibrarySortBy, SettingsState.Current.DefaultLibrarySortDescending);
 
-            ToastState.ShowSuccess(L["Backup restored."], L["The selected backup replaced the current local data."]);
+            ToastState.ShowSuccess(L["Backup restored."], L["The selected backup replaced your current library and settings."]);
             IsImportModalOpen = false;
             SelectedImportFileName = null;
             PendingImportBackup = null;
@@ -350,7 +350,7 @@
             await ThemeState.ApplyThemeAsync(SettingsState.Current.ThemeMode);
             FilterState.Reset(SettingsState.Current.DefaultLibrarySortBy, SettingsState.Current.DefaultLibrarySortDescending);
 
-            ToastState.ShowSuccess(L["Local data reset."], L["The library and saved preferences were cleared from browser storage."]);
+            ToastState.ShowSuccess(L["Local data reset."], L["Your library and saved preferences were removed from this device."]);
             IsResetModalOpen = false;
             SelectedImportFileName = null;
             PendingImportBackup = null;

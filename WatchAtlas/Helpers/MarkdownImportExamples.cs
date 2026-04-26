@@ -4,20 +4,20 @@ public static class MarkdownImportExamples
 {
     public static IReadOnlyList<string> MovieImportSteps =>
     [
-        LocalizedText.Translate("Enter the exact movie title below and copy the AI prompt."),
-        LocalizedText.Translate("Paste the returned markdown here without extra commentary and click Fill Form.")
+        LocalizedText.Translate("Enter the exact movie title below and copy the message."),
+        LocalizedText.Translate("Paste the markdown result here and click Apply Markdown.")
     ];
 
     public static IReadOnlyList<string> SeriesImportSteps =>
     [
-        LocalizedText.Translate("Enter the exact show title below and copy the AI prompt."),
-        LocalizedText.Translate("Paste the returned markdown here without extra commentary and click Fill Form.")
+        LocalizedText.Translate("Enter the exact show title below and copy the message."),
+        LocalizedText.Translate("Paste the markdown result here and click Apply Markdown.")
     ];
 
     public static IReadOnlyList<string> SeasonImportSteps =>
     [
-        LocalizedText.Translate("Enter the show title and the seasons you want to add, then copy the AI prompt."),
-        LocalizedText.Translate("Paste the returned markdown here as raw markdown with no code fences or extra text.")
+        LocalizedText.Translate("Enter the show title and the seasons you want to add, then copy the message."),
+        LocalizedText.Translate("Paste the markdown result here without extra text.")
     ];
 
     public static string Movie =>
@@ -32,7 +32,7 @@ public static class MarkdownImportExamples
 
     public static string MovieAiPrompt =>
         """
-        Create import-ready markdown for one movie for my WatchAtlas app.
+        Create markdown for one movie for my WatchAtlas app.
 
         Replace [MOVIE TITLE] with the exact movie name before generating.
 
@@ -85,7 +85,7 @@ public static class MarkdownImportExamples
 
     public static string SeriesAiPrompt =>
         """
-        Create import-ready markdown for one TV show for my WatchAtlas app.
+        Create markdown for one TV show for my WatchAtlas app.
 
         Replace [SHOW TITLE] with the exact show name before generating.
 
@@ -146,7 +146,7 @@ public static class MarkdownImportExamples
 
     public static string SeasonAiPrompt =>
         """
-        Create import-ready markdown for additional TV seasons for my WatchAtlas app.
+        Create markdown for additional TV seasons for my WatchAtlas app.
 
         Replace [SHOW TITLE] and [SEASONS TO ADD] before generating.
 

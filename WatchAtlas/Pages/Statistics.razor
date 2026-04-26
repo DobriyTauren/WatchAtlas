@@ -11,7 +11,7 @@
     {
         <PageHeader Eyebrow="@L["Statistics"]"
                     Title="@L["Loading your watch progress."]"
-                    Subtitle="@L["Crunching totals, watch-time summaries, and completion breakdowns from browser storage."]" />
+                    Subtitle="@L["Getting your watch totals and progress ready."]" />
 
         <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <SkeletonCard />
@@ -28,7 +28,7 @@
     else
     {
         <PageHeader Eyebrow="@L["Statistics"]"
-                    Title="@L["A clear overview of your watch progress."]" />
+                    Title="@L["See how your library is shaping up."]" />
 
         <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <StatCard Title="@L["Movies Watched"]"
@@ -58,7 +58,7 @@
         <section class="space-y-4">
         <SectionHeader Eyebrow="@L["Rankings"]"
                        Title="@L["Top shows by watched duration."]"
-                       Description="@L["Shows ordered by the amount of watched runtime already logged in the library."]" />
+                       Description="@L["Shows ordered by the time you've already watched."]" />
 
         @if (TopSeriesByDuration.Count == 0)
         {
@@ -80,7 +80,7 @@
         <section class="space-y-4">
         <SectionHeader Eyebrow="@L["Episodes"]"
                        Title="@L["Most episodes watched."]"
-                       Description="@L["Shows ranked by watched episode count, then by logged watch time."]" />
+                       Description="@L["Shows ordered by watched episodes, then by time watched."]" />
 
         @if (MostEpisodesWatchedSeries.Count == 0)
         {
@@ -102,7 +102,7 @@
         <section class="space-y-4">
         <SectionHeader Eyebrow="@L["In Progress"]"
                        Title="@L["Currently watching."]"
-                       Description="@L["Shows that are in progress right now, ranked by watched episodes and active watch time."]" />
+                       Description="@L["Shows you're in the middle of, ordered by watched episodes and time watched."]" />
 
         @if (CurrentlyWatchingSeries.Count == 0)
         {
@@ -124,7 +124,7 @@
         <section class="space-y-4">
         <SectionHeader Eyebrow="@L["Genres"]"
                        Title="@L["Watch time by genre."]"
-                       Description="@L["Watched movie runtime and watched episode runtime grouped by library genres."]" />
+                       Description="@L["Time you've watched, grouped by genre across movies and episodes."]" />
 
         @if (TopGenresByWatchTime.Count == 0)
         {
@@ -146,7 +146,7 @@
         <section class="space-y-4">
         <SectionHeader Eyebrow="@L["Universes"]"
                        Title="@L["Watch time by universe."]"
-                       Description="@L["Watched movie runtime and watched episode runtime grouped by universe."]" />
+                       Description="@L["Time you've watched, grouped by universe across movies and shows."]" />
 
         @if (TopUniversesByWatchTime.Count == 0)
         {
@@ -168,7 +168,7 @@
         <section class="space-y-4">
         <SectionHeader Eyebrow="@L["Seasons"]"
                        Title="@L["Top seasons by watched runtime."]"
-                       Description="@L["Season totals are calculated from episode data and ranked across the whole library."]" />
+                       Description="@L["Seasons ordered by the time you've watched in each one."]" />
 
         @if (TopSeasonsByDuration.Count == 0)
         {

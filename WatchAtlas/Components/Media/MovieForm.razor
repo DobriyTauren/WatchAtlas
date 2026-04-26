@@ -21,17 +21,17 @@
             <div class="flex flex-wrap gap-3">
                 <MarkdownImportLauncher ButtonLabel="@L["Fill From Markdown"]"
                                         ModalTitle="@L["Fill this movie from markdown"]"
-                                        ModalDescription="@L["Paste one clean markdown document for a single movie, or copy the AI prompt below to generate it automatically in the right format."]"
+                                        ModalDescription="@L["Paste markdown for one movie, or copy the message below and let your assistant prepare it for you."]"
                                         ExampleMarkdown="@MarkdownImportExamples.Movie"
                                         ExampleTitle="@L["See a movie example"]"
                                     UsageSteps="@MarkdownImportExamples.MovieImportSteps"
                                     CopyablePrompt="@MarkdownImportExamples.MovieAiPrompt"
-                                    CopyablePromptTitle="@L["Prompt for ChatGPT or Claude"]"
-                                    CopyablePromptDescription="@L["Copy this prepared prompt and ask your assistant for import-ready markdown."]"
+                                    CopyablePromptTitle="@L["Message for ChatGPT or Claude"]"
+                                    CopyablePromptDescription="@L["Copy this message into your assistant, then paste the markdown back here."]"
                                     PromptPrimaryToken="[MOVIE TITLE]"
-                                        PromptPrimaryLabel="@L["Movie title for AI"]"
+                                        PromptPrimaryLabel="@L["Movie title"]"
                                         PromptPrimaryPlaceholder="The Matrix"
-                                        PromptPrimaryHelpText="@L["This title will be inserted into the copied prompt automatically."]"
+                                        PromptPrimaryHelpText="@L["We'll place this title into the copied message automatically."]"
                                         PromptPrimaryValue="@Model.Title"
                                         Placeholder="# Movie&#10;Title: ...&#10;Universe: ...&#10;Genres: ...&#10;Duration: 120"
                                         FieldPrefix="@($"{FieldPrefix}-markdown")"
@@ -99,7 +99,7 @@
 
         Model.CopyFrom(result.Value);
         RefreshEditContext();
-        ToastState.ShowSuccess(L["Movie details added."], L["The movie form was filled from your markdown."]);
+        ToastState.ShowSuccess(L["Movie details added."], L["Your markdown filled the form."]);
 
         if (result.Warnings.Count > 0)
         {
@@ -112,7 +112,7 @@
     private void HandleInvalidSubmit(EditContext editContext)
     {
         var firstMessage = editContext.GetValidationMessages().FirstOrDefault();
-        ToastState.ShowWarning(L["Please review the form fields."], firstMessage ?? L["Some movie details still need attention before save."]);
+        ToastState.ShowWarning(L["Please review the form fields."], firstMessage ?? L["A few movie details still need attention before saving."]);
     }
 
     private void RefreshEditContext()

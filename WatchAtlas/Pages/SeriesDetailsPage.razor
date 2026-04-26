@@ -10,14 +10,14 @@
     @if (!IsReady)
     {
         <PageHeader Eyebrow="@L["Show Details"]"
-                    Title="@L["Loading show details."]"
-                    Subtitle="@L["Reading the selected show from browser storage."]" />
+                    Title="@L["Loading show."]"
+                    Subtitle="@L["Opening the selected show from your library."]" />
     }
     else if (Entry is null)
     {
         <PageHeader Eyebrow="@L["Show Details"]"
-                    Title="@L["This show is not in the library yet."]"
-                    Subtitle="@L["The details route is ready, but the requested show was not found in browser storage."]" />
+                    Title="@L["We couldn't find this show in your library."]"
+                    Subtitle="@L["It may have been removed, or the link may be out of date."]" />
 
         <EmptyStateCard Badge="@L["Show Details"]"
                         Title="@L["No shows found."]"
@@ -55,7 +55,7 @@
                         <div class="movie-cover-fallback h-full">
                             <span class="movie-cover-fallback__badge">@L["Show"]</span>
                             <h2 class="movie-cover-fallback__title">@Entry.Media.Title</h2>
-                            <p class="movie-cover-fallback__copy">@L["Add a cover image from the edit page to give the show page a stronger visual identity."]</p>
+                            <p class="movie-cover-fallback__copy">@L["Add a cover image from the edit page to make this show feel complete."]</p>
                         </div>
                     }
                 </div>
@@ -215,7 +215,7 @@
 
         <AppModal IsOpen="@IsDeleteModalOpen"
                   Title="@L["Delete this show?"]"
-                  Description="@L["This permanently removes the show and all stored seasons and episodes from browser storage."]"
+                  Description="@L["This removes the show, its seasons, and its episodes from your library on this device."]"
                   OnClose="CloseDeleteModalAsync">
             <ChildContent>
                 <p class="text-sm leading-7 text-muted">
@@ -267,8 +267,8 @@
         }
 
         return SeriesStats.TotalEpisodes == 0
-            ? L["This show is saved and ready for seasons, episodes, and watch tracking."]
-            : L["Progress, watched runtime, and per-season completion are calculated automatically from episode state."];
+            ? L["This show is saved and ready for seasons, episodes, and progress updates."]
+            : L["Episode progress and watch time update automatically as you mark episodes watched."];
     }
 
     private static string GetEpisodeBadgeVariant(Episode episode)
